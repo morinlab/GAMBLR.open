@@ -2,7 +2,6 @@ name: deps
 channels:
   - conda-forge
   - nodefaults
-  - r
 dependencies:
   - _libgcc_mutex=0.1
   - _openmp_mutex=4.5
@@ -143,7 +142,7 @@ dependencies:
   - r-lifecycle=1.0.3
   - r-magrittr=2.0.3
   - r-mass=7.3_58.3
-  - r-matrix=1.5_4.1
+  - r-matrix=1.6_0
   - r-matrixmodels=0.5_0
   - r-memoise=2.0.1
   - r-mime=0.12
