@@ -27,11 +27,11 @@ jobs:
     - name: Create conda environment
       uses: conda-incubator/setup-miniconda@v2
       with:
-        activate-environment: r
-        channels: anaconda,conda-forge,defaults
+        activate-environment: deps
+        channels: anaconda,conda-forge,nodefaults
         python-version: 3.11
         auto-activate-base: false
-        environment-file: envs/r.yaml
+        environment-file: envs/deps.yaml
 
     - name: Build package
       run:
