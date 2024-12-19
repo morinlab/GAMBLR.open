@@ -14,5 +14,5 @@ dependencies:
   - mysqlclient
   - r-rmysql
   - r-matrix
-  - r-matrixmodels=0.4.1
+  - r-matrixmodels=0.5.1
   - r-mixtools
