@@ -13,6 +13,6 @@ dependencies:
   - r-pbkrtest=0.5.2
   - mysqlclient
   - r-rmysql
-  - r-matrix
-  - r-matrixmodels=0.5.0
+  - r-matrix=1.5.3
+  - r-matrixmodels=0.5.1
   - r-mixtools
