@@ -3,8 +3,13 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/m/morinlab/GAMBLR.open)
 ![Last commit](https://img.shields.io/github/last-commit/morinlab/GAMBLR.open)
 
+Hello GAMBLRes!
 
 # GAMBLR.open
+
+<p align="center" width="100%">
+    <img width="75%" src="GAMBLR.open.png">
+</p>
 
 Database, mining, manipulation and convenience functions for working with genomic data of mature B-cell lymphomas. This package is a wrapper that provides a convenient one-stop access to load the following packages from the GAMBLR family:
 * [GAMBLR.data](https://github.com/morinlab/GAMBLR.data) - collection of genomic
