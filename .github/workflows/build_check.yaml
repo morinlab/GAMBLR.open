@@ -27,19 +27,19 @@ jobs:
     - name: Create conda environment
       uses: conda-incubator/setup-miniconda@v2
       with:
-        activate-environment: deps
-        channels: anaconda,conda-forge,nodefaults
+        activate-environment: r
+        channels: conda-forge,nodefaults
         python-version: 3.11
         auto-activate-base: false
-        environment-file: envs/deps.yaml
+        environment-file: envs/r.yaml
 
     - name: Build package
       run:
-        Rscript -e "devtools::install()"
+        Rscript --vanilla -e "devtools::install(repos = BiocManager::repositories(), upgrade = FALSE)"
 
     - name: Check package
       run:
-        Rscript -e "devtools::check(vignettes = FALSE, args = '--no-examples')"
+        Rscript --vanilla -e "devtools::check(vignettes = FALSE, args = '--no-examples')"
 
     - name: Upload check results
       if: failure()
