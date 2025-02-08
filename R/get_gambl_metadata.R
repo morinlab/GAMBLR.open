@@ -126,7 +126,7 @@ get_gambl_metadata = function(
 
     metadata <- metadata %>%
         dplyr::left_join(
-            gambl_metadata,
+            GAMBLR.data::gambl_metadata,
             by = "sample_id",
             suffix = c(".X", ".Y")
         ) %>%
