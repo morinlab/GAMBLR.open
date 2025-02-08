@@ -14,12 +14,16 @@ Depends:
     R (>= 3.5.0)
 Imports:
     cli (>= 3.6.1),
+    dplyr,
     GAMBLR.data (>= 1.1.1),
     GAMBLR.helpers (>= 1.1.1),
     GAMBLR.utils (>= 1.1.1),
     GAMBLR.viz (>= 1.1.1),
     GAMBLR.predict (>= 1.0),
-    rlang (>= 1.1.0)
+    purrr,
+    rlang (>= 1.1.0),
+    tibble,
+    tidyr
 Remotes:
     morinlab/GAMBLR.data,
     morinlab/GAMBLR.helpers,
