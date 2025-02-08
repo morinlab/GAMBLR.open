@@ -51,7 +51,7 @@ id_ease = function(these_samples_metadata = NULL,
     if(verbose){
       message("id_ease: No metadata provided, the helper function will fetch metadata for all gambl samples in the selected seq type...") 
     }
-    metadata = GAMBLR.data::get_gambl_metadata(seq_type_filter = this_seq_type)
+    metadata = get_gambl_metadata() %>% dplyr::filter(seq_type %in% this_seq_type)
   }else{
     if(verbose){
       message("id_ease: Metadata is provided and samples of the selected seq type are kept...") 
