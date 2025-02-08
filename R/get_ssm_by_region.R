@@ -26,7 +26,7 @@
 #' In most cases, this parameter should be left to TRUE.
 #' The parameter was added to accommodate for noisy output
 #' when running this function in a loop for retrieving SSM
-#' for multiple regions [GAMBLR.data::get_ssm_by_regions].
+#' for multiple regions [get_ssm_by_regions].
 #' @param ... Any additional parameters.
 #'
 #' @return A data frame containing all mutations (MAF) in the specified region.
@@ -74,7 +74,7 @@ get_ssm_by_region = function(these_sample_ids = NULL,
 
   sample_ids = metadata$sample_id
 
-  
+
 
   # Optionally return variants from a particular study
   if(!missing(this_study)){
@@ -122,7 +122,7 @@ get_ssm_by_region = function(these_sample_ids = NULL,
     muts_region = dplyr::filter(maf_data, Tumor_Sample_Barcode %in% sample_ids) %>%
       dplyr::filter(Chromosome == chromosome & Start_Position > qstart & Start_Position < qend)
   }
-  
+
   # Handle possible duplicates
   muts_region <- muts_region %>%
     distinct(Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, .keep_all = TRUE)
