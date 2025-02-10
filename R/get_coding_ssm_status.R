@@ -196,7 +196,7 @@ get_coding_ssm_status = function(
     # include hotspots if user chooses to do so
     if(include_hotspots){
         # first annotate
-        annotated <- GAMBLR.data::annotate_hotspots(
+        annotated <- annotate_hotspots(
             coding_ssm
         )
 
