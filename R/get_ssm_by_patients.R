@@ -65,7 +65,7 @@ get_ssm_by_patients = function(these_patient_ids,
     }
   }else{
     if(missing(these_samples_metadata)){
-      these_samples_metadata = GAMBLR.data::get_gambl_metadata(seq_type_filter =
+      these_samples_metadata = get_gambl_metadata(seq_type_filter =
                                                                  this_seq_type)
     }
     message("Patient IDs and metadata were provided, this function will resort to all available patient IDs in the provided metadata.")
