@@ -59,14 +59,16 @@
 #' @export
 #'
 #' @examples
-#' #return metadata for genome samples
+#' #return metadata for genome samples (here, the parameter is redundant because 'genome' is the default)
 #' genome_meta = get_gambl_metadata(seq_type_filter = "genome")
 #'
-#' #return metadata for capture samples
+#' #return metadata for capture samples.
 #' capture_meta = get_gambl_metadata(seq_type_filter = "capture")
 #'
-#' #return metadata for genome and capture samples
+#' #If you want metadata for genome and capture samples you can provide a vector of seq types
 #' all_meta = get_gambl_metadata(seq_type_filter = c("genome", "capture"))
+#'
+#' group_by(all_meta,cohort,seq_type) %>% count()
 #'
 get_gambl_metadata = function(
     seq_type_filter = "genome",
