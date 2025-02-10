@@ -2,7 +2,7 @@
 #' 
 #' @description Coding classes as a vector of characters.
 #' 
-#' @details This object is called by [GAMBLR.data::get_coding_ssm] and [GAMBLR.data::assign_cn_to_ssm].
+#' @details This object is called by get_coding_ssm and assign_cn_to_ssm.
 #' 
 #' @noRd
 #' 

@@ -26,7 +26,7 @@
 #' In most cases, this parameter should be left to TRUE.
 #' The parameter was added to accommodate for noisy output
 #' when running this function in a loop for retrieving SSM
-#' for multiple regions [GAMBLR.data::get_ssm_by_regions].
+#' for multiple regions get_ssm_by_regions.
 #' @param ... Any additional parameters.
 #'
 #' @return A data frame containing all mutations (MAF) in the specified region.

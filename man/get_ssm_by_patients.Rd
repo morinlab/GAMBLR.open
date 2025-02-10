@@ -44,7 +44,7 @@ Get MAF-format data frame for more than one patient.
 }
 \details{
 This function returns variants from a set of patients.
-This function internally calls \link[GAMBLR.data:get_ssm_by_samples]{GAMBLR.data::get_ssm_by_samples}.
+This function internally calls get_ssm_by_samples.
 Thus, the main contents of this function is to wrangle the provided patient IDs,
 so that the corresponding sample IDs can be provided to the internal call of \code{get_ssm_by_samples}.
 This function expects either a vector of patient IDs (\code{these_patients_ids})
