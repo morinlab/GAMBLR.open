@@ -44,24 +44,24 @@ Get MAF-format data frame for more than one patient.
 }
 \details{
 This function returns variants from a set of patients.
-This function internally calls \link{get_ssm_by_samples}.
+This function internally calls \link[GAMBLR.data:get_ssm_by_samples]{GAMBLR.data::get_ssm_by_samples}.
 Thus, the main contents of this function is to wrangle the provided patient IDs,
 so that the corresponding sample IDs can be provided to the internal call of \code{get_ssm_by_samples}.
 This function expects either a vector of patient IDs (\code{these_patients_ids})
 or an already subset metadata table (\code{these_samples_metadata}).
 }
 \examples{
-#load packages
-library(dplyr)
 
-#basic usage, these_patient_ids
-my_patient = get_ssm_by_patients(these_patient_ids = "DOHH-2")
+# Lets find which patient_id occur more than once in the metadata first
+my_ids = get_gambl_metadata(seq_type_filter = c("genome","capture")) \%>\%
+             dplyr::group_by(patient_id) \%>\%
+             dplyr::tally() \%>\%
+             dplyr::filter(n>1) \%>\%
+             dplyr::pull(patient_id)
 
-#using a subset metadata tablee to retreive patient SSMs
-cell_line_meta = GAMBLR.data::sample_data$meta \%>\%
- dplyr::filter(cohort == "DLBCL_cell_lines")
-
-patient_maf = get_ssm_by_patients(these_samples_metadata = cell_line_meta,
-                                  this_seq_type = "genome")
+#now let's get every SSM for all samples from these patients
+patient_maf = get_ssm_by_patients(these_patient_ids = my_ids)
+patient_maf \%>\% dplyr::group_by(Tumor_Sample_Barcode) \%>\% 
+                dplyr::count() \%>\% head()
 
 }

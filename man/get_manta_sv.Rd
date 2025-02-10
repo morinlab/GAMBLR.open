@@ -58,7 +58,7 @@ Convenience function for retrieving Manta Structural Variants (SVs) from the bun
 To obtain SV calls for multiple samples, give \code{these_sample_ids} a vector of sample IDs.
 Alternatively, the user can also provide the \code{these_samples_metadata} parameter to make use of an already subset metadata table.
 In this case, the returned SVs will be restricted to the sample_ids within that data frame.
-This function internally calls \link{id_ease} to streamline sample ID/metadata parameters.
+This function internally calls \link[GAMBLR.data:id_ease]{GAMBLR.data::id_ease} to streamline sample ID/metadata parameters.
 This function can also restrict the returned calls to any genomic regions specified within \code{chromosome}, \code{qstart}, \code{qend},
 or the complete region specified under \code{region} (in chr:start-end format), note that chromosome can be either prefixed or not prefixed.
 Useful filtering parameters are also available, use \code{min_vaf} to set the minimum tumour VAF for a SV to be returned and \code{min_score}
@@ -73,9 +73,9 @@ library(dplyr)
 all_sv = get_manta_sv()
 
 #get all SVs DLBCL cell line samples
-cell_line_meta = GAMBLR.data::sample_data$meta \%>\%
+cell_line_meta = GAMBLR.data::sample_data$meta \%>\% 
   dplyr::filter(cohort == "DLBCL_cell_lines")
-
+  
 dlbcl_sv = get_manta_sv(these_samples_metadata = cell_line_meta)
 
 #get the SVs in a region around MYC
