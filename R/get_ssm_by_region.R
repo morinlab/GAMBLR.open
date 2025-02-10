@@ -32,6 +32,7 @@
 #' @return A data frame containing all mutations (MAF) in the specified region.
 #'
 #' @import dplyr
+#' @export
 #'
 #' @examples
 #' my_mutations = get_ssm_by_region(region = "chr8:128,723,128-128,774,067")
