@@ -134,6 +134,6 @@ get_ssm_by_region = function(these_sample_ids = NULL,
   }
   muts_region = create_maf_data(muts_region,projection)
   # use S3-safe version of dplyr function
-  muts_region = mutate.genomic_data(muts_region,maf_seq_type = this_seq_type)
+  muts_region = mutate(muts_region,maf_seq_type = this_seq_type)
   return(muts_region)
 }

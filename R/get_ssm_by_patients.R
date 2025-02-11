@@ -84,5 +84,5 @@ get_ssm_by_patients = function(these_patient_ids,
   samples_ssm = create_maf_data(samples_ssm,projection)
   # use S3-safe version of dplyr function
 
-  samples_ssm = mutate.genomic_data(samples_ssm,maf_seq_type = this_seq_type)
+  samples_ssm = mutate(samples_ssm,maf_seq_type = this_seq_type)
 }

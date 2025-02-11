@@ -97,6 +97,6 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
   # bundle genome_build with the maf_data
   sample_ssm = create_maf_data(sample_ssm,projection)
   # use S3-safe version of dplyr function
-  sample_ssm = mutate.genomic_data(sample_ssm,maf_seq_type = this_seq_type)
+  sample_ssm = mutate(sample_ssm,maf_seq_type = this_seq_type)
   return(sample_ssm)
 }

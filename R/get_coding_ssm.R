@@ -129,6 +129,6 @@ get_coding_ssm = function(
     )
     muts = create_maf_data(muts,projection)
     # use S3-safe version of dplyr function
-    muts = mutate.genomic_data(muts,maf_seq_type = this_seq_type)
+    muts = mutate(muts,maf_seq_type = this_seq_type)
     return(muts)
 }
