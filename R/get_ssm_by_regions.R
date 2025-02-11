@@ -12,6 +12,7 @@
 #' This parameter can also accept an additional column with region names that will be added to the return if `use_name_column = TRUE`
 #' @param streamlined If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name).
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38), default is grch37.
+#' @param use_name_column If your bed-format data frame has a name column (must be named "name") these can be used to name your regions.
 #' @param verbose Set to TRUE to maximize the output to console. Default is TRUE.
 #' This parameter also dictates the verbosity of any helper function internally called inside the main function.
 #' @param ... Any additional parameters.
@@ -49,6 +50,7 @@ get_ssm_by_regions <- function(these_samples_metadata,
                                streamlined = TRUE,
                                projection = "grch37",
                                verbose = FALSE,
+                               use_name_column = FALSE,
                                tool_name = "slms-3",
                                ...) {
 
@@ -72,6 +74,9 @@ get_ssm_by_regions <- function(these_samples_metadata,
     if (!missing(regions_bed)) {
       if("bed_data" %in% class(regions_bed)){
         #confirm the genome builds match
+        if(is.null(get_genome_build(regions_bed))){
+          stop("something is wrong with regions_bed. No genome_build found!")
+        }
         if(!get_genome_build(regions_bed)==projection){
           stop(paste("requested projection:",projection,"and genome_build of regions_bed:", get_genome_build(regions_bed), "don't match"))
         }
@@ -108,6 +113,7 @@ get_ssm_by_regions <- function(these_samples_metadata,
                         "Start_Position"="start",
                         "End_Position"="end",
                         "region"="name")) 
+
     }else{
       regions_df <- as.data.frame(regions) %>%
         `names<-`("regions") %>%
@@ -132,10 +138,16 @@ get_ssm_by_regions <- function(these_samples_metadata,
       dplyr::select(all_of(c(names(sample_maf), "region"))) %>%
       dplyr::group_split(region)
     maf_df = do.call(bind_rows, region_mafs)
-    
+
+    if(!use_name_column){
+      maf_df = mutate(maf_df,region=paste0(Chromosome,":",Start_Position))
+    }
+    maf_df = dplyr::rename(maf_df,c("region_name"="region"))
     if(streamlined){
-      maf_df = dplyr::select(maf_df,Start_Position,Tumor_Sample_Barcode,region) %>%
-        dplyr::rename(c("sample_id"="Tumor_Sample_Barcode"))
+      
+      maf_df = dplyr::select(maf_df,Start_Position,Tumor_Sample_Barcode,region_name) %>%
+        dplyr::rename(c("sample_id"="Tumor_Sample_Barcode","start"="Start_Position"))
+      
     }
     return(maf_df)
     
