@@ -1,0 +1,37 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "GAMBLR.open",
+    "section": "",
+    "text": "Why use GAMBLR.open?\n  \n  \n    \n     How to install?\n  \n  \n    \n     How to use?\n  \n  \n    \n     Release notes\n  \n  \n    \n     GitHub"
+  },
+  {
+    "objectID": "index.html#about",
+    "href": "index.html#about",
+    "title": "GAMBLR.open",
+    "section": "About",
+    "text": "About\nThe GAMBLR-verse is a database, mining, manipulation and collection of a convenience functions for working with genomic data of mature B-cell lymphomas. This GAMBLR.open an open-source open access package that is a wrapper providing a convenient one-stop access to load the following packages from the GAMBLR family:\n\nGAMBLR.open - collection of genomic data for analysis of Mature B-cell neoplasms\nGAMBLR.helpers - a set of low-level functions for data operation\nGAMBLR.utils - higher level set of functions to operate on genomic data\nGAMBLR.viz - set of functions used mostly for visualizations\nGAMBLR.predict - collection of functions and helpers to classify B-cell lymphomas\n\nIn addition, a number of simple functions is included, giving access to a light-weight version of the functionality available for the GAMBL consortium members.\n\n\n\n\n\n\nWho should use this package?\n\n\n\nThis package is recommended for the community interested in lymphoma genomics research and are not members of the GAMBL consortium, or if you are waiting for your access approval but want to get started. In addition to being a large resource for lymphoma researchers, this package is also a great educational resource for junior users interested in bioinformatics analyses, genomics, software analysis, data engineering, R package development, GitHub workflows, and other best practices."
+  },
+  {
+    "objectID": "index.html#about-1",
+    "href": "index.html#about-1",
+    "title": "GAMBLR.open",
+    "section": "About",
+    "text": "About\nTo install this package, we recommend doing it by accessing the latest master version directly from GitHub (requires devtools dependency):\ndevtools::install_github(\n    \"morinlab/GAMBLR.open\",\n    repos = BiocManager::repositories()\n)\n\n\n\nQuickstart"
+  },
+  {
+    "objectID": "index.html#quickstart",
+    "href": "index.html#quickstart",
+    "title": "GAMBLR.open",
+    "section": "Quickstart",
+    "text": "Quickstart\nThe quick and easy way to get started is to make sure the devtools dependency is installed, then install the GAMBLR.open and run the simplest functions to confirm successful setup:\n# Verify devtools is installed\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\n# Install GAMBLR.open\ndevtools::install_github(\n    \"morinlab/GAMBLR.open\",\n    repos = BiocManager::repositories()\n)\nWe recommend restarting your R session after the installation.\n\nlibrary(GAMBLR.open)\n\n# Confirm successful setup\nmetadata &lt;- get_gambl_metadata()\nmaf &lt;- get_coding_ssm()"
+  },
+  {
+    "objectID": "index.html#installation-for-developers",
+    "href": "index.html#installation-for-developers",
+    "title": "GAMBLR.open",
+    "section": "Installation for developers",
+    "text": "Installation for developers\nThe easiest way to obtain and contribute to GAMBLR.open is to do this via cloning the repository\ncd\ngit clone git@github.com:morinlab/GAMBLR.open.git\nIn your R editor of choice (which is hopefully VS Code), set your working directory to the directory you just cloned the repo into.\nsetwd(\"~/GAMBLR.open\")\nInstall the package in R by running the following command (requires the devtools package):\ndevtools::install()\nAfter applying your modifications to the code, use the following command to quickly test your changes without directly installing the package (requires the devtools dependency):\ndevtools::load_all()\nGAMBLR.open is a free open-source package, but the Master branch is protected. We welcome contributions (pull request, bug report, feature request, PR review) from all levels of users. All commits must be submitted via pull request on a branch. Please refer to the GitHub documentation for details on how to do pull request."
+  }
+]
