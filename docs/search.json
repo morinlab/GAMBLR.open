@@ -14,11 +14,11 @@
     "text": "About\nThe GAMBLR-verse is a database, mining, manipulation and collection of a convenience functions for working with genomic data of mature B-cell lymphomas. This GAMBLR.open an open-source open access package that is a wrapper providing a convenient one-stop access to load the following packages from the GAMBLR family:\n\nGAMBLR.open - collection of genomic data for analysis of Mature B-cell neoplasms\nGAMBLR.helpers - a set of low-level functions for data operation\nGAMBLR.utils - higher level set of functions to operate on genomic data\nGAMBLR.viz - set of functions used mostly for visualizations\nGAMBLR.predict - collection of functions and helpers to classify B-cell lymphomas\n\nIn addition, a number of simple functions is included, giving access to a light-weight version of the functionality available for the GAMBL consortium members.\n\n\n\n\n\n\nWho should use this package?\n\n\n\nThis package is recommended for the community interested in lymphoma genomics research and are not members of the GAMBL consortium, or if you are waiting for your access approval but want to get started. In addition to being a large resource for lymphoma researchers, this package is also a great educational resource for junior users interested in bioinformatics analyses, genomics, software analysis, data engineering, R package development, GitHub workflows, and other best practices."
   },
   {
-    "objectID": "index.html#about-1",
-    "href": "index.html#about-1",
+    "objectID": "index.html#install",
+    "href": "index.html#install",
     "title": "GAMBLR.open",
-    "section": "About",
-    "text": "About\nTo install this package, we recommend doing it by accessing the latest master version directly from GitHub (requires devtools dependency):\ndevtools::install_github(\n    \"morinlab/GAMBLR.open\",\n    repos = BiocManager::repositories()\n)\n\n\n\nQuickstart"
+    "section": "Install",
+    "text": "Install\nTo install this package, we recommend doing it by accessing the latest master version directly from GitHub (requires devtools dependency):\ndevtools::install_github(\n    \"morinlab/GAMBLR.open\",\n    repos = BiocManager::repositories()\n)\n\n\n\nQuickstart"
   },
   {
     "objectID": "index.html#quickstart",

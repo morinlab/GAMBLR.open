@@ -1,6 +1,6 @@
 ---
 title: "GAMBLR.open"
-description: "Collection of genomic data for analysis of Mature B-cell neoplasms"
+description: "Collection of genomic data and functionality for analysis of Mature B-cell neoplasms"
 repo-actions: false
 code-annotations: hover
 format:
@@ -51,7 +51,7 @@ This package is recommended for the community interested in lymphoma genomics re
 :::
 
 
-## About
+## Install
 
 To install this package, we recommend doing it by accessing the latest master version directly from GitHub (requires `devtools` dependency):
 
