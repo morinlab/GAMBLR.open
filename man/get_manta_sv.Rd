@@ -5,80 +5,120 @@
 \title{Get Manta SVs}
 \usage{
 get_manta_sv(
-  these_sample_ids = NULL,
   these_samples_metadata = NULL,
   projection = "grch37",
-  this_seq_type = "genome",
+  region,
+  min_vaf = 0.1,
+  min_score = 40,
+  pass_filters = TRUE,
+  verbose = FALSE,
   chromosome,
   qstart,
   qend,
-  region,
   pairing_status,
-  min_vaf = 0.1,
-  min_score = 40,
-  pass = TRUE,
-  verbose = FALSE,
+  these_sample_ids = NULL,
   ...
 )
 }
 \arguments{
-\item{these_sample_ids}{Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.}
-
-\item{these_samples_metadata}{Optional, a metadata table (with sample IDs in a column) to subset the return to.
-If not provided (and if \code{these_sample_ids} is not provided), the function will return all samples from the specified seq_type in the metadata.}
+\item{these_samples_metadata}{A metadata data frame to limit the
+result to sample_ids within it}
 
 \item{projection}{The projection genome build. Default is grch37.}
 
-\item{this_seq_type}{The this_seq_type you want back, default is genome.}
+\item{region}{Specify a single region to fetch SVs anchored within
+using the format "chrom:start-end"}
 
-\item{chromosome}{Optional, the chromosome you are restricting to (can be prefixed or not prefixed).}
+\item{min_vaf}{The minimum tumour VAF for a SV to be returned.
+Default is 0.1.}
 
-\item{qstart}{Optional, query start coordinate of the range you are restricting to.}
+\item{min_score}{The lowest Manta somatic score for a SV to be returned.
+Default is 40.}
 
-\item{qend}{Optional, query end coordinate of the range you are restricting to.}
+\item{pass_filters}{If TRUE (default) only return SVs that are annotated with
+PASS in the FILTER column. Set to FALSE to keep all variants,
+regardless if they PASS the filters.}
 
-\item{region}{Optional, region formatted like chrX:1234-5678 (chromosome can be prefixed or not prefixed) instead of specifying chromosome, start and end separately.}
+\item{verbose}{Set to FALSE to minimize the output to console.
+Default is TRUE. This parameter also dictates the verbose-ness of
+any helper function internally called inside the main function.}
 
-\item{pairing_status}{Use to restrict results (if desired) to matched or unmatched results (default is to return all). This parameter takes the filtering condition as a string ("matched" or "unmatched").}
+\item{chromosome}{DEPRECATED. Use \code{region} instead.}
 
-\item{min_vaf}{The minimum tumour VAF for a SV to be returned. Default is 0.1.}
+\item{qstart}{DEPRECATED. Use \code{region} instead.}
 
-\item{min_score}{The lowest Manta somatic score for a SV to be returned. Default is 40.}
+\item{qend}{DEPRECATED. Use \code{region} instead.}
 
-\item{pass}{If TRUE (default) only return SVs that are annotated with PASS in the FILTER column. Set to FALSE to keep all variants, regardless if they PASS the filters.}
+\item{pairing_status}{DEPRECATED.}
 
-\item{verbose}{Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.}
+\item{these_sample_ids}{DEPRECATED.
+Subset your metadata and supply `these_samples_metadata`` instead.}
 
 \item{...}{Any additional parameters.}
 }
 \description{
-Convenience function for retrieving Manta Structural Variants (SVs) from the bundled data \link[GAMBLR.data:sample_data]{GAMBLR.data::sample_data}.
+Retrieve Manta SVs for one or many samples
 }
 \details{
-To obtain SV calls for multiple samples, give \code{these_sample_ids} a vector of sample IDs.
-Alternatively, the user can also provide the \code{these_samples_metadata} parameter to make use of an already subset metadata table.
-In this case, the returned SVs will be restricted to the sample_ids within that data frame.
-This function internally calls id_ease to streamline sample ID/metadata parameters.
-This function can also restrict the returned calls to any genomic regions specified within \code{chromosome}, \code{qstart}, \code{qend},
-or the complete region specified under \code{region} (in chr:start-end format), note that chromosome can be either prefixed or not prefixed.
-Useful filtering parameters are also available, use \code{min_vaf} to set the minimum tumour VAF for a SV to be returned and \code{min_score}
-to set the lowest Manta somatic score for a SV to be returned. \code{pair_status} can be used to return variants from either matched or unmatched samples.
-In addition, the user can chose to return all variants, even the ones not passing the filter criteria. To do so, set \code{pass = FALSE} (default is TRUE).
+Retrieve Manta SVs with additional VCF information to allow for
+filtering of high-confidence variants.
+To get SV calls for multiple samples, supply a metadata table via
+\code{these_samples_metadata} that has been subset to only those samples.
+The results will be restricted to the sample_ids within that data frame.
+This function can also restrict the returned breakpoints within a genomic
+region specified via \code{region} (in chr:start-end format).
+Useful filtering parameters are also available, use \code{min_vaf} to set the
+minimum tumour VAF for a SV to be returned and \code{min_score}
+to set the lowest Manta somatic score for a SV to be returned.
+In addition, the user can chose to return all variants, even
+the ones not passing the filter criteria. To do so,
+set \code{pass_filters = FALSE} (defaults to TRUE).
 }
 \examples{
-#load packages
-library(dplyr)
+# lazily get every SV in the table with default quality filters
+all_sv <- get_manta_sv()
+head(all_sv)
 
-#lazily get every SV in the table with default quality filters
-all_sv = get_manta_sv()
+# get all SVs for just one cohort
+cohort_meta = suppressMessages(get_gambl_metadata()) \%>\% 
+              dplyr::filter(cohort == "DLBCL_cell_lines")
 
-#get all SVs DLBCL cell line samples
-cell_line_meta = GAMBLR.data::sample_data$meta \%>\% 
-  dplyr::filter(cohort == "DLBCL_cell_lines")
-  
-dlbcl_sv = get_manta_sv(these_samples_metadata = cell_line_meta)
+some_sv <- get_manta_sv(these_samples_metadata = cohort_meta, verbose=FALSE)
+head(some_sv)
+nrow(some_sv)
 
-#get the SVs in a region around MYC
-myc_locus_sv = get_manta_sv(region = "8:128723128-128774067")
+# get the SVs in a region around MYC
+# WARNING: This is not the best way to find MYC SVs.
+# Use annotate_sv on the full SV set instead.
+myc_region_hg38 = "chr8:127710883-127761821"
+myc_region_grch37 = "8:128723128-128774067"
+
+hg38_myc_locus_sv <- get_manta_sv(region = myc_region_hg38,
+                                projection = "hg38",
+                                verbose = FALSE)
+head(hg38_myc_locus_sv)
+nrow(hg38_myc_locus_sv)
+
+incorrect_myc_locus_sv <- get_manta_sv(region = myc_region_grch37,
+                                projection = "hg38",
+                                verbose = FALSE)
+head(incorrect_myc_locus_sv)
+nrow(incorrect_myc_locus_sv)
+
+# Despite potentially being incomplete, we can nonetheless
+# annotate these directly for more details
+annotated_myc_hg38 = suppressMessages(
+         annotate_sv(hg38_myc_locus_sv, genome_build = "hg38")
+)
+head(annotated_myc_hg38)
+table(annotated_myc_hg38$partner)
+# The usual MYC partners are seen here
+
+annotated_myc_incorrect = suppressMessages(
+         annotate_sv(incorrect_myc_locus_sv, genome_build = "hg38")
+)
+head(annotated_myc_incorrect)
+table(annotated_myc_incorrect$partner)
+# The effect of specifying the wrong coordinate is evident
 
 }
