@@ -12,6 +12,7 @@ get_ssm_by_regions(
   streamlined = TRUE,
   projection = "grch37",
   verbose = FALSE,
+  use_name_column = FALSE,
   tool_name = "slms-3",
   ...
 )
@@ -32,6 +33,8 @@ This parameter can also accept an additional column with region names that will 
 
 \item{verbose}{Set to TRUE to maximize the output to console. Default is TRUE.
 This parameter also dictates the verbosity of any helper function internally called inside the main function.}
+
+\item{use_name_column}{If your bed-format data frame has a name column (must be named "name") these can be used to name your regions.}
 
 \item{tool_name}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
 
