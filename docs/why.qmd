@@ -19,6 +19,7 @@ The GAMBLR.open primarily targets:
 ## What does GAMBLR.open offer?
 
 Some of the advantages of GAMBLR.open are:
+
 - Access to preprocessed genomic data: retrieve genomic datasets without worrying about complex file handling.
 - Standardized data queries: easily search and filter genomic data using a consistent and intuitive API.
 - Integration of GAMBLR ecosystem: work seamlessly with the broader [GAMBLR suite](./concepts/GAMBLR_family.html) of packages to design analytical workflows.
@@ -35,4 +36,4 @@ Community discussions primarily happen through issue submission on [GitHub](http
 
 ## Getting started
 
-Explore the [documentation](https://morinlab.github.io/GAMBLR.open/) and start using GAMBLR.open today!
+Explore the [documentation](./tutorials/getting_started.html) and start using GAMBLR.open today!
