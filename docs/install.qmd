@@ -1,0 +1,33 @@
+---
+hide:
+  - toc
+  - navigation
+  - footer
+---
+
+# Installation
+
+This package is recommended for the community interested in lymphoma genomics research and are not members of the GAMBL consortium, or if you are waiting for your access approval but want to get started. In addition to being a large resource for lymphoma researchers, this package is also a great educational resource for junior users interested in bioinformatics analyses, genomics, software analysis, data engineering, R package development, GitHub workflows, and other best practices.
+
+We recommend installing the package directly from GitHub (requires `devtools` dependency).
+
+```r
+if (!require("devtools")) install.packages("devtools")
+
+devtools::install_github(
+    "morinlab/GAMBLR.open",
+    repos = BiocManager::repositories()
+)
+```
+
+This will install all required dependencies and members of the [GAMBLR-verse](./concepts/GAMBLR_family.html) available to you.
+
+
+After installation, you can confirm successful setup:
+```{r}
+#| message: true
+#| output: true
+
+# Confirm successful setup
+library(GAMBLR.open) # load package
+```
