@@ -1,0 +1,397 @@
+---
+from: markdown+emoji
+warning: false
+fig.width: 7
+fig.height: 5
+fig.align: "center"
+---
+
+# Tutorial: getting started
+
+This is a quick tour of some basic commands and usage patterns, just to get you
+started.
+
+```{r load_packages}
+#| message: false
+
+# Load packages
+library(GAMBLR.open)
+library(tidyverse)
+
+# Set a custom GAMBLR theme
+theme_set(theme_Morons())
+
+# Custom ggplot function that always adds consistent colors and sets scales
+ggplot_consistent <- function(...) {
+    ggplot(...) +
+        scale_fill_manual(values = get_gambl_colours()) +
+        scale_y_continuous(expand = expansion(mult = c(0, 0.1)))
+}
+
+# Example gene
+my_genes <- c("MYC")
+```
+
+This tutorial explores how to retrieve different data types bundled within GAMBLR.data. Commonly, GAMBLR functions are prefixed with `get_`. These functions are readily available for returning data of different types: Simple Somatic Mutations (SSM), Copy Number (CN) segments and Structural Variants (SV). This resource explores commonly occurring arguments across different functions, best-practices and recommendations in the scope of retrieving data.
+
+## How do I obtain metadata?
+First, let's start with retrieving metadata for all GAMBL samples. We can control which samples to be included in the output with `seq_type_filter` argument, which returns *genome* samples by default. To return metadata for capture samples, set `seq_type_filter = "capture"`. It is also possible to return metadata for more than one seq type, e.g `seq_type_filter = c("genome", "capture")`.
+```{r metadata}
+
+metadata <- list()
+# Get gambl metadata for genome samples
+metadata$genomes <- get_gambl_metadata(
+    seq_type_filter = "genome"
+)
+metadata$capture <- get_gambl_metadata(
+    seq_type_filter = "capture"
+)
+metadata$all <- get_gambl_metadata(
+    seq_type_filter = c("genome", "capture")
+)
+
+metadata$cell_lines <- get_gambl_metadata() %>%
+    filter(
+        cohort == "DLBCL_cell_lines"
+    )
+```
+
+Now that we have the metadata, we can look at the expected column names and their format:
+
+```{r metadata_structure}
+str(metadata$all)
+```
+
+We can now use the metadata as we wish. For example, we can visualize the counts of samples per pathology and sequencing type:
+
+```{r manipulate_metadata}
+# We can see what is included in the metadata
+metadata$all %>%
+    count(pathology, seq_type) %>%
+    ggplot_consistent(
+        aes(
+            x = pathology,
+            y = n,
+            fill = pathology
+        )
+    ) +
+    geom_bar(stat = "identity") +
+    facet_wrap(~seq_type, scales = "free") +
+    geom_text(aes(label=n), size=3.5) +
+    theme(
+        axis.text.x = element_text(
+            angle = 90,
+            vjust = 0.5,
+            hjust = 1
+        )
+    )
+
+# We can also visualize these counts when subset to only DLBCL:
+# Subset metadata on a set of samples (samples classified as DLBCL for pathology)
+metadata$dlbcl <- metadata$all %>%
+    filter(pathology == "DLBCL")
+
+metadata$dlbcl %>%
+    count(pathology, seq_type) %>%
+    ggplot_consistent(
+        aes(
+            x = pathology,
+            y = n,
+            fill = pathology
+        )
+    ) +
+    geom_bar(stat = "identity") +
+    facet_wrap(~seq_type) +
+    geom_text(aes(label=n), size=3.5)
+```
+
+## How do I obtain SSM?
+Based on the information available to you, your application, or your downstream analysis, there are multiple ways to retrieve SSM data. For example, if you know the sample ID and are only interested in looking at SSM results for that particular sample, you can use `get_ssm_by_sample`. If multiple samples are to be analyzed, `get_ssm_by_samples` (plural version) is recommended. You can also use patient IDs for retrieving this data, in this case `get_ssm_by_patients` is available. In addition, you can also restrict SSM calls to specific genomic regions with `get_ssm_by_regions` or `get_ssm_by_region`.
+
+Another possibility is to focus on coding mutations only and call `get_coding_ssm`, this function returns all coding SSMs from the bundled data in maf-like format. If you have an already pre-filtered metadata, the `these_samples_metadata` argument can be used with all SSM functions to restrict the variants returned to the sample IDs in this data frame, handy!
+
+### By Samples
+Return SSMs for one or more samples with `get_ssm_by_samples`. In the example below, we are requesting SSM for the DOHH-2 cell line in two different ways:
+
+#### Using `these_sample_ids`
+```{r e1}
+my_sample_id <- "DOHH-2"
+
+# Using the these_samples_id argument
+ssm_sample <- get_ssm_by_samples(these_sample_ids = my_sample_id)
+
+# How many mutations do we get back?
+dim(ssm_sample)
+
+# What columns are available?
+colnames(ssm_sample)
+
+# What variants are available?
+ssm_sample %>%
+    count(Variant_Classification) %>%
+    ggplot_consistent(
+        aes(
+            x = Variant_Classification,
+            y = n,
+            fill = Variant_Classification
+        )
+    ) +
+    geom_bar(stat = "identity") +
+    geom_text(aes(label=n), size=3.5, vjust = -0.5) +
+    theme(
+        axis.text.x = element_text(
+            angle = 90,
+            vjust = 0.5,
+            hjust = 1
+        )
+    )
+```
+
+#### Using `these_samples_metadata`
+We can supply instead a metadata table that has already been subset to the sample ID(s) of interest.
+
+```{r e2}
+metadata$dohh2 <- metadata$genome %>%
+    filter(sample_id == "DOHH-2")
+
+# Using the these_samples_metadata argument
+ssm_meta <- get_ssm_by_samples(
+    these_samples_metadata = metadata$dohh2
+)
+
+# How many mutations do we get back?
+dim(ssm_meta)
+
+# What columns are available?
+colnames(ssm_meta)
+
+# What variants are available?
+ssm_meta %>%
+    count(Variant_Classification) %>%
+    ggplot_consistent(
+        aes(
+            x = Variant_Classification,
+            y = n,
+            fill = Variant_Classification
+        )
+    ) +
+    geom_bar(stat = "identity") +
+    geom_text(aes(label=n), size=3.5, vjust = -0.5) +
+    theme(
+        axis.text.x = element_text(
+            angle = 90,
+            vjust = 0.5,
+            hjust = 1
+        )
+    )
+```
+
+We can make sure that both approaches generate identical outputs:
+```{r c1}
+identical(
+    ssm_sample,
+    ssm_meta
+)
+```
+
+Thus, there is no "right" or "wrong" way, it is simply your personal preference!
+
+#### In a different projection
+Often many downstream tools can only work on one specific genome build, and GAMBLR.data provides a simple and straightforward way to obtain variants in different projections. The default output is always with respect to `grch37`, and it can be easily modified with argument `projection`:
+
+```{r e5}
+ssm_hg38 <- get_ssm_by_samples(
+    projection = "hg38"
+)
+
+# Sanity check the projection
+ssm_hg38 %>%
+    count(NCBI_Build) %>%
+    ggplot_consistent(
+        aes(
+            x = NCBI_Build,
+            y = n,
+            fill = NCBI_Build
+        )
+    ) +
+    geom_bar(stat = "identity") +
+    geom_text(aes(label=n), size=3.5, vjust = -0.5)
+```
+
+As we did not specify any sample ID, metadata, or gene to the above call, it returned the data for all samples available in GAMBLR.data, and we can see from the plot that all of the variants are with respect to hg38. Sweet! :sunglasses:
+
+### By Region
+In this section, we are exploring the different ways you can obtain the maf data for a specific region (or regions) of interest.
+
+In this example, we will obtain SSM calls for all aSHM regions associated with *PAX5* across all available samples. With this function we also will get the region name added to the returned data frame. If you are providing regions as a bed file (`regions_bed`), you have the option of setting `use_name_column = TRUE`. If you do so, your bed file should have a column simply named "name". In this case, the function will keep this column for naming the returned regions in the maf. With `streamlined = TRUE` the function returns the minimal number of columns. 
+
+::: {.callout-note}
+Don't know coordinates of aSHM at *PAX5*? GAMBLR.data has you covered!
+:::
+
+
+```{r e11}
+# Get aSHM genes, select the columns of interest and rename for
+# get_ssm_by_regions compatibility
+ashm_gene <- "PAX5"
+regions <- create_bed_data(
+    GAMBLR.data::grch37_ashm_regions %>%
+        filter(gene == ashm_gene),
+    fix_names = "concat",
+    concat_cols = c("gene","region"),
+    sep="-"
+)
+
+# Get ssm for all ashm regions
+ashm_ssm <- get_ssm_by_regions(
+    these_samples_metadata = metadata$genomes,
+    regions_bed = regions,
+    streamlined = FALSE
+)
+
+dim(ashm_ssm)
+ashm_ssm[1:5,1:10]
+```
+
+### Coding SSM
+Lastly, another way to retrieve SSM is to call `get_coding_ssm`. This function returns coding SSM for any given sample. This function is a convenient option for anyone interested in focusing only on coding mutations. Convenient filtering arguments are included in this function for easy and straightforward subsetting. If these arguments are not used, coding SSM will be returned for all samples. Of course, similar to the examples above, you can provide a metadata subset that has already been filtered to the sample IDs of interest (using `these_samples_metadata`).
+```{r e13}
+# All default arguments
+all_ssm <- get_coding_ssm()
+dim(all_ssm)
+
+# Provide metadata
+dlbcl_cell_lines <- get_coding_ssm(
+    these_samples_metadata = metadata$cell_lines
+)
+dim(dlbcl_cell_lines)
+```
+
+## How do I obtain CNV?
+For the purpose of retrieving CN data, we have the function `get_sn_segments`. If you want to query CN calls for a specific region or genomic loci, `get_cn_segments` is best used. In this section we will demonstrate how this function can be used.
+
+#### Using `these_samples_metadata`
+We can use metadata restricted to the sample ID of interest to demonstrate what type of data will be returned:
+
+```{r e17}
+seg <- get_cn_segments(
+    these_samples_metadata = metadata$cell_lines
+)
+
+# What are the columns we have available?
+head(seg)
+```
+
+#### In a different projection
+We can retrieve CN segments while also requesting a different projection. Similar to the SSM functionality shown earlier, this can be done by toggling the `projection` argument and switching it to the `hg38` value.
+```{r e18}
+# Call in hg38 projection
+seg <- get_cn_segments(
+    these_samples_metadata = metadata$cell_lines,
+    projection = "hg38"
+)
+
+head(seg)
+```
+
+## How do I obtain SV?
+In this last section, we will explore how to get SV data using GAMBLR.data. For this purpose `get_manta_sv` was developed. This function can restrict the returned calls to any genomic regions specified with `chromosome`, `qstart`, `qend`, or the complete region specified with the `region` argument (in chr:start-end format). In addition, useful filtering arguments are also available, use `min_vaf` to set the minimum tumour VAF in order for a SV to be returned and `min_score` to set the lowest Manta somatic score in order for a SV to be returned. `pair_status` can be used to obtain variants from either matched or unmatched samples.
+
+#### Default behaviour
+We will call `get_manta_sv` with default arguments to examine the output.
+```{r e21}
+# Default arguments
+all_manta <- get_manta_sv()
+
+# How many SVs do we get back?
+nrow(all_manta)
+
+# How many samples do we have SV calls for?
+length(unique(all_manta$tumour_sample_id))
+
+# What does the returned data frame look like?
+head(all_manta)
+```
+
+
+#### Using `these_samples_metadata` example
+Alternatively, you can also provide `these_samples_metadata` argument to make use of a pre-filtered metadata table. In this case, the returned SVs will be restricted to the sample_ids within the data frame.
+
+```{r e23}
+cell_line_manta <- get_manta_sv(
+    these_samples_metadata = metadata$cell_lines
+)
+
+# How many SVs do we get back?
+nrow(cell_line_manta)
+
+# How many samples do we have SV calls for?
+length(unique(cell_line_manta$tumour_sample_id))
+
+# What does the returned data frame look like?
+head(cell_line_manta)
+```
+
+### By Region
+We can call `get_manta_sv` specifying the region of interest first in the region format and then with specifying the chromosome, start and end individually.
+
+::: {.callout-note}
+Don't know coordinates of *MYC* gene region? GAMBLR got you covered!
+:::
+
+```{r e24}
+# Convert the gene name to the region
+myc_region <- gene_to_region(
+    gene_symbol = "MYC"
+)
+
+myc_region
+
+# Specifying MYC in region format
+myc_manta_region <- get_manta_sv(
+    these_samples_metadata = metadata$genomes,
+    region = myc_region,
+    min_vaf = 0,
+    min_score = 0
+)
+
+# Specifying MYC with chromosome, qstart and qend arguments
+myc_manta_chunks <- get_manta_sv(
+    these_samples_metadata = metadata$genomes,
+    chromosome = 8,
+    qstart = 128747680,
+    qend = 128753674,
+    min_vaf = 0,
+    min_score = 0
+)
+
+# Are the returned data frames the same?
+identical(
+    myc_manta_region,
+    myc_manta_chunks
+)
+```
+
+### SV filtering
+Here we are demonstrating the filtering options to obtain SVs. In this example, we are calling `get_manta_sv` on the DLBCL metadata subset. For demonstration purposes, we are also requesting a non-default projection and adding some more filtering.
+```{r e25}
+# Get manta SVs for the samples with DLBCL pathology
+dlbcl_manta <- get_manta_sv(
+    these_samples_metadata = metadata$dlbcl,
+    projection = "hg38",
+    min_vaf = 0.4,
+    min_score = 100
+)
+
+# How many variants do we get back with these filters?
+nrow(dlbcl_manta)
+
+# Does the advertised VAF filters work?
+all(dlbcl_manta$VAF_tumour >= 0.4)
+
+# Do the advertised SCORE filter work?
+all(dlbcl_manta$SCORE >= 100)
+
+# What does the returned data frame look like?
+head(cell_line_manta)
+```
