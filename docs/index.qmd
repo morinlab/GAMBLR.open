@@ -37,8 +37,8 @@ about:
 
 The GAMBLR-verse is a database, mining, manipulation and collection of a convenience functions for working with genomic data of mature B-cell lymphomas. The GAMBLR.open is an open-source package that is a wrapper providing a convenient one-stop access to load the following packages from the GAMBLR family:
 
-- [GAMBLR.open](https://github.com/morinlab/GAMBLR.open) - collection of genomic
-data for analysis of Mature B-cell neoplasms
+- [GAMBLR.open](https://github.com/morinlab/GAMBLR.open) - collection of genomic data for analysis of Mature B-cell neoplasms
+* [GAMBLR.data](https://github.com/morinlab/GAMBLR.data) - a "storage unit" with [different types](https://morinlab.github.io/GAMBLR.data/resources/bundled_data.html) of bundled data.
 - [GAMBLR.helpers](https://github.com/morinlab/GAMBLR.helpers) - a set of low-level functions for data operation
 - [GAMBLR.utils](https://github.com/morinlab/GAMBLR.utils) - higher level set of functions to operate on genomic data
 - [GAMBLR.viz](https://github.com/morinlab/GAMBLR.viz) - set of functions used mostly for visualizations
