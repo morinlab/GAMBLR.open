@@ -64,7 +64,7 @@ website:
       style: "docked"
       collapse-level: 4
       contents:
-      #   - why.qmd
+        - why.qmd
         - auto: concepts/*.qmd
     - id: bundled-data
       title: "Resources"

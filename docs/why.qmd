@@ -1,0 +1,38 @@
+---
+title: "Why GAMBLR.open?"
+---
+
+## Open data access, simplified!
+
+GAMBLR.open is designed to make open-access genomic data of mature B-cell lymphomas more accessible and easier to analyze. Whether you're a researcher, data scientist, or student, this package provides a seamless interface for querying, retrieving, and preprocessing genomic data, so you can focus on analysis rather than data wrangling.
+
+GAMBLR stands for **G**enomic **A**nalysis of **M**ature **B**-cell **L**ymphomas in **R**, and is part of the family of R packages for lymphoma cancer research called "GAMBLR-verse" and developed in the [Morin Lab](https://morinlab.github.io/) at the Simon Fraser University. For more details, please refer to the [GAMBLR family](./concepts/GAMBLR_family.html) section.
+
+## Who Is It For?
+
+The GAMBLR.open primarily targets:
+
+- researchers who need rapid access to standardized genomic datasets.
+- data scientists and bioinformaticians looking for structured and easily queryable cancer genomics data.
+- students who want to explore real-world genomic data in a learning environment.
+
+## What does GAMBLR.open offer?
+
+Some of the advantages of GAMBLR.open are:
+- Access to preprocessed genomic data: retrieve genomic datasets without worrying about complex file handling.
+- Standardized data queries: easily search and filter genomic data using a consistent and intuitive API.
+- Integration of GAMBLR ecosystem: work seamlessly with the broader [GAMBLR suite](./concepts/GAMBLR_family.html) of packages to design analytical workflows.
+- Reproducibility and transparency: leverage a well-documented [pipelines](https://github.com/LCR-BCCRC/lcr-modules) to ensure consistent and transparent data retrieval.
+
+
+## Local experience
+
+The data bundled with the GAMBLR.data is immediately available upon package installation and does not require internet connection or ssh access to GSC resources. It can run anywhere that R is available without restrictions and limitations.
+
+## Community
+
+Community discussions primarily happen through issue submission on [GitHub](https://github.com/morinlab/GAMBLR.open/issues).
+
+## Getting started
+
+Explore the [documentation](https://morinlab.github.io/GAMBLR.open/) and start using GAMBLR.open today!

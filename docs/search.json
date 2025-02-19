@@ -17,6 +17,76 @@
     "text": "Installation\nThis package is recommended for the community interested in lymphoma genomics research and are not members of the GAMBL consortium, or if you are waiting for your access approval but want to get started. In addition to being a large resource for lymphoma researchers, this package is also a great educational resource for junior users interested in bioinformatics analyses, genomics, software analysis, data engineering, R package development, GitHub workflows, and other best practices.\nWe recommend installing the package directly from GitHub (requires devtools dependency).\nif (!require(\"devtools\")) install.packages(\"devtools\")\n\ndevtools::install_github(\n    \"morinlab/GAMBLR.open\",\n    repos = BiocManager::repositories()\n)\nThis will install all required dependencies and members of the GAMBLR-verse available to you.\nAfter installation, you can confirm successful setup:\n\n# Confirm successful setup\nlibrary(GAMBLR.open) # load package\n\n\n\n\n\n Back to top"
   },
   {
+    "objectID": "why.html",
+    "href": "why.html",
+    "title": "Why GAMBLR.open?",
+    "section": "",
+    "text": "GAMBLR.open is designed to make open-access genomic data of mature B-cell lymphomas more accessible and easier to analyze. Whether you’re a researcher, data scientist, or student, this package provides a seamless interface for querying, retrieving, and preprocessing genomic data, so you can focus on analysis rather than data wrangling.\nGAMBLR stands for Genomic Analysis of Mature B-cell Lymphomas in R, and is part of the family of R packages for lymphoma cancer research called “GAMBLR-verse” and developed in the Morin Lab at the Simon Fraser University. For more details, please refer to the GAMBLR family section.",
+    "crumbs": [
+      "Why GAMBLR.open?"
+    ]
+  },
+  {
+    "objectID": "why.html#open-data-access-simplified",
+    "href": "why.html#open-data-access-simplified",
+    "title": "Why GAMBLR.open?",
+    "section": "",
+    "text": "GAMBLR.open is designed to make open-access genomic data of mature B-cell lymphomas more accessible and easier to analyze. Whether you’re a researcher, data scientist, or student, this package provides a seamless interface for querying, retrieving, and preprocessing genomic data, so you can focus on analysis rather than data wrangling.\nGAMBLR stands for Genomic Analysis of Mature B-cell Lymphomas in R, and is part of the family of R packages for lymphoma cancer research called “GAMBLR-verse” and developed in the Morin Lab at the Simon Fraser University. For more details, please refer to the GAMBLR family section.",
+    "crumbs": [
+      "Why GAMBLR.open?"
+    ]
+  },
+  {
+    "objectID": "why.html#who-is-it-for",
+    "href": "why.html#who-is-it-for",
+    "title": "Why GAMBLR.open?",
+    "section": "Who Is It For?",
+    "text": "Who Is It For?\nThe GAMBLR.open primarily targets:\n\nresearchers who need rapid access to standardized genomic datasets.\ndata scientists and bioinformaticians looking for structured and easily queryable cancer genomics data.\nstudents who want to explore real-world genomic data in a learning environment.",
+    "crumbs": [
+      "Why GAMBLR.open?"
+    ]
+  },
+  {
+    "objectID": "why.html#what-does-gamblr.open-offer",
+    "href": "why.html#what-does-gamblr.open-offer",
+    "title": "Why GAMBLR.open?",
+    "section": "What does GAMBLR.open offer?",
+    "text": "What does GAMBLR.open offer?\nSome of the advantages of GAMBLR.open are: - Access to preprocessed genomic data: retrieve genomic datasets without worrying about complex file handling. - Standardized data queries: easily search and filter genomic data using a consistent and intuitive API. - Integration of GAMBLR ecosystem: work seamlessly with the broader GAMBLR suite of packages to design analytical workflows. - Reproducibility and transparency: leverage a well-documented pipelines to ensure consistent and transparent data retrieval.",
+    "crumbs": [
+      "Why GAMBLR.open?"
+    ]
+  },
+  {
+    "objectID": "why.html#local-experience",
+    "href": "why.html#local-experience",
+    "title": "Why GAMBLR.open?",
+    "section": "Local experience",
+    "text": "Local experience\nThe data bundled with the GAMBLR.data is immediately available upon package installation and does not require internet connection or ssh access to GSC resources. It can run anywhere that R is available without restrictions and limitations.",
+    "crumbs": [
+      "Why GAMBLR.open?"
+    ]
+  },
+  {
+    "objectID": "why.html#community",
+    "href": "why.html#community",
+    "title": "Why GAMBLR.open?",
+    "section": "Community",
+    "text": "Community\nCommunity discussions primarily happen through issue submission on GitHub.",
+    "crumbs": [
+      "Why GAMBLR.open?"
+    ]
+  },
+  {
+    "objectID": "why.html#getting-started",
+    "href": "why.html#getting-started",
+    "title": "Why GAMBLR.open?",
+    "section": "Getting started",
+    "text": "Getting started\nExplore the documentation and start using GAMBLR.open today!",
+    "crumbs": [
+      "Why GAMBLR.open?"
+    ]
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "GAMBLR.open",
