@@ -24,7 +24,7 @@ about:
       href: GAMBLR.open/tutorials/getting_started.html
     - icon: postcard
       text: Release notes
-      href: posts.qmd
+      href: https://github.com/morinlab/GAMBLR.open/releases
     - icon: github
       text: GitHub
       href: https://github.com/morinlab/GAMBLR.open
