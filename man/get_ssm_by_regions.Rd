@@ -61,12 +61,12 @@ my_meta = get_gambl_metadata()
 ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
                                         these_samples_metadata = my_meta,
                                         streamlined = FALSE)
-
-# This example intentionally fails
-ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
-                              these_samples_metadata = my_meta,
-                               projection="hg38")
+\dontrun{
+# This example fails, as it should
+#ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
+#                              these_samples_metadata = my_meta,
+#                               projection="hg38")
 # Error in get_ssm_by_regions(regions_bed = regions_bed, these_samples_metadata = my_meta,  : 
 # requested projection: hg38 and genome_build of regions_bed: grch37 don't match
-
+}
 }

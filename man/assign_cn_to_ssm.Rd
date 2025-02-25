@@ -77,8 +77,8 @@ ssm_genomes_grch37 \%>\% dplyr::select(1:8)
 cn_list = assign_cn_to_ssm(some_meta,ssm_genomes_grch37)
 
 cn_list$maf \%>\% dplyr::select(1:8,log.ratio,CN)
-
-# This won't work because the hg38 seg_data is not bundled
+\dontrun{
+# This wouldn't work because the hg38 seg_data is not bundled
 ssm_genomes_hg38 = get_coding_ssm(projection = "hg38",
                                   these_samples_metadata = some_meta)
 cn_list = assign_cn_to_ssm(some_meta,ssm_genomes_hg38)
@@ -89,5 +89,5 @@ cn_list = assign_cn_to_ssm(projection = "grch37")
 
 cn_list$maf \%>\% dplyr::group_by(Tumor_Sample_Barcode,CN) \%>\%
   dplyr::count()
-
+}
 }
