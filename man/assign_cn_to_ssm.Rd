@@ -63,7 +63,7 @@ set \code{coding_only = TRUE}. When necessary, this function relies on
 # long-handed way
 # 1. get some metadata for a collection of samples
 some_meta = get_gambl_metadata() \%>\%
-        dplyr::filter(cohort=="FL_Dreval",
+        dplyr::filter(study=="FL_Dreval",
         grepl("SP",sample_id))
 # 2. Get the SSMs for these samples
 
@@ -72,7 +72,8 @@ ssm_genomes_grch37 = get_coding_ssm(projection = "grch37",
 # peek at the results
 ssm_genomes_grch37 \%>\% dplyr::select(1:8)
 
-# 3. Lazily let this function obtain the corresponding seg_data for the right genome_build
+# 3. Lazily let this function obtain the corresponding seg_data
+# for the right genome_build
 cn_list = assign_cn_to_ssm(some_meta,ssm_genomes_grch37)
 
 cn_list$maf \%>\% dplyr::select(1:8,log.ratio,CN)
