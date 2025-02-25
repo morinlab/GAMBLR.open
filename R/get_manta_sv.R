@@ -71,7 +71,8 @@
 #'                                 verbose = FALSE)
 #' head(incorrect_myc_locus_sv)
 #' nrow(incorrect_myc_locus_sv)
-#'
+#' # The effect of specifying the wrong coordinate is evident
+#' 
 #' # Despite potentially being incomplete, we can nonetheless
 #' # annotate these directly for more details
 #' annotated_myc_hg38 = suppressMessages(
@@ -80,14 +81,7 @@
 #' head(annotated_myc_hg38)
 #' table(annotated_myc_hg38$partner)
 #' # The usual MYC partners are seen here
-#' 
-#' annotated_myc_incorrect = suppressMessages(
-#'          annotate_sv(incorrect_myc_locus_sv, genome_build = "hg38")
-#' )
-#' head(annotated_myc_incorrect)
-#' table(annotated_myc_incorrect$partner)
-#' # The effect of specifying the wrong coordinate is evident
-#' 
+#'
 get_manta_sv = function(these_samples_metadata = NULL,
                         projection = "grch37",
                         region,
