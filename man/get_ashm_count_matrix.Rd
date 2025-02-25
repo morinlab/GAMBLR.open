@@ -40,19 +40,21 @@ regions_bed = create_bed_data(GAMBLR.data::grch37_ashm_regions,
                               concat_cols=c("gene","region"),
                               sep="-")
 my_meta = get_gambl_metadata() \%>\% dplyr::filter(pathology=="DLBCL")
-matrix <- get_ashm_count_matrix(
+shm_matrix <- get_ashm_count_matrix(
      regions_bed = regions_bed,
-     this_seq_type = "genome"
+     this_seq_type = "genome",
+     these_samples_metadata = my_meta
 )
-
+head(shm_matrix[,c(1:12)])
+\dontrun{
 #this example should fail because the regions_bed is not hg38
- matrix <- get_ashm_count_matrix(regions_bed=regions_bed,
+shm_matrix <- get_ashm_count_matrix(regions_bed=regions_bed,
                             this_seq_type = "genome",
                             these_samples_metadata = my_meta,
                             projection = "hg38")
 # Error in get_ashm_count_matrix(
 # Your projection argument does not match the genome_build of regions_bed
-
+}
 # format the name column to include the coordinates instead of the gene
 regions_bed = create_bed_data(GAMBLR.data::hg38_ashm_regions,
                            fix_names="concat",
