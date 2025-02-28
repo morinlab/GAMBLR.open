@@ -3,7 +3,7 @@
 ![Commit activity](https://img.shields.io/github/commit-activity/m/morinlab/GAMBLR.open)
 ![Last commit](https://img.shields.io/github/last-commit/morinlab/GAMBLR.open)
 
-Hello GAMBLRes!
+Hello GAMBLRs!
 
 # GAMBLR.open
 
