@@ -39,7 +39,7 @@
 #' # long-handed way
 #' # 1. get some metadata for a collection of samples
 #' some_meta = get_gambl_metadata() %>%
-#'         dplyr::filter(cohort=="FL_Dreval",
+#'         dplyr::filter(study=="FL_Dreval",
 #'         grepl("SP",sample_id))
 #' # 2. Get the SSMs for these samples
 #' 
@@ -48,12 +48,13 @@
 #' # peek at the results
 #' ssm_genomes_grch37 %>% dplyr::select(1:8)
 #' 
-#' # 3. Lazily let this function obtain the corresponding seg_data for the right genome_build
+#' # 3. Lazily let this function obtain the corresponding seg_data
+#' # for the right genome_build
 #' cn_list = assign_cn_to_ssm(some_meta,ssm_genomes_grch37)
 #' 
 #' cn_list$maf %>% dplyr::select(1:8,log.ratio,CN)
-#' 
-#' # This won't work because the hg38 seg_data is not bundled
+#' \dontrun{
+#' # This wouldn't work because the hg38 seg_data is not bundled
 #' ssm_genomes_hg38 = get_coding_ssm(projection = "hg38",
 #'                                   these_samples_metadata = some_meta)
 #' cn_list = assign_cn_to_ssm(some_meta,ssm_genomes_hg38)
@@ -64,7 +65,7 @@
 #' 
 #' cn_list$maf %>% dplyr::group_by(Tumor_Sample_Barcode,CN) %>%
 #'   dplyr::count()
-#'
+#' }
 assign_cn_to_ssm = function(
     these_samples_metadata,
     maf_data,

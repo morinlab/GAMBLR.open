@@ -25,19 +25,21 @@
 #'                               concat_cols=c("gene","region"),
 #'                               sep="-")
 #' my_meta = get_gambl_metadata() %>% dplyr::filter(pathology=="DLBCL")
-#' matrix <- get_ashm_count_matrix(
+#' shm_matrix <- get_ashm_count_matrix(
 #'      regions_bed = regions_bed,
-#'      this_seq_type = "genome"
+#'      this_seq_type = "genome",
+#'      these_samples_metadata = my_meta
 #' )
-#'
+#' head(shm_matrix[,c(1:12)])
+#' \dontrun{
 #' #this example should fail because the regions_bed is not hg38
-#'  matrix <- get_ashm_count_matrix(regions_bed=regions_bed,
+#' shm_matrix <- get_ashm_count_matrix(regions_bed=regions_bed,
 #'                             this_seq_type = "genome",
 #'                             these_samples_metadata = my_meta,
 #'                             projection = "hg38")
 #' # Error in get_ashm_count_matrix(
 #' # Your projection argument does not match the genome_build of regions_bed
-#'
+#' }
 #' # format the name column to include the coordinates instead of the gene
 #' regions_bed = create_bed_data(GAMBLR.data::hg38_ashm_regions,
 #'                            fix_names="concat",
@@ -108,14 +110,14 @@ get_ashm_count_matrix = function(
     ashm_maf = strip_genomic_classes(ashm_maf)
 
     ashm_counted <- ashm_maf %>%
-      group_by(sample_id, region) %>%
+      group_by(sample_id, region_name) %>%
       tally()
 
     
     #fill out all combinations so we can get the cases with zero mutations
     eg <- expand_grid(
         sample_id = pull(all_meta, sample_id),
-        region = unique(ashm_counted$region)
+        region_name = unique(ashm_counted$region_name)
     )
     all_counts <- left_join(eg, ashm_counted) %>%
         mutate(n = replace_na(n, 0)) %>%
@@ -124,7 +126,7 @@ get_ashm_count_matrix = function(
     all_counts_wide <- pivot_wider(
         all_counts,
         id_cols = sample_id,
-        names_from = region,
+        names_from = region_name,
         values_from = n
     ) %>%
         column_to_rownames(var = "sample_id")

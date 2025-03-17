@@ -83,15 +83,18 @@ coding_tabulated_df = get_coding_ssm_status(
  gene_symbols = c("EZH2","KMT2D","CREBBP","MYC")
 )
 
-
+head(coding_tabulated_df)
 
 #all lymphoma genes from bundled NHL gene list
-coding_tabulated_df = get_coding_ssm_status()
-
-#this example will fail because hg38 is not supported by this function (yet)
+coding_tabulated_df = get_coding_ssm_status(
+                           maf_data = get_coding_ssm()
+                      )
+head(coding_tabulated_df[,c(1:10)])
+\dontrun{
+#this example would fail because hg38 is not supported by this function (yet)
 coding_tabulated_df = get_coding_ssm_status(maf_data=
                         get_coding_ssm(projection = "hg38"))
 # Error in get_coding_ssm_status(maf_data = get_coding_ssm(projection = "hg38")) : 
 # Currently only grch37 projection (hg19 genome build) is supported.
-
+}
 }

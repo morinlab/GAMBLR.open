@@ -1,68 +1,107 @@
 #' @title Get Manta SVs
 #'
-#' @description Convenience function for retrieving Manta Structural Variants (SVs) from the bundled data [GAMBLR.data::sample_data].
-#'
-#' @details To obtain SV calls for multiple samples, give `these_sample_ids` a vector of sample IDs. 
-#' Alternatively, the user can also provide the `these_samples_metadata` parameter to make use of an already subset metadata table. 
-#' In this case, the returned SVs will be restricted to the sample_ids within that data frame. 
-#' This function internally calls id_ease to streamline sample ID/metadata parameters.
-#' This function can also restrict the returned calls to any genomic regions specified within `chromosome`, `qstart`, `qend`,
-#' or the complete region specified under `region` (in chr:start-end format), note that chromosome can be either prefixed or not prefixed.
-#' Useful filtering parameters are also available, use `min_vaf` to set the minimum tumour VAF for a SV to be returned and `min_score`
-#' to set the lowest Manta somatic score for a SV to be returned. `pair_status` can be used to return variants from either matched or unmatched samples.
-#' In addition, the user can chose to return all variants, even the ones not passing the filter criteria. To do so, set `pass = FALSE` (default is TRUE).
-#'
-#' @param these_sample_ids Optional, a vector of multiple sample_id (or a single sample ID as a string) that you want results for.
-#' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to. 
-#' If not provided (and if `these_sample_ids` is not provided), the function will return all samples from the specified seq_type in the metadata.
+#' @description Retrieve Manta SVs for one or many samples
+#' 
+#' @details Retrieve Manta SVs with additional VCF information to allow for
+#' filtering of high-confidence variants.
+#' To get SV calls for multiple samples, supply a metadata table via
+#' `these_samples_metadata` that has been subset to only those samples.
+#' The results will be restricted to the sample_ids within that data frame.
+#' This function can also restrict the returned breakpoints within a genomic
+#' region specified via `region` (in chr:start-end format).
+#' Useful filtering parameters are also available, use `min_vaf` to set the
+#' minimum tumour VAF for a SV to be returned and `min_score`
+#' to set the lowest Manta somatic score for a SV to be returned.
+#' In addition, the user can chose to return all variants, even
+#' the ones not passing the filter criteria. To do so,
+#' set `pass_filters = FALSE` (defaults to TRUE).
+#' 
+#' @param these_samples_metadata A metadata data frame to limit the
+#' result to sample_ids within it
 #' @param projection The projection genome build. Default is grch37.
-#' @param this_seq_type The this_seq_type you want back, default is genome.
-#' @param chromosome Optional, the chromosome you are restricting to (can be prefixed or not prefixed).
-#' @param qstart Optional, query start coordinate of the range you are restricting to.
-#' @param qend Optional, query end coordinate of the range you are restricting to.
-#' @param region Optional, region formatted like chrX:1234-5678 (chromosome can be prefixed or not prefixed) instead of specifying chromosome, start and end separately.
-#' @param pairing_status Use to restrict results (if desired) to matched or unmatched results (default is to return all). This parameter takes the filtering condition as a string ("matched" or "unmatched").
-#' @param min_vaf The minimum tumour VAF for a SV to be returned. Default is 0.1.
-#' @param min_score The lowest Manta somatic score for a SV to be returned. Default is 40.
-#' @param pass If TRUE (default) only return SVs that are annotated with PASS in the FILTER column. Set to FALSE to keep all variants, regardless if they PASS the filters.
-#' @param verbose Set to FALSE to minimize the output to console. Default is TRUE. This parameter also dictates the verbosity of any helper function internally called inside the main function.
+#' @param min_vaf The minimum tumour VAF for a SV to be returned.
+#' Default is 0.1.
+#' @param min_score The lowest Manta somatic score for a SV to be returned.
+#' Default is 40.
+#' @param pass_filters If TRUE (default) only return SVs that are annotated with
+#' PASS in the FILTER column. Set to FALSE to keep all variants,
+#' regardless if they PASS the filters.
+#' @param verbose Set to FALSE to minimize the output to console.
+#' Default is TRUE. This parameter also dictates the verbose-ness of
+#' any helper function internally called inside the main function.
+#' @param region Specify a single region to fetch SVs anchored within
+#' using the format "chrom:start-end"
+#' @param chromosome DEPRECATED. Use `region` instead.
+#' @param qstart DEPRECATED. Use `region` instead.
+#' @param qend DEPRECATED. Use `region` instead.
+#' @param pairing_status DEPRECATED.
+#' @param these_sample_ids DEPRECATED. 
+#' Subset your metadata and supply `these_samples_metadata`` instead.
 #' @param ... Any additional parameters.
 #' 
 #' @export
-#' 
 #' @import dplyr
-#' 
 #' @examples
-#' #load packages
-#' library(dplyr)
+#' # lazily get every SV in the table with default quality filters
+#' all_sv <- get_manta_sv()
+#' head(all_sv)
 #' 
-#' #lazily get every SV in the table with default quality filters
-#' all_sv = get_manta_sv()
+#' # get all SVs for just one cohort
+#' cohort_meta = suppressMessages(get_gambl_metadata()) %>% 
+#'               dplyr::filter(cohort == "DLBCL_cell_lines")
 #'
-#' #get all SVs DLBCL cell line samples
-#' cell_line_meta = GAMBLR.data::sample_data$meta %>% 
-#'   dplyr::filter(cohort == "DLBCL_cell_lines")
-#'   
-#' dlbcl_sv = get_manta_sv(these_samples_metadata = cell_line_meta)
-#'
-#' #get the SVs in a region around MYC
-#' myc_locus_sv = get_manta_sv(region = "8:128723128-128774067")
+#' some_sv <- get_manta_sv(these_samples_metadata = cohort_meta, verbose=FALSE)
+#' head(some_sv)
+#' nrow(some_sv)
 #' 
-get_manta_sv = function(these_sample_ids = NULL,
-                        these_samples_metadata = NULL,
+#' # get the SVs in a region around MYC
+#' # WARNING: This is not the best way to find MYC SVs.
+#' # Use annotate_sv on the full SV set instead.
+#' myc_region_hg38 = "chr8:127710883-127761821"
+#' myc_region_grch37 = "8:128723128-128774067"
+#' 
+#' hg38_myc_locus_sv <- get_manta_sv(region = myc_region_hg38,
+#'                                 projection = "hg38",
+#'                                 verbose = FALSE)
+#' head(hg38_myc_locus_sv)
+#' nrow(hg38_myc_locus_sv)
+#' 
+#' incorrect_myc_locus_sv <- get_manta_sv(region = myc_region_grch37,
+#'                                 projection = "hg38",
+#'                                 verbose = FALSE)
+#' head(incorrect_myc_locus_sv)
+#' nrow(incorrect_myc_locus_sv)
+#' # The effect of specifying the wrong coordinate is evident
+#' 
+#' # Despite potentially being incomplete, we can nonetheless
+#' # annotate these directly for more details
+#' annotated_myc_hg38 = suppressMessages(
+#'          annotate_sv(hg38_myc_locus_sv, genome_build = "hg38")
+#' )
+#' head(annotated_myc_hg38)
+#' table(annotated_myc_hg38$partner)
+#' # The usual MYC partners are seen here
+#'
+get_manta_sv = function(these_samples_metadata = NULL,
                         projection = "grch37",
-                        this_seq_type = "genome",
+                        region,
+                        min_vaf = 0.1,
+                        min_score = 40,
+                        pass_filters = TRUE,
+                        verbose = FALSE,
                         chromosome,
                         qstart,
                         qend,
-                        region,
                         pairing_status,
-                        min_vaf = 0.1,
-                        min_score = 40,
-                        pass = TRUE,
-                        verbose = FALSE,
+                        these_sample_ids = NULL,
                         ...){
-  
+  if (!missing(these_sample_ids) | !missing(chromosome) | !missing(qstart) | !missing(qend)) {
+    stop("Parameters `these_sample_ids`, `chromosome`, `qstart` and `qend` deprecated and will be ignored.
+    Please use `these_samples_metadata` and/or `region` instead.")
+  }
+  if(missing(these_samples_metadata)){
+    these_samples_metadata = get_gambl_metadata() %>% dplyr::filter(seq_type=="genome")
+  }
   #warn/notify the user what version of this function they are using
   message("Using the bundled Manta SV (.bedpe) calls in GAMBLR.data...")
   
@@ -72,11 +111,7 @@ get_manta_sv = function(these_sample_ids = NULL,
   #get valid projections
   valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
   
-  #get samples with the dedicated helper function
-  metadata = id_ease(these_samples_metadata = these_samples_metadata,
-                     these_sample_ids = these_sample_ids,
-                     verbose = verbose,
-                     this_seq_type = this_seq_type)
+  metadata = these_samples_metadata
   
   sample_ids = metadata$sample_id
   
@@ -85,7 +120,8 @@ get_manta_sv = function(these_sample_ids = NULL,
     manta_sv = GAMBLR.data::sample_data[[projection]]$bedpe %>% 
       dplyr::filter(tumour_sample_id %in% sample_ids)
   }else{
-    stop(paste("please provide a valid projection. The following are available:",
+    stop(paste("please provide a valid projection.
+    The following are available:",
                paste(valid_projections,collapse=", ")))
   }
   
@@ -135,30 +171,20 @@ get_manta_sv = function(these_sample_ids = NULL,
   }
   
   #PASS filter
-  if(pass){
+  if(pass_filters){
     manta_sv = manta_sv %>%
       dplyr::filter(FILTER == "PASS")
   }
   
-  #pairing status filter
-  if(!missing(pairing_status)){
-    if(verbose){
-      message(paste0("  Pairing status: ", pairing_status))
-    }
-    
-    manta_sv = manta_sv %>%
-      dplyr::filter(pair_status == pairing_status)
-  }
-  
-  #convert to data frame and print some metrics
-  manta_sv = as.data.frame(manta_sv)
+  #attach genome_build 
+  manta_sv = create_genomic_data(manta_sv, projection)
   
   if(verbose){
     n_variants = nrow(manta_sv)
     unique_samples = unique(manta_sv$tumour_sample_id)
-    message(paste0("\nReturning ", n_variants, " variants from ", length(unique_samples), " sample(s)"))
+    message(paste0("Returning ", n_variants,
+                   " variants from ", length(unique_samples), " sample(s)"))
     message("\nDone!")
   }
-  
   return(manta_sv)
 }
