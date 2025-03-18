@@ -32,7 +32,7 @@ In the [previous tutorial](./getting_started.html), we have already explored the
 
 metadata <- get_gambl_metadata() %>%
     filter(
-        cohort == "FL_Dreval"
+        study == "FL_Dreval"
     )
 
 ```
@@ -220,7 +220,7 @@ We can now combine both coding and non-coding mutations into single matrix:
 feature_matrix <- left_join(
     coding_matrix,
     ashm_matrix
-) %>% 
+) %>%
     mutate(
         across(
             where(is.numeric), ~ replace_na(.x, 0)

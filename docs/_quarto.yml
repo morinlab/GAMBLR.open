@@ -88,3 +88,4 @@ code-annotations: hover
 execute:
   warning: false
   error: false
+  message: false

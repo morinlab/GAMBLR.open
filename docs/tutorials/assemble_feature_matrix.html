@@ -4789,6 +4789,10 @@ overflow-x: auto;
  <span class="dropdown-text">Tutorial: assemble feature matrix</span></a>
   </li>  
         <li>
+    <a class="dropdown-item" href="../tutorials/classifying_tumours.html">
+ <span class="dropdown-text">Tutorial: classifying tumours</span></a>
+  </li>  
+        <li>
     <a class="dropdown-item" href="../tutorials/getting_started.html">
  <span class="dropdown-text">Tutorial: getting started</span></a>
   </li>  
@@ -4883,6 +4887,12 @@ overflow-x: auto;
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../tutorials/classifying_tumours.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial: classifying tumours</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../tutorials/getting_started.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Tutorial: getting started</span></a>
   </div>
@@ -4934,7 +4944,7 @@ overflow-x: auto;
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">get_gambl_metadata</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        cohort <span class="sc">==</span> <span class="st">&quot;FL_Dreval&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        study <span class="sc">==</span> <span class="st">&quot;FL_Dreval&quot;</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can now see that the samples from the FL study are in the cohort <code>FL_Dreval</code>. Let’s explore these samples more:</p>
@@ -4959,10 +4969,10 @@ COMFL DLBCL    FL
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co"># How does our metadata looks like now?</span></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(metadata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>tibble [10 × 29] (S3: tbl_df/tbl/data.frame)
+<pre><code>tibble [10 × 30] (S3: tbl_df/tbl/data.frame)
  $ age_group           : chr [1:10] &quot;Other&quot; &quot;Other&quot; &quot;Other&quot; &quot;Other&quot; ...
  $ bam_available       : logi [1:10] TRUE TRUE TRUE TRUE TRUE TRUE ...
- $ cohort              : chr [1:10] &quot;FL_Dreval&quot; &quot;FL_Dreval&quot; &quot;FL_Dreval&quot; &quot;FL_Dreval&quot; ...
+ $ cohort              : chr [1:10] &quot;DLBCL_ICGC&quot; &quot;DLBCL_ICGC&quot; &quot;DLBCL_ICGC&quot; &quot;DLBCL_ICGC&quot; ...
  $ compression         : chr [1:10] &quot;cram&quot; &quot;cram&quot; &quot;cram&quot; &quot;cram&quot; ...
  $ COO_consensus       : chr [1:10] &quot;ABC&quot; &quot;GCB&quot; NA &quot;ABC&quot; ...
  $ DHITsig_consensus   : chr [1:10] &quot;DHITsigNeg&quot; &quot;DHITsigNeg&quot; &quot;NA&quot; &quot;DHITsigNeg&quot; ...
@@ -4987,6 +4997,7 @@ COMFL DLBCL    FL
  $ sample_id           : chr [1:10] &quot;SP59412&quot; &quot;SP59448&quot; &quot;SP59452&quot; &quot;SP59456&quot; ...
  $ seq_type            : chr [1:10] &quot;genome&quot; &quot;genome&quot; &quot;genome&quot; &quot;genome&quot; ...
  $ sex                 : chr [1:10] &quot;M&quot; &quot;F&quot; &quot;M&quot; &quot;F&quot; ...
+ $ study               : chr [1:10] &quot;FL_Dreval&quot; &quot;FL_Dreval&quot; &quot;FL_Dreval&quot; &quot;FL_Dreval&quot; ...
  $ time_point          : chr [1:10] &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;A&quot; ...
  $ Tumor_Sample_Barcode: chr [1:10] &quot;SP59412&quot; &quot;SP59448&quot; &quot;SP59452&quot; &quot;SP59456&quot; ...</code></pre>
 </div>
@@ -5083,7 +5094,7 @@ Translation_Start_Site
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>crebbp_hotspot_mutation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MAF Data Object
+<pre><code>genomic_data Object
 Genome Build: grch37 
 Showing first 10 rows:
   Chromosome Start_Position Variant_Classification
@@ -5154,7 +5165,7 @@ CD79B_NONtrunc    17  62006800  62006800</code></pre>
 <span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>regions_bed</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>BED Data Object
+<pre><code>genomic_data Object
 Genome Build: grch37 
 Showing first 10 rows:
   chrom     start       end        name region regulatory_comment
@@ -5224,7 +5235,7 @@ SP59464        1           0         0        0</code></pre>
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>feature_matrix <span class="ot">&lt;-</span> <span class="fu">left_join</span>(</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    coding_matrix,</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    ashm_matrix</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
 <span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
 <span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">across</span>(</span>
 <span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>            <span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">replace_na</span>(.x, <span class="dv">0</span>)</span>
