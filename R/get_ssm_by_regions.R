@@ -33,8 +33,15 @@
 #' my_meta = get_gambl_metadata()
 #' # get a full MAF-format data frame for all aSHM regions on grch37 coordinates
 #' ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
-#'                                         these_samples_metadata = my_meta,
-#'                                         streamlined = FALSE)
+#'                               these_samples_metadata = my_meta,
+#'                               streamlined = FALSE)
+#' 
+#' 
+#'
+#' one_region_maf = get_ssm_by_regions(regions_list = "2:136875000-136875097",
+#'                          streamlined = F,
+#'                          projection = "grch37",
+#'                          these_samples_metadata = my_meta)
 #' \dontrun{
 #' # This example fails, as it should
 #' #ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
@@ -107,7 +114,7 @@ get_ssm_by_regions <- function(these_samples_metadata,
       projection = projection,
       tool_name = tool_name
     )
-    if(!missing(regions_bed) & "bed_data" %in% class(regions_bed)){
+    if(!missing(regions_bed) && "bed_data" %in% class(regions_bed)){
       regions_df = dplyr::select(regions_bed,1:4) %>%
         dplyr::rename(c("Chromosome"="chrom",
                         "Start_Position"="start",
