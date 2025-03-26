@@ -15,7 +15,8 @@ get_all_coding_ssm(
 
 \item{include_silent}{If set to TRUE, silent/synonymous mutations in the coding regions will also be returned.}
 
-\item{...}{Additional arguments passed to get_coding_ssm}
+\item{projection}{The desired genome build
+'grch37' or 'hg38' are allowed. Default is grch37}
 }
 \value{
 A data frame containing all the MAF data columns (one row per mutation).

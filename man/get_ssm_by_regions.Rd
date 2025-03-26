@@ -65,7 +65,7 @@ ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
 
 
 one_region_maf = get_ssm_by_regions(regions_list = "2:136875000-136875097",
-                         streamlined = F,
+                         streamlined = FALSE,
                          projection = "grch37",
                          these_samples_metadata = my_meta)
 \dontrun{
