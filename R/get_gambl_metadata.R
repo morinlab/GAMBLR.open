@@ -71,7 +71,7 @@
 #' group_by(all_meta,cohort,seq_type) %>% count()
 #'
 get_gambl_metadata = function(
-    seq_type_filter = "genome",
+    seq_type_filter = c("genome","capture"),
     case_set,
     ...
 ){

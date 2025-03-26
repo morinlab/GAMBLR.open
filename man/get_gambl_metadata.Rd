@@ -4,7 +4,7 @@
 \alias{get_gambl_metadata}
 \title{Get GAMBL Metadata.}
 \usage{
-get_gambl_metadata(seq_type_filter = "genome", case_set, ...)
+get_gambl_metadata(seq_type_filter = c("genome", "capture"), case_set, ...)
 }
 \arguments{
 \item{seq_type_filter}{Specify the seq type you want to return metadata for.

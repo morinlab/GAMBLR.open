@@ -97,9 +97,8 @@ get_coding_ssm_status = function(
     }
     # check the projection
     if(!genome_build == "grch37"){
-        stop(
-            "Currently only grch37 projection (hg19 genome build) is supported."
-        )
+        include_hotspots = FALSE
+        message("hot spot annotations are not available for this genome build")
     }
 
     if(missing(gene_symbols)){
