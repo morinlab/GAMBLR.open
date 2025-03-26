@@ -68,7 +68,8 @@
 #' #If you want metadata for genome and capture samples you can provide a vector of seq types
 #' all_meta = get_gambl_metadata(seq_type_filter = c("genome", "capture"))
 #'
-#' group_by(all_meta,cohort,seq_type) %>% count()
+#' dplyr::group_by(all_meta,cohort,seq_type) %>% 
+#'     dplyr::count()
 #'
 get_gambl_metadata = function(
     seq_type_filter = c("genome","capture"),
