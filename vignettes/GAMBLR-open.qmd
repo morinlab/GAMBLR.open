@@ -1,0 +1,88 @@
+---
+title: "Why GAMBLR.open?"
+vignette: >
+  %\VignetteIndexEntry{quarto vignettes}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+warning: false
+execute:
+    cache: false
+---
+
+## Open data access, simplified!
+
+GAMBLR.open is designed to make open-access genomic data of mature B-cell lymphomas more accessible and easier to analyze. Whether you're a researcher, data scientist, or student, this package provides a seamless interface for querying, retrieving, and preprocessing genomic data, so you can focus on analysis rather than data wrangling.
+
+GAMBLR.open is part of a larger family of R tools for the analysis of lymphoma
+genomic data (*the GAMBLRverse*, if you will). GAMBLR began as a toolkit for analysts participating
+in the **G**enomic **A**nalysis of **M**ature **B**-cell **L**ymphomas project, 
+led by the [Morin Lab](https://morinlab.github.io/) at BC Cancer and Simon Fraser
+University.
+
+```
+  /$$$$$$     /$$$$$$    /$$      /$$   /$$$$$$$    /$$        .:::::::     
+ /$$__  $$   /$$__  $$  | $$$    /$$$  | $$__  $$  | $$        .::    .::   
+| $$  \__/  | $$  \ $$  | $$$$  /$$$$  | $$  \ $$  | $$        .::    .::   
+| $$ /$$$$  | $$$$$$$$  | $$ $$/$$ $$  | $$$$$$$   | $$   <-   .: .::       
+| $$|_  $$  | $$__  $$  | $$  $$$| $$  | $$__  $$  | $$        .::  .::     
+| $$  \ $$  | $$  | $$  | $$\  $ | $$  | $$  \ $$  | $$        .::    .::   
+|  $$$$$$/  | $$  | $$  | $$ \/  | $$  | $$$$$$$/  | $$$$$$$$  .::      .:: 
+ \______/   |__/  |__/  |__/     |__/  |_______/   |________/ 
+ ~GENOMIC~~~~~~~~~~~~~OF~~~~~~~~~~~~~~~~~B-CELL~~~~~~~~~~~~~~~~~~IN~~~~~~ 
+ ~~~~~~~~~~~~ANALYSIS~~~~~~MATURE~~~~~~~~~~~~~~~~~~~LYMPHOMAS~~~~~~~~~~R~ 
+```
+
+## Who Is It For?
+
+The GAMBLR.open primarily caters to:
+
+- researchers who need rapid access to standardized genomic datasets.
+- data scientists and bioinformaticians looking for structured and easily queryable cancer genomics data.
+- students who want to explore real-world genomic data in a learning environment.
+
+## What does GAMBLR.open offer?
+
+Some of the advantages of GAMBLR.open are:
+
+- Access to preprocessed genomic data: retrieve genomic datasets without worrying about complex file handling.
+- Standardized data queries: easily search and filter genomic data using a consistent and intuitive API.
+- Integration of GAMBLR ecosystem: work seamlessly with the broader [GAMBLR suite](./concepts/GAMBLR_family.html) of packages to design analytical workflows.
+- Reproducibility and transparency: leverage a well-documented [pipelines](https://github.com/LCR-BCCRC/lcr-modules) to ensure consistent and transparent data retrieval.
+
+
+## The GAMBLR.open family includes:
+
+* [GAMBLR.data](https://github.com/morinlab/GAMBLR.data) - a "storage unit" with [different types](https://morinlab.github.io/GAMBLR.data/resources/bundled_data.html) of bundled data.
+* [GAMBLR.helpers](https://github.com/morinlab/GAMBLR.helpers) - a set of low-level functions for data operation.
+* [GAMBLR.utils](https://github.com/morinlab/GAMBLR.utils) - higher level set of functions to operate on genomic data.
+* [GAMBLR.viz](https://github.com/morinlab/GAMBLR.viz) - set of functions used mostly for visualizations.
+* [GAMBLR.predict](https://github.com/morinlab/GAMBLR.predict) - a collection of machine learning algorithms and functions to pre-format inputs for these models. Contains classifiers of [Burkitt](https://doi.org/10.1182/blood.2022016534) and [Follicular](https://doi.org/10.1182/blood.2022018719) lymphomas originally published, as well as reproduced of DLBCL classification by the groupings of [Chapuy et al](https://doi.org/10.1038/s41591-018-0016-8), [Lacy et al](https://doi.org/10.1182/blood.2019003535), and [Runge et al](https://doi.org/10.1111/bjh.17132).
+* GAMBLR.open - this package.
+
+This diagram illustrates in a simplified way the dependency relationship of
+different packages in the GAMBLR family:
+
+```{mermaid}
+%%{
+    init : {
+        "flowchart" : { "curve" : "monotoneX" },
+        'themeVariables': {'fontSize': '24px'}
+    }
+
+}%%
+flowchart LR
+  A("GAMBLR.data") ==> B("GAMBLR.helpers")
+  B ==> C("GAMBLR.utils")
+  B ==> D("GAMBLR.predict")
+  D ==> E("GAMBLR.open")
+  C ==> F("GAMBLR.viz")
+  F ==> E
+  classDef A,B font-size:18pt;
+  style E fill:#6aa84f,stroke:#333,stroke-width:4,font-size:20px
+```
+
+All dependencies should be installed automatically for you, just like with any other R package. If not, please report the issue in the appropriate GitHub repo.
+
+## Community
+
+Community discussions primarily happen through issue submission on [GitHub](https://github.com/morinlab/GAMBLR.open/issues).
