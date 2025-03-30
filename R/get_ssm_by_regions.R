@@ -90,17 +90,25 @@ get_ssm_by_regions <- function(these_samples_metadata,
       }
       regions = apply(regions_bed, 1, bed2region)
     } else {
-      stop("You must supply either regions_list or regions_bed")
+      if(projection == "grch37"){
+        regions_bed = create_bed_data(grch37_ashm_regions,
+                      genome_build = projection,
+                      fix_names="concat",
+                      concat_cols = c("gene","region"),
+                      sep="-")
+      }else if(projection == "hg38"){
+        regions_bed = create_bed_data(grch37_ashm_regions,
+                                      genome_build = projection,
+                                      fix_names="concat",
+                                      concat_cols = c("gene","region"),
+                                      sep="-")
+      }
+      message(paste("defaulting to aSHM regions for ", projection))
+      regions = apply(regions_bed, 1, bed2region)
     }
   } else {
     regions = regions_list
   }
-
-  # Get samples with the dedicated helper function
-  metadata = id_ease(these_samples_metadata = these_samples_metadata,
-                     verbose = verbose,
-                     this_seq_type = this_seq_type)
-
 
   # Warn/notify the user what version of this function they are using
   message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")

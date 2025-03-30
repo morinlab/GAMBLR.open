@@ -1,56 +1,35 @@
-url: https://morinlab.github.io/GAMBLR.viz/
+url: https://morinlab.github.io/GAMBLR.open/
 template:
   bootstrap: 5
-  theme:
-    light: [flatly, theme-light.scss]
-    dark: [darkly, theme-dark.scss]
 
-navbar:
   structure:
-    left:  [intro, articles, reference]
+    left:  [intro, reference, articles]
     right: [search, github, lightswitch]
 
-articles:
-- title: Quick Start
-  navbar: Installation
-  contents:
-    - install
-- title: Guides
-  navbar: Guides
-  contents:
-    - recap_figures
-    - forestplot
-    - CopyNumberHeatmap
-    - data_q
-    - oncoplot
-    - recap_figures
-    - getting_started
-- title: Resources
-  navbar: Help
-  contents:
-    - faq
-
 reference:
-  - title: prettyPlots
+  - title: "get_ functions"
     contents:
-      - starts_with("pretty")
-    examples: false
-  - title: fancyPlots
-    contents:
-      - starts_with("fancy")
-    examples: false
+      - starts_with("get_")
+    examples: true
   - title: Other
     contents:
-      - ashm_rainbow_plot
-      - ashm_multi_rainbow_plot
-      - circular_CN_plot
-      - copy_number_vaf_plot
-      - focal_cn_plot
-      - mutation_hotspot_logo
-      - plot_MutationTimeR
-      - plot_sample_circos
-      - splendidHeatmap
-    examples: false
+      - annotate_hotspots
+      - assign_cn_to_ssm
+      - calc_mutation_frequency_bin_region
+      - calc_mutation_frequency_bin_regions
+      - check_excess_params
+      - collate_results
+      - id_ease
+    examples: true
+
+articles:
+  - title: Guides
+    navbar: Guides
+    contents:
+      - mutation_summary
+      - feature_matrix
+      - genetic_classification
+
 
 figures:
   dev: ragg::agg_png

@@ -1,0 +1,464 @@
+---
+title: "Exploring simple somatic mutations"
+vignette: >
+  %\VignetteIndexEntry{quarto vignettes}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+warning: false
+execute:
+    cache: false
+---
+
+
+
+```{r load}
+#| warning: false
+#| message: true
+library(GAMBLR.open)
+suppressMessages(library(tidyverse))
+```
+
+In general, the experimental data available through GAMBLR.open is obtained using one of the `get_` [family of functions](../reference/index.html#get-functions). These require that you specify which samples you want data from, which you accomplish by providing a metadata table that has been subset to just the samples you require. The metadata for the full set of samples available in `GAMBLR.data` can be obtained using `get_gambl_metadata`. You can subset this table using `dplyr::filter`. Here, we'll focus on all DLBCL and FL samples. In many of the examples for GAMBLR.open and other packages in the GAMBLR family you will see `check_and_clean_metadata`. This is currently required due to the existence of near duplicate rows in the metadata. These duplicated rows exist because some samples were part of more than one study and each row refers to one of those studies. A call to `check_and_clean_metadata` as in this example will remove the duplicated rows, which ensures your analyses will not include duplicated data.
+
+```{r mymeta}
+
+my_meta <- get_gambl_metadata(seq_type_filter = c("genome","capture")) %>%
+  dplyr::filter(
+    pathology %in% c("FL", "DLBCL")
+  ) 
+#How many rows for each pathology and seq_type?
+group_by(my_meta, seq_type, pathology) %>% 
+  count() %>% kableExtra::kable(format="html")
+
+my_meta = check_and_clean_metadata(my_meta,duplicate_action = "keep_first")
+
+#How many rows remain?
+group_by(my_meta, seq_type, pathology) %>% 
+  count() %>% kableExtra::kable(format="html")
+
+length(unique(my_meta$sample_id))
+nrow(my_meta)
+```
+
+This shows that the rows in our metadata represent unique samples so we can proceed. Retrieving simple somatic mutations (SSMs) in a MAF-like format can be done a variety of ways. If your analysis is focusing on protein-coding alterations, then `get_coding_ssm` should meet your needs. 
+
+```{r coding}
+#| warning: false
+#| message: false
+# retrieve MAF for all exome (capture) samples
+capture_coding <- get_coding_ssm(
+  these_samples_metadata = my_meta,
+  projection = "grch37",
+  include_silent = TRUE,
+  this_seq_type = "capture"
+)
+
+nrow(capture_coding)
+
+# retrieve MAF for all genome samples
+genome_coding <- get_coding_ssm(
+  these_samples_metadata = my_meta,
+  projection = "grch37",
+  include_silent = TRUE,
+  this_seq_type = "genome"
+)
+
+num_genome_coding_rows = nrow(genome_coding)
+genome_coding_sample = unique(genome_coding$Tumor_Sample_Barcode)
+num_genome_coding_sample = length(genome_coding_sample)
+```
+
+A total of `r num_genome_coding_rows` mutations in coding regions from `r num_genome_coding_sample` samples were retrieved with `get_coding_ssm`.
+
+To access additional mutations in non-coding regions, you can use `get_ssm_by_samples` if you desire all available mutations or `get_ssm_by_regions` if you want more control over which regions the mutations correspond to. 
+
+::: {.callout-note}
+`GAMBLR.data`, and therefore `GAMBLR.open` does not contain genome-wide mutations from very many samples due to data sharing restrictions. Instead, for most samples the only non-coding mutations included are those within the regions commonly affected by aberrant somatic hypermutation (aSHM).
+:::
+
+```{r} 
+#retrieve genome-wide mutations for all genomes
+genome_all = get_ssm_by_samples(these_samples_metadata = my_meta,
+                                this_seq_type="genome")
+
+num_genome_all_rows = nrow(genome_all)
+genome_all_sample = unique(genome_all$Tumor_Sample_Barcode)
+num_genome_all_sample = length(genome_all_sample)
+```
+
+A total of `r num_genome_all_rows` genome-wide mutations from `r num_genome_all_sample` samples were retrieved with `get_ssm_by_samples`.
+
+These two approaches give us mutations from a different number of samples. We can delve into this a bit by focusing on the differences. 
+
+```{r compare}
+
+genome_all_only = genome_all_sample[!genome_all_sample %in% genome_coding_sample]
+g_u = length(genome_all_only)
+
+```
+
+There are `r g_u` sample_id that have mutations in the genome-wide result but not in coding space. 
+
+```{r view_compare}
+
+filter(my_meta, sample_id %in% genome_all_only) %>% 
+    dplyr::select(sample_id,cohort,pairing_status, pathology, patient_id, study) %>%
+    kableExtra::kable(format="html")
+
+```
+
+Since the non-coding mutations we get from `get_ssm_by_samples` are restricted to known B-cell lymphoma genes and regions affected by aSHM, we should be able to obtain most of these with a call to [get_ssm_by_regions](../reference/get_ssm_by_regions.html) as long as the regions we request include all aSHM sites. 
+
+```{r}
+ashm_genome_maf = get_ssm_by_regions(these_samples_metadata = my_meta,
+                              this_seq_type = "genome",
+                              streamlined = F)
+coding_counted = group_by(genome_coding,Tumor_Sample_Barcode) %>%
+  summarise(coding=n())
+ashm_counted = group_by(ashm_genome_maf,Tumor_Sample_Barcode) %>%
+    summarise(ashm=n())
+
+genome_all_counted = group_by(genome_all,Tumor_Sample_Barcode) %>%
+    summarise(all=n())
+
+count_compare = left_join(genome_all_counted,ashm_counted)
+count_compare = left_join(count_compare,coding_counted) %>%
+  arrange(desc(all))
+
+count_compare = left_join(count_compare,
+                          select(my_meta,Tumor_Sample_Barcode,cohort))
+
+count_compare %>% kableExtra::kable(format="html")
+
+```
+
+::: {.callout-note}
+From this output we can see that there are actually genome-wide mutation calls for a few samples. All these samples are cell lines. 
+:::
+
+```{r}
+my_meta = dplyr::filter(my_meta,
+                       !cohort %in% "DLBCL_cell_lines") 
+genome_coding <- get_coding_ssm(
+  these_samples_metadata = my_meta,
+  projection = "grch37",
+  include_silent = TRUE,
+  this_seq_type = "genome"
+)
+```
+
+## Coding and non-coding mutations
+
+For a high-level overview of what genes the mutations are subset to and their overall mutation incidence in these samples, we can use the `GAMBLR.viz` function `prettyGeneCloud`. This function will automatically remove non-coding variants from your data as a convenience feature. We can get around that by assigning the Variant_Classification column for all mutations to imply they are Missense mutations.  
+
+```{r cloud1}
+fake_maf = mutate(genome_all,Variant_Classification = "Missense_Mutation")
+
+prettyGeneCloud(fake_maf,
+zoomout = 0.2,these_genes= unique(genome_all$Hugo_Symbol))
+
+```
+
+
+```{r cloud2}
+
+prettyGeneCloud(genome_all,
+zoomout = 0.4,these_genes= unique(genome_all$Hugo_Symbol))
+
+```
+
+You will notice that many genes that were prominent in the first cloud are much smaller in the second one. This can be explained by the overwhelming fraction of their mutations representing non-coding variants. This is confirmed by counting up the mutations by `Variant_Classification`, as demonstrated below.
+
+```{r brinp3}
+filter(genome_all,
+  Hugo_Symbol %in% c("BRINP3","PTPRD","DOCK1","UNC5C")) %>% 
+  group_by(Hugo_Symbol,
+           Variant_Classification) %>% 
+  count() %>%
+  kableExtra::kable(format="html")
+
+```
+
+## aSHM targets
+
+Rather than completely ignoring non-coding variants, we can use this approach to gain an overview of the frequency of mutations in regions that have been identified as targets of aSHM. 
+
+```{r ashm_cloud}
+# re-run with the cell lines removed
+ashm_genome_maf = get_ssm_by_regions(these_samples_metadata = my_meta,
+                              this_seq_type = "genome",
+                              streamlined = F)
+prettyGeneCloud(mutate(ashm_genome_maf,
+                Variant_Classification = "Missense_Mutation"),
+                zoomout = 0.4,
+                these_genes= unique(ashm_genome_maf$Hugo_Symbol))
+
+```
+
+```{r ashm_cloud_better}
+# re-run with the cell lines removed
+ashm_genome_streamlined = get_ssm_by_regions(these_samples_metadata = my_meta,
+                              this_seq_type = "genome",
+                              streamlined = TRUE,
+                              use_name_column = TRUE)
+#add columns to force prettyGeneCloud to include everything 
+ashm_genome_streamlined = mutate(ashm_genome_streamlined,
+                            Hugo_Symbol = region_name,
+                            Variant_Classification= "Missense_Mutation",
+                            Tumor_Sample_Barcode = sample_id)
+
+prettyGeneCloud(ashm_genome_streamlined,
+                zoomout = 0.3,
+                these_genes= unique(ashm_genome_streamlined$Hugo_Symbol))
+
+```
+
+
+
+## Summarizing with ggplot2
+
+Word clouds are not useful for communicating the relationship between numeric values. We'll continue using ggplot2 instead. 
+
+```{r ashm_bar}
+ashm_genome_freq = mutate(ashm_genome_streamlined,
+                          gene = str_remove(Hugo_Symbol,"-.+")) %>%
+                   group_by(gene) %>%
+                   summarise(num_mutations=n()) %>% 
+                   arrange(desc(num_mutations))
+ashm_genome_freq$gene = factor(ashm_genome_freq$gene,
+                              levels = rev(unique(ashm_genome_freq$gene)))
+p = ggplot(ashm_genome_freq,aes(y=gene,x=num_mutations)) + 
+    geom_col() +
+    theme_Morons(base_size=4)
+p
+```
+
+As you can see, the total number of coding + non-coding mutations affecting each of these genes among these samples is quite variable. BCL2, IGLL5, BCL6, PAX5 etc are the most heavily affected. 
+
+## Building a MAF summary from scratch
+
+Many analyses will probably focus on mutations in protein-coding space and their predicted effect on proteins. For the rest of this tutorial, we'll delve into this with the mutations we obtained at the start using `get_coding_ssm`. Here, we'll work towards reproducing the output of `maftools::plotmafSummary`, working on one panel at a time.
+
+```{r panel1}
+make_panel1 = function(maf_data,base_size=7,title=""){
+vc_counted  = maf_data %>% 
+  group_by(Variant_Classification) %>% 
+  count() %>% 
+  arrange(n)
+vc_counted$Variant_Classification = factor(
+        vc_counted$Variant_Classification,
+        levels=unique(vc_counted$Variant_Classification)
+    )
+mut_cols = get_gambl_colours("mutation")
+p1 = ggplot(vc_counted,
+            aes(x=n,
+                y=Variant_Classification,
+                fill=Variant_Classification)) + 
+  geom_col() + scale_fill_manual(values=mut_cols)+
+  theme_Morons(base_size = base_size,
+  my_legend_position = "none")  +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+    axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()
+        ) +
+  ggtitle(title)
+p1
+}
+make_panel1(genome_coding, title="Genomes, coding regions")
+make_panel1(genome_all, title="Genomes, all regions")
+make_panel1(capture_coding, title="Exomes")
+```
+
+```{r panel2}
+
+make_panel2 = function(maf_data,base_size=7,title=""){
+type_counted  = maf_data %>% 
+  group_by(Variant_Type) %>% 
+  count() %>% 
+  arrange(n)
+type_counted$Variant_Type = factor(
+        type_counted$Variant_Type,
+        levels=unique(type_counted$Variant_Type)
+    )
+
+mut_cols = c(SNP="purple1",INS="yellow3",DEL="lightblue",DNP="orange","TNP"="lightgreen")
+p2 =ggplot(type_counted,aes(x=n,y=Variant_Type,fill=Variant_Type)) + 
+  geom_col() + scale_fill_manual(values=mut_cols)+
+  theme_Morons(base_size = base_size,my_legend_position = "none")  +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+    axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()
+        ) +
+  ggtitle(title)
+  p2
+}
+make_panel2(genome_coding, title="Genomes, coding regions")
+make_panel2(genome_all, title="Genomes, all regions")
+make_panel2(capture_coding, title = "Exomes")
+  
+```
+
+```{r panel3}
+make_panel3 = function(maf_data,base_size=7,title=""){
+  
+
+comp = function(base){
+  chartr("ACTG", "TGAC",base)
+}
+maf_data = mutate(maf_data,
+                       class = case_when(
+                         Reference_Allele %in% c("T","C") ~ 
+                           paste0(Reference_Allele,
+                                  ">",
+                                  Tumor_Seq_Allele2),
+                         TRUE ~ paste0(comp(Reference_Allele),
+                                       ">",
+                                       comp(Tumor_Seq_Allele2)))
+                       )
+
+class_counted = maf_data %>% dplyr::filter(Variant_Type == "SNP") %>%
+  group_by(class) %>% count()
+class_counted = mutate(class_counted,class = factor(class,levels=c("C>A","C>G","C>T","T>C","T>A","T>G")))
+mut_cols = get_gambl_colours("rainfall")
+p3 = ggplot(class_counted,aes(x=n,y=class,fill=class)) + 
+  geom_col() + scale_fill_manual(values=mut_cols)+
+  theme_Morons(base_size = base_size,my_legend_position = "none")  + 
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+    axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()
+        ) +
+  ggtitle(title)
+p3
+}
+make_panel3(genome_coding, title="Genomes, coding regions")
+make_panel3(genome_all, title="Genomes, all regions")
+make_panel3(capture_coding, title = "Exomes")
+  
+```
+
+```{r panel_4}
+make_panel4 = function(maf_data,base_size=7,title=""){
+  
+
+type_counted  = maf_data %>% 
+  group_by(Tumor_Sample_Barcode,Variant_Classification) %>% 
+  count() %>% 
+  arrange(desc(n))
+type_counted$Tumor_Sample_Barcode = factor(type_counted$Tumor_Sample_Barcode,
+                                            levels=unique(type_counted$Tumor_Sample_Barcode))
+
+mut_cols = get_gambl_colours("mutation")
+p4 = ggplot(type_counted,aes(x=Tumor_Sample_Barcode,y=n,fill=Variant_Classification)) + 
+  geom_col() +
+  scale_fill_manual(values=mut_cols) +
+  
+  theme_Morons(base_size = base_size,my_legend_position = "none") + 
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+    axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()
+        ) +
+  ggtitle(title)
+  
+
+p4
+}
+make_panel4(genome_coding, title="Genomes, coding regions")
+make_panel4(genome_all, title="Genomes, all regions")
+make_panel4(capture_coding, title = "Exomes")
+  
+```
+
+```{r panel_5}
+library(ggbeeswarm)
+make_panel5 = function(maf_data,base_size=7,point_size=0.5,title=""){
+  mut_cols = get_gambl_colours()
+  type_counted  = maf_data %>% 
+  group_by(Tumor_Sample_Barcode,Variant_Classification) %>% 
+  count() %>% 
+  arrange(desc(n))
+vc_counted  = maf_data %>% 
+  group_by(Variant_Classification) %>% 
+  count() %>% 
+  arrange(n)
+vc_counted$Variant_Classification = factor(vc_counted$Variant_Classification,
+                                             levels=unique(vc_counted$Variant_Classification))
+type_counted$Variant_Classification = factor(type_counted$Variant_Classification,
+                                             levels=rev(unique(vc_counted$Variant_Classification)))
+p5 = ggplot(type_counted,aes(x=Variant_Classification,y=n,colour=Variant_Classification)) + 
+  geom_quasirandom(size=point_size) +
+  scale_colour_manual(values=mut_cols) +
+  scale_y_log10() +
+  theme_Morons(base_size = base_size,my_legend_position = "none")  +
+  theme(axis.title.y =element_blank(),
+        axis.text.x =element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x=element_blank()) +
+  ggtitle(title)
+p5
+}
+make_panel5(genome_coding, title="Genomes, coding regions")
+make_panel5(genome_all, title="Genomes, all regions")
+make_panel5(capture_coding, title="Exomes")
+```
+
+```{r}
+make_panel6 = function(maf_data,base_size=7,top=10,title=""){
+  type_counted  = maf_data %>% 
+  group_by(Hugo_Symbol,Variant_Classification) %>% 
+  count() %>% 
+  arrange(n)
+
+top_n = group_by(type_counted,Hugo_Symbol) %>%
+  summarise(total=sum(n)) %>%
+  arrange(desc(total)) %>%
+  slice_head(n=top) %>%
+  pull(Hugo_Symbol)
+mut_cols = get_gambl_colours()
+some_type_counted = dplyr::filter(type_counted,Hugo_Symbol %in% top_n)
+some_type_counted$Hugo_Symbol = factor(some_type_counted$Hugo_Symbol,
+                                            levels=rev(top_n))
+p6 = 
+  ggplot(some_type_counted,aes(y=Hugo_Symbol,x=n,fill=Variant_Classification)) + 
+  geom_col() +
+  scale_fill_manual(values=mut_cols) +
+  theme_Morons(base_size = base_size,my_legend_position = "none")  +
+  theme(axis.text.x=element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks.x=element_blank()) +
+  ggtitle(title)
+
+p6
+}
+make_panel6(genome_coding,base_size=6, title="Genome, coding regions")
+make_panel6(genome_all, title="Genomes, all regions")
+make_panel6(capture_coding, title = "Exomes")
+```
+
+```{r}
+library(cowplot)
+bs = 8
+ps =0.1
+p1 = make_panel1(genome_coding,base_size = bs,title="Variant Classification")
+p2 = make_panel2(genome_coding,base_size = bs,title="Variant Type")
+p3 = make_panel3(genome_coding,base_size = bs,title="SNV Class")
+p4 = make_panel4(genome_coding,base_size = bs,title="Variants per sample")
+p5 = make_panel5(genome_coding,base_size = bs,point_size=ps,title="Variant Classification Summary")
+p6 = make_panel6(genome_coding,base_size = bs, title="Top 10 genes")
+all_p = cowplot::plot_grid(p1,p2,p3,p4,p5,p6,nrow = 2,ncol=3)
+all_p
+
+```
+

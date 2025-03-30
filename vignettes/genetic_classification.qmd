@@ -1,0 +1,280 @@
+---
+title: "Genetic classification of tumours"
+vignette: >
+  %\VignetteIndexEntry{quarto vignettes}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+execute:
+    cache: true
+from: markdown+emoji
+warning: false
+fig.width: 7
+fig.height: 5
+fig.align: "center"
+---
+
+# Tutorial: classifying tumours
+
+In the [previous tutorial](./tutorials/assemble_feature_matrix.html), we have looked at how the GAMBLR functionality can be used to generate binary matrices. In this tutorial, we will review how the binary matrix generation can be utilized to classify samples according to different classification systems and tumour labels can be inferred to assign tumours into genetic subgroups.
+
+::: {.callout-tip}
+We would not need to assemble the matrix separately - the `classify_` family of GAMBLR functions will directly support the maf/seg/bedpe data and handle matrix construction for you.
+:::
+
+The GAMBLR contains [a collection of machine learning algorithms](https://github.com/morinlab/GAMBLR.predict) and functions to pre-format inputs for these models. It contains classifiers of [Burkitt](https://doi.org/10.1182/blood.2022016534) and [Follicular](https://doi.org/10.1182/blood.2022018719) lymphomas originally published, as well as reproduced of DLBCL classification by the groupings of [Chapuy et al](https://doi.org/10.1038/s41591-018-0016-8), [Lacy et al](https://doi.org/10.1182/blood.2019003535), and [Runge et al](https://doi.org/10.1111/bjh.17132).
+
+## Load packages and data
+
+First, we will load required packages. Only `GAMBLR.open` and `tidyverse` are needed - they both will load for you all required functionality.
+```{r load_packages}
+# Load packages
+library(GAMBLR.open)
+library(tidyverse)
+
+```
+
+Next, we will obtain the data. We would need the metadata, SSM in maf format, CNV in seg format, and SV in bedped format. For the demonstration purposes, we will use the data bundled with GAMBLR to show the classification functionality. Here, we will subset data to a small number of samples and will illustrate the required formatting and minimal required information.
+
+
+### Metadata
+
+The metadata is a data frame which contains the column `sample_id` listing sample ids for tumours to be classified, and column `pathology` which will dictate sliding threshold for aSHM site annotation when necessary. The column `seq_type` is not required for classification purposes, but will be kept in this tutorial for the purpose of subsequent retreival of mutation data.
+
+```{r metadata}
+# Load metadata
+metadata <- get_gambl_metadata() %>%
+    filter(seq_type == "genome") %>%
+    filter(pathology %in% c("FL", "DLBCL", "BL")) %>%
+    group_by(sample_id) %>%
+    slice_head() %>%
+    ungroup %>%
+    filter(!study %in% c("DLBCL_Arthur", "DLBCL_Thomas"))
+
+metadata %>%
+    count(pathology)
+
+# Demonstrate the required columns in metadata
+metadata <- metadata %>%
+    select(sample_id, pathology, seq_type)
+
+head(metadata)
+```
+
+
+### SSM (maf format)
+
+The key data to be provided for the genetic subgroup classification is SSM in maf format. Only a small subset of columns is required to be used as input information, and here we would demonstrate the expected format and minimal required information for SSM.
+
+```{r load_maf}
+maf <- get_ssm_by_samples(
+    these_samples_metadata = metadata
+) %>% as.data.frame
+
+# Only these columns are required
+maf_columns <- c(
+    "Hugo_Symbol", "NCBI_Build",
+    "Chromosome", "Start_Position", "End_Position",
+    "Variant_Classification", "HGVSp_Short",
+    "Tumor_Sample_Barcode"
+)
+
+maf <- maf %>%
+    select(all_of(maf_columns))
+
+head(maf)
+```
+
+### CNV (seg format)
+
+Several classifiers ([Chapuy et al](https://doi.org/10.1038/s41591-018-0016-8), [Lacy et al](https://doi.org/10.1182/blood.2019003535), and [Runge et al](https://doi.org/10.1111/bjh.17132)) require a CNV information to be provided, and here we would demonstrate the expected format and minimal required information for CNV in standard seg format.
+
+```{r load_seg}
+seg <- get_cn_segments(
+    these_samples_metadata = metadata
+) %>% as.data.frame
+
+# Only these columns are required
+seg_columns <- c(
+    "ID", "chrom", "start", "end", "LOH_flag", "log.ratio"
+)
+
+seg <- seg %>%
+    select(all_of(seg_columns))
+
+head(seg)
+```
+
+### SV (bedpe format)
+
+Several classifiers require SV data to be provided, and here we would demonstrate the expected format and minimal required information for SV in standard bed format.
+
+```{r load_bedpe}
+bedpe <- get_manta_sv(
+    these_samples_metadata = metadata
+) %>% as.data.frame
+
+# Only these columns are required
+bedpe_columns <- colnames(bedpe)[1:11]
+
+bedpe <- bedpe %>%
+    select(all_of(bedpe_columns))
+
+head(bedpe)
+```
+
+::: {.callout-note}
+The column `manta_name` can be any other column from the tool of choice that generated bedpe output and reports the unique id of the SV event, and is expected to be unique for the SV event.
+:::
+
+## Classify DLBCL
+
+Here, we will explore the reproduced DLBCL classification by the groupings of [Chapuy et al](https://doi.org/10.1038/s41591-018-0016-8), [Lacy et al](https://doi.org/10.1182/blood.2019003535), and [Runge et al](https://doi.org/10.1111/bjh.17132). The classification algorithm can be easily controlled by switching the argument `method` of the `classify_dlbcl()` function.
+
+::: {.callout-important}
+The DLBCL classifiers were not released with the publications, and the models provided here are the best attempt on reproducing the original models. While the model described by Chapuy et al is reproduced with > 92% accuracy, the Lacy and HMRN classifier results need to be taken with caution as the accuracy of the bundled model is only 80%.
+:::
+
+### Chapuy et al. (C0-C5 clusters)
+
+The paper published originally in 2018 by [Chapuy et al](https://doi.org/10.1038/s41591-018-0016-8) was the first attempt to use systematic approach and classify DLBCL patients into genetic subgroupings using genomic information.
+
+::: {.callout-note}
+This model classifies tumours according to the original 2018 publication, and is not directly related to the 2024 DLBCLass model.
+:::
+
+Here is how these subgroupings can be recapitulated with GAMBLR functionality:
+
+```{r chapuy}
+#| eval: false
+predictions <- classify_dlbcl(
+    these_samples_metadata = metadata %>%
+        filter(pathology == "DLBCL"),
+    maf_data = maf,
+    seg_data = seg,
+    sv_data = bedpe
+)
+```
+
+The `classify_` family of functions by default return both the assembled matrix and predictions. The model reports the confidence of each tumour's subgoup vote, as well as final label.
+
+```{r chapuy_pred}
+#| eval: false
+# assembled matrix
+predictions$chapuy_matrix[1:5,1:5]
+
+# subgroup assignment
+head(predictions$chapuy_predictons)
+count(predictions$chapuy_predictons, Chapuy_cluster)
+```
+
+### Lacy et al.
+
+The paper published originally in 2020 by [Lacy et al](https://doi.org/10.1182/blood.2019003535) did not release the classification algorithm, but we recapitulated it by training random forest model with 80% accuaracy.  Here is how these subgroupings can be recapitulated with GAMBLR functionality:
+
+```{r lacy}
+#| eval: false
+predictions <- classify_dlbcl(
+    these_samples_metadata = metadata %>%
+        filter(pathology == "DLBCL"),
+    maf_data = maf,
+    seg_data = seg,
+    sv_data = bedpe,
+    method = "lacy"
+)
+```
+
+Similar to the Chapuy et al predictions, we can see both the constructed matrix and the confidence of each tumour's subgoup vote, as well as final label.
+
+```{r lacy_pred}
+#| eval: false
+# assembled matrix
+predictions$lacy_matrix[1:5,1:5]
+
+# subgroup assignment
+head(predictions$lacy_predictons)
+count(predictions$lacy_predictons, Lacy_cluster)
+```
+
+### HMRN
+
+The paper published by [Runge et al](https://doi.org/10.1111/bjh.17132) modified the original Lacy et al. subgoupings to more closely adhere the genetic subgroups to the [LymphGen](https://doi.org/10.1016/j.ccell.2020.03.015) classification system. The difference between the Runge and Lacy methods is that tumours with truncating *NOTCH1* mutation will be assigned to a separate subgrouping category regardless of other genetic alterations present in the same tumour sample. Here is how these subgroupings can be recapitulated with GAMBLR functionality:
+
+```{r hmrn}
+#| eval: false
+predictions <- classify_dlbcl(
+    these_samples_metadata = metadata %>%
+        filter(pathology == "DLBCL"),
+    maf_data = maf,
+    seg_data = seg,
+    sv_data = bedpe,
+    method = "hmrn"
+)
+```
+
+Take a look at the resulting output
+
+```{r hmrn_pred}
+#| eval: false
+# assembled matrix
+predictions$hmrn_matrix[1:5,1:5]
+
+# subgroup assignment
+head(predictions$hmrn_predictons)
+count(predictions$hmrn_predictons, hmrn_cluster)
+```
+
+## Classify FL
+
+Here, we will explore the classification of FL tumours into genetic subgroups with differential propensity for transformation as originally described [here](https://doi.org/10.1182/blood.2022018719). The developed model can be easily accessed with `classify_fl()` function.
+
+```{r fl}
+#| eval: false
+predictions <- classify_fl(
+    these_samples_metadata = metadata %>%
+        filter(pathology  %in% c("FL", "DLBCL")),
+    maf_data = maf,
+    output = "both"
+)
+```
+
+Similar to DLBCL classifier, we can take a look at the assembled matrix, as well as at the predictions and the confidence of each tumour's vote:
+
+```{r fl_pred}
+#| eval: false
+# assembled matrix
+predictions$matrix[1:10, 1:5]
+
+# subgroup assignment
+head(predictions$predictions)
+count(predictions$predictions, is_cFL)
+```
+
+
+## Classify BL
+
+Here, we will explore the classification of BL tumours into genetic subgroups as originally described in[Thomas et al](https://doi.org/10.1182/blood.2022016534). The developed model reported in this study can be easily accessed with `classify_bl()` function.
+
+```{r bl}
+#| eval: false
+predictions <- classify_bl(
+    these_samples_metadata = metadata %>%
+        filter(pathology  %in% c("BL", "DLBCL")),
+    maf_data = maf
+)
+```
+
+Similar to other classifiers, we can take a look at the assembled matrix, as well as at the predictions and the confidence of each tumour's vote:
+
+```{r bl_pred}
+#| eval: false
+# assembled matrix
+predictions$matrix[1:10, 1:5]
+
+# subgroup assignment
+head(predictions$predictions)
+count(predictions$predictions, BL_subgroup)
+```
+
+That's it!
+
+Happy GAMBLing!
