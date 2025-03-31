@@ -1,0 +1,45 @@
+url: https://morinlab.github.io/GAMBLR.open/
+template:
+  bootstrap: 5
+
+  structure:
+    left:  [intro, reference, articles]
+    right: [search, github, lightswitch]
+
+reference:
+  - title: "get_ functions"
+    contents:
+      - starts_with("get_")
+    examples: true
+  - title: Other
+    contents:
+      - annotate_hotspots
+      - assign_cn_to_ssm
+      - calc_mutation_frequency_bin_region
+      - calc_mutation_frequency_bin_regions
+      - check_excess_params
+      - collate_results
+      - id_ease
+    examples: true
+
+articles:
+  - title: Guides
+    navbar: Guides
+    contents:
+      - mutation_summary
+      - feature_matrix
+      - genetic_classification
+
+
+figures:
+  dev: ragg::agg_png
+  dpi: 96
+  dev.args: []
+  fig.ext: png
+  fig.width: 9
+  fig.height: ~
+  fig.retina: 2
+  fig.asp: 0.9
+  bg: NA
+  other.parameters: []
+

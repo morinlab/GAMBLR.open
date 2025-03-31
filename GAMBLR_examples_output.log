@@ -1,5 +1,5 @@
-[1] "=== STARTED AT 2025-02-25 13:24:59.380351 ==="
-── Running 19 example files ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── GAMBLR.open ──
+[1] "=== STARTED AT 2025-03-28 14:20:26.498598 ==="
+── Running 21 example files ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── GAMBLR.open ──
 
 > my_metadata = get_gambl_metadata()
 
@@ -142,6 +142,37 @@ Showing first 10 rows:
 
 > all_meta_collated = collate_results(join_with_full_metadata = TRUE)
 
+> library(GAMBLR.open)
+
+> my_meta = get_gambl_metadata(seq_type_filter = c("genome", 
++     "capture"))
+
+> my_meta = check_and_clean_metadata(my_meta, duplicate_action = "keep_first")
+
+> maf_all_seqtype = get_all_coding_ssm(my_meta)
+
+> table(maf_all_seqtype$maf_seq_type)
+
+capture  genome 
+  57951 3171050 
+
+> dplyr::group_by(maf_all_seqtype, Hugo_Symbol, Variant_Classification) %>% 
++     dplyr::count() %>% dplyr::arrange(desc(n))
+genomic_data Object
+Genome Build: grch37 
+Showing first 10 rows:
+   Hugo_Symbol Variant_Classification       n
+1      Unknown                    IGR 1306295
+2        PTPRD                 Intron   20317
+3        IGLL5                 Intron   12050
+4         PCLO                 Intron    5932
+5        UNC5D                 Intron    5530
+6         BCL6                 Intron    5207
+7        ROBO2                 Intron    4850
+8         BCL2                 Intron    4737
+9         BCL2                  5'UTR    4728
+10       PTPRK                 Intron    4369
+
 > regions_bed = create_bed_data(GAMBLR.data::grch37_ashm_regions, 
 +     fix_names = "concat", concat_cols = c("gene", "region"), 
 +     sep = "-")
@@ -170,7 +201,7 @@ Showing first 10 rows:
 +     projection = "hg38")
 
 > print(dim(matrix_hg38))
-[1] 529 129
+[1] 2312  129
 
 > print(head(matrix_hg38[, c(1:8)]))
           chr1-203305570-203306650 chr1-226732862-226740184 chr1-226733387-226740281 chr1-28506039-28509827 chr1-30756165-30759164 chr11-102317439-102319346 chr11-111377353-111379499 chr11-118883749-118885805
@@ -185,6 +216,71 @@ Showing first 10 rows:
 
 > genome_segments_hg38 = get_cn_segments(these_samples_metadata = genome_metadata, 
 +     projection = "hg38")
+
+> library(GAMBLR.open)
+
+> all_types_meta = suppressMessages(get_gambl_metadata()) %>% 
++     dplyr::filter(pathology == "BL")
+
+> dplyr::group_by(all_types_meta, seq_type) %>% dplyr::summarize(n = dplyr::n())
+# A tibble: 1 × 2
+  seq_type     n
+  <chr>    <int>
+1 genome     234
+
+> genes_and_cn_threshs = data.frame(gene_id = c("MYC", 
++     "MIR17HG", "CCND3", "ID3", "DDX3X", "SYNCRIP"), cn_thresh = c(3, 
++     3, 2, 2, 2, 1))
+
+> genome_cnv_ssm_status = suppressMessages(get_cnv_and_ssm_status(genes_and_cn_threshs, 
++     genome_build = "hg38", dplyr::filter(all_types_meta, seq_type == 
++         "genome"), only_cnv = "MIR17HG"))
+
+> print(dim(genome_cnv_ssm_status))
+[1] 234   6
+
+> head(genome_cnv_ssm_status)
+                          MYC MIR17HG CCND3 ID3 DDX3X SYNCRIP
+Akata                       1       1     0   1     1       0
+BL2                         1       1     0   1     1       0
+BL30                        1       1     0   1     1       0
+BL41                        1       1     1   1     0       0
+BL70                        1       1     1   1     1       0
+BLGSP-71-06-00001-01A-11D   0       0     1   1     1       0
+
+> colSums(genome_cnv_ssm_status)
+    MYC MIR17HG   CCND3     ID3   DDX3X SYNCRIP 
+    172      38      68     112     118      12 
+
+> all_path_meta = suppressMessages(get_gambl_metadata())
+
+> all_path_meta = check_and_clean_metadata(all_path_meta, 
++     duplicate_action = "keep_first")
+
+> dplyr::group_by(all_types_meta, seq_type) %>% dplyr::summarize(n = dplyr::n())
+# A tibble: 1 × 2
+  seq_type     n
+  <chr>    <int>
+1 genome     234
+
+> all_pathology_status = suppressMessages(get_cnv_and_ssm_status(genes_and_cn_threshs, 
++     all_path_meta, genome_build = "grch37", only_cnv = "MIR17HG"))
+
+> print(dim(all_pathology_status))
+[1] 448   6
+
+> head(all_pathology_status)
+          MYC MIR17HG CCND3 ID3 DDX3X SYNCRIP
+01-20260T   1       0     0   0     0       0
+02-13135T   1       0     0   0     1       0
+02-20170T   0       1     0   0     0       1
+02-22991T   1       0     0   0     0       0
+03-34157T   0       0     0   0     0       0
+04-24029T   0       0     0   0     0       0
+
+> colSums(all_pathology_status)
+    MYC MIR17HG   CCND3     ID3   DDX3X SYNCRIP 
+    114      62      25       5      25     134 
 
 > ssm_exomes_grch37 = get_coding_ssm(projection = "grch37", 
 +     this_seq_type = "capture")
@@ -222,7 +318,7 @@ Showing first 10 rows:
 > all_meta = get_gambl_metadata(seq_type_filter = c("genome", 
 +     "capture"))
 
-> group_by(all_meta, cohort, seq_type) %>% count()
+> dplyr::group_by(all_meta, cohort, seq_type) %>% dplyr::count()
 # A tibble: 21 × 3
 # Groups:   cohort, seq_type [21]
    cohort             seq_type     n
@@ -370,6 +466,9 @@ Showing first 10 rows:
 > ashm_maf = get_ssm_by_regions(regions_bed = regions_bed, 
 +     these_samples_metadata = my_meta, streamlined = FALSE)
 
+> one_region_maf = get_ssm_by_regions(regions_list = "2:136875000-136875097", 
++     streamlined = FALSE, projection = "grch37", these_samples_metadata = my_meta)
+
 > cell_line_meta = get_gambl_metadata() %>% dplyr::filter(cohort == 
 +     "DLBCL_cell_lines")
 
@@ -397,4 +496,4 @@ Showing first 10 rows:
 +     head(5)
 
 > these_ids = id_ease(these_samples_metadata = this_metadata)
-[1] "=== COMPLETED AT 2025-02-25 13:25:47.722534 ==="
+[1] "=== COMPLETED AT 2025-03-28 14:21:25.020465 ==="
