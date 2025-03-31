@@ -9,7 +9,7 @@ Authors@R: c(
   )
 Description: Database, mining, manipulation and convenience functions for
     working with genomic data of mature B-cell lymphomas.
-License: MIT
+License: MIT + file LICENSE
 Depends:
     R (>= 3.5.0)
 Imports:

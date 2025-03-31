@@ -41,6 +41,7 @@
 #' @return A data frame with CNV and SSM combined status.
 #' 
 #' @import dplyr GAMBLR.utils
+#' @importFrom stats setNames
 #' @export
 #'
 #' @examples

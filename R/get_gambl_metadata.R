@@ -59,7 +59,8 @@
 #' @export
 #'
 #' @examples
-#' #return metadata for genome samples (here, the parameter is redundant because 'genome' is the default)
+#' #return metadata for genome samples (here, the parameter is redundant because 
+#' # 'genome' is the default)
 #' genome_meta = get_gambl_metadata(seq_type_filter = "genome")
 #'
 #' #return metadata for capture samples.
