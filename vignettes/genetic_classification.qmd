@@ -5,23 +5,36 @@ vignette: >
   %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
 execute:
-    cache: true
+    cache: false
 from: markdown+emoji
+results: asis
 warning: false
 fig.width: 7
 fig.height: 5
 fig.align: "center"
 ---
 
-# Tutorial: classifying tumours
+```{r setup}
+#| include: false
+library(knitr)
+library(kableExtra)
+registerS3method("knit_print", "data.frame", 
+  function(x, ...) {
+    knitr::asis_output(kableExtra::kable(x, format = "html", ...))
+  },
+  envir = asNamespace("knitr")
+)
 
-In the [previous tutorial](./tutorials/assemble_feature_matrix.html), we have looked at how the GAMBLR functionality can be used to generate binary matrices. In this tutorial, we will review how the binary matrix generation can be utilized to classify samples according to different classification systems and tumour labels can be inferred to assign tumours into genetic subgroups.
+```
+
+
+In another tutorial, we saw at how GAMBLR.open can be used to generate binary matrices representing the presence/absence of mutations and other genetic features (e.g. common CNVs, SVs). In this tutorial, we will review how the binary matrix generation can be utilized to classify samples according to different classification systems and tumour labels can be inferred to assign tumours into genetic subgroups.
 
 ::: {.callout-tip}
 We would not need to assemble the matrix separately - the `classify_` family of GAMBLR functions will directly support the maf/seg/bedpe data and handle matrix construction for you.
 :::
 
-The GAMBLR contains [a collection of machine learning algorithms](https://github.com/morinlab/GAMBLR.predict) and functions to pre-format inputs for these models. It contains classifiers of [Burkitt](https://doi.org/10.1182/blood.2022016534) and [Follicular](https://doi.org/10.1182/blood.2022018719) lymphomas originally published, as well as reproduced of DLBCL classification by the groupings of [Chapuy et al](https://doi.org/10.1038/s41591-018-0016-8), [Lacy et al](https://doi.org/10.1182/blood.2019003535), and [Runge et al](https://doi.org/10.1111/bjh.17132).
+The GAMBLR contains [a collection of trained models](https://github.com/morinlab/GAMBLR.predict) and functions to pre-format inputs for these models. It contains classifiers of [Burkitt](https://doi.org/10.1182/blood.2022016534) and [Follicular](https://doi.org/10.1182/blood.2022018719) lymphomas originally published, as well as reproduced of DLBCL classification by the groupings of [Chapuy et al](https://doi.org/10.1038/s41591-018-0016-8), [Lacy et al](https://doi.org/10.1182/blood.2019003535), and [Runge et al](https://doi.org/10.1111/bjh.17132).
 
 ## Load packages and data
 
@@ -55,9 +68,9 @@ metadata %>%
 
 # Demonstrate the required columns in metadata
 metadata <- metadata %>%
-    select(sample_id, pathology, seq_type)
+    select(sample_id, pathology, seq_type) 
 
-head(metadata)
+head(metadata) 
 ```
 
 
@@ -81,7 +94,7 @@ maf_columns <- c(
 maf <- maf %>%
     select(all_of(maf_columns))
 
-head(maf)
+head(maf) 
 ```
 
 ### CNV (seg format)
@@ -101,7 +114,7 @@ seg_columns <- c(
 seg <- seg %>%
     select(all_of(seg_columns))
 
-head(seg)
+head(seg) 
 ```
 
 ### SV (bedpe format)
@@ -119,7 +132,7 @@ bedpe_columns <- colnames(bedpe)[1:11]
 bedpe <- bedpe %>%
     select(all_of(bedpe_columns))
 
-head(bedpe)
+head(bedpe) 
 ```
 
 ::: {.callout-note}
@@ -145,7 +158,7 @@ This model classifies tumours according to the original 2018 publication, and is
 Here is how these subgroupings can be recapitulated with GAMBLR functionality:
 
 ```{r chapuy}
-#| eval: false
+
 predictions <- classify_dlbcl(
     these_samples_metadata = metadata %>%
         filter(pathology == "DLBCL"),
@@ -158,13 +171,15 @@ predictions <- classify_dlbcl(
 The `classify_` family of functions by default return both the assembled matrix and predictions. The model reports the confidence of each tumour's subgoup vote, as well as final label.
 
 ```{r chapuy_pred}
-#| eval: false
+
 # assembled matrix
-predictions$chapuy_matrix[1:5,1:5]
+predictions$matrix[1:5,1:5] 
 
 # subgroup assignment
-head(predictions$chapuy_predictons)
-count(predictions$chapuy_predictons, Chapuy_cluster)
+predictions$predictions %>%
+ slice_head(n=10)
+count(predictions$predictions, Chapuy_cluster) 
+
 ```
 
 ### Lacy et al.
@@ -172,7 +187,7 @@ count(predictions$chapuy_predictons, Chapuy_cluster)
 The paper published originally in 2020 by [Lacy et al](https://doi.org/10.1182/blood.2019003535) did not release the classification algorithm, but we recapitulated it by training random forest model with 80% accuaracy.  Here is how these subgroupings can be recapitulated with GAMBLR functionality:
 
 ```{r lacy}
-#| eval: false
+
 predictions <- classify_dlbcl(
     these_samples_metadata = metadata %>%
         filter(pathology == "DLBCL"),
@@ -186,13 +201,13 @@ predictions <- classify_dlbcl(
 Similar to the Chapuy et al predictions, we can see both the constructed matrix and the confidence of each tumour's subgoup vote, as well as final label.
 
 ```{r lacy_pred}
-#| eval: false
 # assembled matrix
-predictions$lacy_matrix[1:5,1:5]
+predictions$matrix[1:5,1:5]
 
 # subgroup assignment
-head(predictions$lacy_predictons)
-count(predictions$lacy_predictons, Lacy_cluster)
+head(predictions$predictions) 
+
+count(predictions$predictions, Lacy_cluster) 
 ```
 
 ### HMRN
@@ -200,7 +215,7 @@ count(predictions$lacy_predictons, Lacy_cluster)
 The paper published by [Runge et al](https://doi.org/10.1111/bjh.17132) modified the original Lacy et al. subgoupings to more closely adhere the genetic subgroups to the [LymphGen](https://doi.org/10.1016/j.ccell.2020.03.015) classification system. The difference between the Runge and Lacy methods is that tumours with truncating *NOTCH1* mutation will be assigned to a separate subgrouping category regardless of other genetic alterations present in the same tumour sample. Here is how these subgroupings can be recapitulated with GAMBLR functionality:
 
 ```{r hmrn}
-#| eval: false
+
 predictions <- classify_dlbcl(
     these_samples_metadata = metadata %>%
         filter(pathology == "DLBCL"),
@@ -214,13 +229,14 @@ predictions <- classify_dlbcl(
 Take a look at the resulting output
 
 ```{r hmrn_pred}
-#| eval: false
+
 # assembled matrix
-predictions$hmrn_matrix[1:5,1:5]
+predictions$matrix[1:5,1:5]
 
 # subgroup assignment
-head(predictions$hmrn_predictons)
-count(predictions$hmrn_predictons, hmrn_cluster)
+head(predictions$predictions) 
+
+count(predictions$predictions, hmrn_cluster)
 ```
 
 ## Classify FL
@@ -228,7 +244,7 @@ count(predictions$hmrn_predictons, hmrn_cluster)
 Here, we will explore the classification of FL tumours into genetic subgroups with differential propensity for transformation as originally described [here](https://doi.org/10.1182/blood.2022018719). The developed model can be easily accessed with `classify_fl()` function.
 
 ```{r fl}
-#| eval: false
+
 predictions <- classify_fl(
     these_samples_metadata = metadata %>%
         filter(pathology  %in% c("FL", "DLBCL")),
@@ -240,22 +256,23 @@ predictions <- classify_fl(
 Similar to DLBCL classifier, we can take a look at the assembled matrix, as well as at the predictions and the confidence of each tumour's vote:
 
 ```{r fl_pred}
-#| eval: false
+
 # assembled matrix
 predictions$matrix[1:10, 1:5]
 
 # subgroup assignment
-head(predictions$predictions)
+head(predictions$predictions) 
+
 count(predictions$predictions, is_cFL)
 ```
 
 
 ## Classify BL
 
-Here, we will explore the classification of BL tumours into genetic subgroups as originally described in[Thomas et al](https://doi.org/10.1182/blood.2022016534). The developed model reported in this study can be easily accessed with `classify_bl()` function.
+Here, we will explore the classification of BL tumours into genetic subgroups as originally described in [Thomas et al](https://doi.org/10.1182/blood.2022016534). The developed model reported in this study can be easily accessed with `classify_bl()` function.
 
 ```{r bl}
-#| eval: false
+
 predictions <- classify_bl(
     these_samples_metadata = metadata %>%
         filter(pathology  %in% c("BL", "DLBCL")),
@@ -266,15 +283,29 @@ predictions <- classify_bl(
 Similar to other classifiers, we can take a look at the assembled matrix, as well as at the predictions and the confidence of each tumour's vote:
 
 ```{r bl_pred}
-#| eval: false
+
 # assembled matrix
 predictions$matrix[1:10, 1:5]
 
 # subgroup assignment
-head(predictions$predictions)
+head(predictions$predictions) 
+
 count(predictions$predictions, BL_subgroup)
 ```
 
 That's it!
 
-Happy GAMBLing!
+*Happy GAMBLing!*
+
+```
+  /$$$$$$     /$$$$$$    /$$      /$$   /$$$$$$$    /$$        .:::::::     
+ /$$__  $$   /$$__  $$  | $$$    /$$$  | $$__  $$  | $$        .::    .::   
+| $$  \__/  | $$  \ $$  | $$$$  /$$$$  | $$  \ $$  | $$        .::    .::   
+| $$ /$$$$  | $$$$$$$$  | $$ $$/$$ $$  | $$$$$$$   | $$   <-   .: .::       
+| $$|_  $$  | $$__  $$  | $$  $$$| $$  | $$__  $$  | $$        .::  .::     
+| $$  \ $$  | $$  | $$  | $$\  $ | $$  | $$  \ $$  | $$        .::    .::   
+|  $$$$$$/  | $$  | $$  | $$ \/  | $$  | $$$$$$$/  | $$$$$$$$  .::      .:: 
+ \______/   |__/  |__/  |__/     |__/  |_______/   |________/ 
+ ~GENOMIC~~~~~~~~~~~~~OF~~~~~~~~~~~~~~~~~B-CELL~~~~~~~~~~~~~~~~~~IN~~~~~~ 
+ ~~~~~~~~~~~~ANALYSIS~~~~~~MATURE~~~~~~~~~~~~~~~~~~~LYMPHOMAS~~~~~~~~~~R~ 
+```
