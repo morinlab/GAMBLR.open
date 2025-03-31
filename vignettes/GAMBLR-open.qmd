@@ -52,12 +52,46 @@ Some of the advantages of GAMBLR.open are:
 
 ## The GAMBLR.open family includes:
 
-* [GAMBLR.data](https://github.com/morinlab/GAMBLR.data) - a "storage unit" with [different types](https://morinlab.github.io/GAMBLR.data/resources/bundled_data.html) of bundled data.
-* [GAMBLR.helpers](https://github.com/morinlab/GAMBLR.helpers) - a set of low-level functions for data operation.
-* [GAMBLR.utils](https://github.com/morinlab/GAMBLR.utils) - higher level set of functions to operate on genomic data.
-* [GAMBLR.viz](https://github.com/morinlab/GAMBLR.viz) - set of functions used mostly for visualizations.
-* [GAMBLR.predict](https://github.com/morinlab/GAMBLR.predict) - a collection of machine learning algorithms and functions to pre-format inputs for these models. Contains classifiers of [Burkitt](https://doi.org/10.1182/blood.2022016534) and [Follicular](https://doi.org/10.1182/blood.2022018719) lymphomas originally published, as well as reproduced of DLBCL classification by the groupings of [Chapuy et al](https://doi.org/10.1038/s41591-018-0016-8), [Lacy et al](https://doi.org/10.1182/blood.2019003535), and [Runge et al](https://doi.org/10.1111/bjh.17132).
+::: {.panel-tabset}
+
+## Overview
+
+* **GAMBLR.data** - a "storage unit" with various types of bundled data including curated resources.
+
+* **GAMBLR.viz** - A collection of functions to help generate visual representations of lymphoma genomic data. 
+
+* **GAMBLR.helpers** - a set of low-level functions for data operation. 
+
+* **GAMBLR.utils** - higher level set of somewhat generic functions to facilitate some common cancer genomic data analysis tasks. 
+
+
+* **GAMBLR.predict** - a collection of machine learning algorithms and functions to pre-format inputs for these models. Contains classifiers of [Burkitt](https://doi.org/10.1182/blood.2022016534) and [Follicular](https://doi.org/10.1182/blood.2022018719) lymphomas originally published, as well as reproduced of DLBCL classification by the groupings of [Chapuy et al](https://doi.org/10.1038/s41591-018-0016-8), [Lacy et al](https://doi.org/10.1182/blood.2019003535), and [Runge et al](https://doi.org/10.1111/bjh.17132).
+
 * GAMBLR.open - this package.
+
+## Code
+
+* [**GAMBLR.open**](https://github.com/morinlab/GAMBLR.open)
+
+* [**GAMBLR.viz**](https://github.com/morinlab/GAMBLR.viz)
+
+* [**GAMBLR.data**](https://github.com/morinlab/GAMBLR.data)
+
+* [**GAMBLR.helpers**](https://github.com/morinlab/GAMBLR.helpers)
+
+* [**GAMBLR.utils**](https://github.com/morinlab/GAMBLR.utils)
+
+* [**GAMBLR.predict**](https://github.com/morinlab/GAMBLR.predict)
+
+## Documentation and tutorials
+
+* [**GAMBLR.open**](https://morinlab.github.io/GAMBLR.open)
+
+* [**GAMBLR.viz**](https://morinlab.github.io/GAMBLR.viz)
+
+* [**GAMBLR.data**](https://morinlab.github.io/GAMBLR.data/resources/bundled_data.html) 
+
+:::
 
 This diagram illustrates in a simplified way the dependency relationship of
 different packages in the GAMBLR family:
