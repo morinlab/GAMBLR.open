@@ -13,7 +13,7 @@ Hello GAMBLRs!
 
 Database, mining, manipulation and convenience functions for working with genomic data of mature B-cell lymphomas. This package is a wrapper that provides a convenient one-stop access to load the following packages from the GAMBLR family:
 
-* [GAMBLR.open](https://morinlab.gihtub.io/GAMBLR.open) - this package
+* [GAMBLR.open](https://morinlab.github.io/GAMBLR.open) - this package
 
 * [GAMBLR.data](https://github.com/morinlab/GAMBLR.data) - collection of genomic
 data for analysis of Mature B-cell neoplasms
