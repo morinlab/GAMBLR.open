@@ -26,6 +26,7 @@ articles:
   - title: Guides
     navbar: Guides
     contents:
+      - glossary
       - mutation_summary
       - feature_matrix
       - genetic_classification
