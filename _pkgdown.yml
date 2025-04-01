@@ -30,6 +30,7 @@ articles:
       - mutation_summary
       - feature_matrix
       - genetic_classification
+      - bundled_data
 
 
 figures:
