@@ -4,7 +4,7 @@
 \alias{get_gambl_metadata}
 \title{Get GAMBL Metadata.}
 \usage{
-get_gambl_metadata(seq_type_filter = "genome", case_set, ...)
+get_gambl_metadata(seq_type_filter = c("genome", "capture"), case_set, ...)
 }
 \arguments{
 \item{seq_type_filter}{Specify the seq type you want to return metadata for.
@@ -67,7 +67,8 @@ DLBCL_Reddy (all samples from Reddy et al study), DLBCL_Thomas (HTMCP DLBCLs
 from Thomas et al study), BL_Thomas (BL samples from Thomas et al study)
 }
 \examples{
-#return metadata for genome samples (here, the parameter is redundant because 'genome' is the default)
+#return metadata for genome samples (here, the parameter is redundant because 
+# 'genome' is the default)
 genome_meta = get_gambl_metadata(seq_type_filter = "genome")
 
 #return metadata for capture samples.
@@ -76,6 +77,7 @@ capture_meta = get_gambl_metadata(seq_type_filter = "capture")
 #If you want metadata for genome and capture samples you can provide a vector of seq types
 all_meta = get_gambl_metadata(seq_type_filter = c("genome", "capture"))
 
-group_by(all_meta,cohort,seq_type) \%>\% count()
+dplyr::group_by(all_meta,cohort,seq_type) \%>\% 
+    dplyr::count()
 
 }

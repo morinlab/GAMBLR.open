@@ -59,7 +59,8 @@
 #' @export
 #'
 #' @examples
-#' #return metadata for genome samples (here, the parameter is redundant because 'genome' is the default)
+#' #return metadata for genome samples (here, the parameter is redundant because 
+#' # 'genome' is the default)
 #' genome_meta = get_gambl_metadata(seq_type_filter = "genome")
 #'
 #' #return metadata for capture samples.
@@ -68,10 +69,11 @@
 #' #If you want metadata for genome and capture samples you can provide a vector of seq types
 #' all_meta = get_gambl_metadata(seq_type_filter = c("genome", "capture"))
 #'
-#' group_by(all_meta,cohort,seq_type) %>% count()
+#' dplyr::group_by(all_meta,cohort,seq_type) %>% 
+#'     dplyr::count()
 #'
 get_gambl_metadata = function(
-    seq_type_filter = "genome",
+    seq_type_filter = c("genome","capture"),
     case_set,
     ...
 ){
@@ -89,19 +91,19 @@ get_gambl_metadata = function(
         # pre-defined case sets
         if(case_set == "FL_Dreval"){
             metadata <- metadata %>%
-                dplyr::filter(cohort == "FL_Dreval", pathology == "FL")
+                dplyr::filter(study == "FL_Dreval", pathology == "FL")
         }else if(case_set == "DLBCL_Dreval"){
             metadata <- metadata %>%
-                dplyr::filter(cohort == "FL_Dreval", pathology == "DLBCL")
+                dplyr::filter(study == "FL_Dreval", pathology == "DLBCL")
         }else if(case_set == "FL-DLBCL-study"){
             metadata <- metadata %>%
-                dplyr::filter(cohort == "FL_Dreval")
+                dplyr::filter(study == "FL_Dreval")
         }else if(case_set == "DLBCL_Arthur"){
             metadata <- metadata %>%
-                dplyr::filter(cohort == "DLBCL_Arthur")
+                dplyr::filter(study == "DLBCL_Arthur")
         }else if(case_set == "DLBCL_Hilton"){
             metadata <- metadata %>%
-                dplyr::filter(cohort == "DLBCL_Hilton")
+                dplyr::filter(study == "DLBCL_Hilton")
         }else if(case_set == "DLBCL_cell_lines"){
             metadata <- metadata %>%
                 dplyr::filter(cohort == "DLBCL_cell_lines")
@@ -116,10 +118,10 @@ get_gambl_metadata = function(
                 dplyr::filter(cohort == "dlbcl_reddy")
         }else if(case_set == "BL_Thomas"){
             metadata <- metadata %>%
-                dplyr::filter(cohort == "BL_Thomas")
+                dplyr::filter(study == "BL_Thomas")
         }else if(case_set == "DLBCL_Thomas"){
             metadata <- metadata %>%
-                dplyr::filter(cohort == "DLBCL_Thomas")
+                dplyr::filter(study == "DLBCL_Thomas")
         }else{
             message(paste("case set", case_set, "not available"))
             return()

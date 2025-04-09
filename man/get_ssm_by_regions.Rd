@@ -59,14 +59,21 @@ regions_bed = create_bed_data( GAMBLR.data::grch37_ashm_regions,
 my_meta = get_gambl_metadata()
 # get a full MAF-format data frame for all aSHM regions on grch37 coordinates
 ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
-                                        these_samples_metadata = my_meta,
-                                        streamlined = FALSE)
-
-# This example intentionally fails
-ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
                               these_samples_metadata = my_meta,
-                               projection="hg38")
+                              streamlined = FALSE)
+
+
+
+one_region_maf = get_ssm_by_regions(regions_list = "2:136875000-136875097",
+                         streamlined = FALSE,
+                         projection = "grch37",
+                         these_samples_metadata = my_meta)
+\dontrun{
+# This example fails, as it should
+#ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
+#                              these_samples_metadata = my_meta,
+#                               projection="hg38")
 # Error in get_ssm_by_regions(regions_bed = regions_bed, these_samples_metadata = my_meta,  : 
 # requested projection: hg38 and genome_build of regions_bed: grch37 don't match
-
+}
 }
