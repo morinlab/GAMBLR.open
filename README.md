@@ -26,3 +26,6 @@ data for analysis of Mature B-cell neoplasms
 
 * [GAMBLR.predict](https://github.com/morinlab/GAMBLR.predict) - collection of functions and helpers to classify B-cell lymphomas
 
+# Shiny dashboard
+
+For the code-free functionality of this package, please visit our Shiny Dashboard [here](https://shiny.research.sfu.ca/u/kdreval/GAMBL.shiny/).
