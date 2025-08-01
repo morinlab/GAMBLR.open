@@ -161,7 +161,8 @@ get_ssm_by_regions <- function(these_samples_metadata,
         dplyr::rename(c("Chromosome"="chrom",
                         "Start_Position"="start",
                         "End_Position"="end",
-                        "region"="name")) 
+                        "bed_name"="name")) %>%
+        dplyr::mutate(region = paste0(Chromosome, ":", Start_Position, "-", End_Position))
 
     }else{
       regions_df <- as.data.frame(regions) %>%
@@ -174,24 +175,32 @@ get_ssm_by_regions <- function(these_samples_metadata,
         mutate(
           Start_Position = as.numeric(Start_Position),
           End_Position = as.numeric(End_Position),
-          region = row_number()
+          region = paste0(Chromosome, ":", Start_Position, "-", End_Position)
         )
     }
     
 
-    region_mafs <- cool_overlaps(
+    maf_df <- cool_overlaps(
       sample_maf,
       regions_df
     ) %>%
       dplyr::rename_with(~ gsub(".x", "", .x, fixed = TRUE)) %>%
-      dplyr::select(all_of(c(names(sample_maf), "region"))) %>%
-      dplyr::group_split(region)
-    maf_df = do.call(bind_rows, region_mafs)
+      dplyr::select(all_of(c(names(sample_maf), "region")), any_of("bed_name"))
 
-    if(!use_name_column){
-      maf_df = mutate(maf_df,region=paste0(Chromosome,":",Start_Position))
+    if(use_name_column){
+      if(!missing(regions_bed)){
+        maf_df = maf_df %>%
+          dplyr::mutate(region = bed_name) %>%
+          dplyr::select(-bed_name)
+      }else{
+        stop("use_name_column = TRUE can only be used with regions_bed")
+      }
+    }else if(!missing(regions_bed)){
+      maf_df = maf_df %>%
+        dplyr::select(-bed_name)
     }
     maf_df = dplyr::rename(maf_df,c("region_name"="region"))
+
     # To remove duplicate rows in the case of the same region provided more than once
     maf_df <- unique(maf_df)
 
