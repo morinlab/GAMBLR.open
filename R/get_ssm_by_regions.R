@@ -107,7 +107,11 @@ get_ssm_by_regions <- function(these_samples_metadata,
       regions = apply(regions_bed, 1, bed2region)
     }
   } else {
-    regions = regions_list
+    if(projection == "grch37"){
+      regions = gsub(",", "", gsub("chr", "", regions_list))
+    }else{
+      regions = gsub(",", "", regions_list)
+    }
   }
 
   # Warn/notify the user what version of this function they are using
