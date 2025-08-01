@@ -5,14 +5,16 @@
 #' @details This function internally calls get_ssm_by_region to retrieve SSM calls for the specified regions.
 #'
 #' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to.
-#' @param this_seq_type The this_seq_type you want back, default is genome.
-#' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
 #' @param regions_list A vector of regions in the chr:start-end format to restrict the returned SSM calls to.
 #' @param regions_bed A data frame in BED format with the coordinates you want to retrieve (recommended).
 #' This parameter can also accept an additional column with region names that will be added to the return if `use_name_column = TRUE`
+#' @param maf_data Use an already loaded MAF object of class "genomic_data" or "maf_data".
+#' @param this_seq_type The this_seq_type you want back, default is genome.
 #' @param streamlined If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name).
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38), default is grch37.
 #' @param use_name_column If your bed-format data frame has a name column (must be named "name") these can be used to name your regions.
+#' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to 
+#'  return the exact variants as reported in the original papers.
 #' @param verbose Set to TRUE to maximize the output to console. Default is TRUE.
 #' This parameter also dictates the verbosity of any helper function internally called inside the main function.
 #' @param ... Any additional parameters.
@@ -53,12 +55,13 @@
 get_ssm_by_regions <- function(these_samples_metadata,
                                regions_list,
                                regions_bed,
+                               maf_data,
                                this_seq_type = "genome",
                                streamlined = TRUE,
                                projection = "grch37",
-                               verbose = FALSE,
                                use_name_column = FALSE,
                                tool_name = "slms-3",
+                               verbose = FALSE,
                                ...) {
 
   # check provided projection
@@ -114,18 +117,45 @@ get_ssm_by_regions <- function(these_samples_metadata,
     }
   }
 
-  # Warn/notify the user what version of this function they are using
-  message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
+  if(!missing(maf_data)){
+    # Warn/notify the user what version of this function they are using
+    message("Using the supplied maf_data")
+
+    # Confirm the genome build and projection match
+    if(is.null(get_genome_build(maf_data))){
+      stop("No genome_build found for maf_data! Is it a genomic_data or maf_data Object?")
+    }
+    if(!get_genome_build(maf_data)==projection){
+      stop(paste("requested projection:",projection,"and genome_build of maf_data:", 
+            get_genome_build(maf_data), "don't match"))
+    }
+    sample_maf <- maf_data %>%
+      dplyr::filter(Tumor_Sample_Barcode %in% these_samples_metadata$sample_id)
+    # Remove any existing region_name or name columns from this maf being made by
+    # a previous call to get_ssm_by_regions. Only annotations from the current
+    # regions_bed / regions_list will remain
+    if("region_name" %in% names(sample_maf)){
+      sample_maf <- sample_maf %>%
+        dplyr::select(-region_name)
+    }
+    if("name" %in% names(sample_maf)){
+      sample_maf <- sample_maf %>%
+        dplyr::select(-name)
+    }
+  } else{
+    # Warn/notify the user what version of this function they are using
+    message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
     if (verbose) {
       print("Using the non-default engine for efficiency...")
     }
-
     sample_maf <- get_ssm_by_samples(
       these_samples_metadata = these_samples_metadata,
       this_seq_type = this_seq_type,
       projection = projection,
       tool_name = tool_name
     )
+  }
+
     if(!missing(regions_bed) && "bed_data" %in% class(regions_bed)){
       regions_df = dplyr::select(regions_bed,1:4) %>%
         dplyr::rename(c("Chromosome"="chrom",
