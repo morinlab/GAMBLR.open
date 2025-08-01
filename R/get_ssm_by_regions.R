@@ -162,6 +162,9 @@ get_ssm_by_regions <- function(these_samples_metadata,
       maf_df = mutate(maf_df,region=paste0(Chromosome,":",Start_Position))
     }
     maf_df = dplyr::rename(maf_df,c("region_name"="region"))
+    # To remove duplicate rows in the case of the same region provided more than once
+    maf_df <- unique(maf_df)
+
     if(streamlined){
       
       maf_df = dplyr::select(maf_df,Start_Position,Tumor_Sample_Barcode,region_name) %>%
