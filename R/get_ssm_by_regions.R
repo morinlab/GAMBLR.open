@@ -15,7 +15,7 @@
 #' @param use_name_column If your bed-format data frame has a name column (must be named "name") these can be used to name your regions.
 #' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to 
 #'  return the exact variants as reported in the original papers.
-#' @param verbose Set to TRUE to maximize the output to console. Default is TRUE.
+#' @param verbose Set to TRUE to maximize the output to console. Default is FALSE.
 #' This parameter also dictates the verbosity of any helper function internally called inside the main function.
 #' @param ... Any additional parameters.
 #'
@@ -26,24 +26,31 @@
 #' @export
 #'
 #' @examples
-#' #basic usage, adding custom names from bundled ashm data frame
+#' # Create bed data by adding custom names from the bundled ashm data frame
 #' regions_bed = create_bed_data( GAMBLR.data::grch37_ashm_regions,
 #'                           fix_names = "concat",
 #'                           concat_cols = c("gene","region"),
 #'                           sep="-")
 #' 
 #' my_meta = get_gambl_metadata()
-#' # get a full MAF-format data frame for all aSHM regions on grch37 coordinates
+#' 
+#' # Get a full MAF-format data frame for all aSHM regions on grch37 coordinates
 #' ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
 #'                               these_samples_metadata = my_meta,
 #'                               streamlined = FALSE)
 #' 
-#' 
-#'
-#' one_region_maf = get_ssm_by_regions(regions_list = "2:136875000-136875097",
+#' # Using a vector of regions in the chr:start-end format
+#' one_region_maf = get_ssm_by_regions(regions_list = "chr2:136875000-136875097",
 #'                          streamlined = FALSE,
 #'                          projection = "grch37",
 #'                          these_samples_metadata = my_meta)
+#' 
+#' # Providing an existing MAF-format data frame
+#' one_region_maf = get_ssm_by_regions(regions_list = "chr2:136875000-136875097",
+#'                          streamlined = FALSE,
+#'                          projection = "grch37",
+#'                          these_samples_metadata = my_meta,
+#'                          maf_data = ashm_maf)
 #' \dontrun{
 #' # This example fails, as it should
 #' #ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,

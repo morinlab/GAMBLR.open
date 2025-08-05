@@ -8,12 +8,13 @@ get_ssm_by_regions(
   these_samples_metadata,
   regions_list,
   regions_bed,
+  maf_data,
   this_seq_type = "genome",
   streamlined = TRUE,
   projection = "grch37",
-  verbose = FALSE,
   use_name_column = FALSE,
   tool_name = "slms-3",
+  verbose = FALSE,
   ...
 )
 }
@@ -25,18 +26,21 @@ get_ssm_by_regions(
 \item{regions_bed}{A data frame in BED format with the coordinates you want to retrieve (recommended).
 This parameter can also accept an additional column with region names that will be added to the return if \code{use_name_column = TRUE}}
 
+\item{maf_data}{Use an already loaded MAF object of class "genomic_data" or "maf_data".}
+
 \item{this_seq_type}{The this_seq_type you want back, default is genome.}
 
 \item{streamlined}{If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name).}
 
 \item{projection}{Obtain variants projected to this reference (one of grch37 or hg38), default is grch37.}
 
-\item{verbose}{Set to TRUE to maximize the output to console. Default is TRUE.
-This parameter also dictates the verbosity of any helper function internally called inside the main function.}
-
 \item{use_name_column}{If your bed-format data frame has a name column (must be named "name") these can be used to name your regions.}
 
-\item{tool_name}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.}
+\item{tool_name}{Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to
+return the exact variants as reported in the original papers.}
+
+\item{verbose}{Set to TRUE to maximize the output to console. Default is FALSE.
+This parameter also dictates the verbosity of any helper function internally called inside the main function.}
 
 \item{...}{Any additional parameters.}
 }
@@ -50,24 +54,31 @@ Efficiently retrieve all mutations across a range of genomic regions.
 This function internally calls get_ssm_by_region to retrieve SSM calls for the specified regions.
 }
 \examples{
-#basic usage, adding custom names from bundled ashm data frame
+# Create bed data by adding custom names from the bundled ashm data frame
 regions_bed = create_bed_data( GAMBLR.data::grch37_ashm_regions,
                           fix_names = "concat",
                           concat_cols = c("gene","region"),
                           sep="-")
 
 my_meta = get_gambl_metadata()
-# get a full MAF-format data frame for all aSHM regions on grch37 coordinates
+
+# Get a full MAF-format data frame for all aSHM regions on grch37 coordinates
 ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
                               these_samples_metadata = my_meta,
                               streamlined = FALSE)
 
-
-
-one_region_maf = get_ssm_by_regions(regions_list = "2:136875000-136875097",
+# Using a vector of regions in the chr:start-end format
+one_region_maf = get_ssm_by_regions(regions_list = "chr2:136875000-136875097",
                          streamlined = FALSE,
                          projection = "grch37",
                          these_samples_metadata = my_meta)
+
+# Providing an existing MAF-format data frame
+one_region_maf = get_ssm_by_regions(regions_list = "chr2:136875000-136875097",
+                         streamlined = FALSE,
+                         projection = "grch37",
+                         these_samples_metadata = my_meta,
+                         maf_data = ashm_maf)
 \dontrun{
 # This example fails, as it should
 #ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
