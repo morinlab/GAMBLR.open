@@ -1,5 +1,5 @@
-[1] "=== STARTED AT 2025-08-06 08:43:11 ==="
-── Running 21 example files ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── GAMBLR.open ──
+[1] "=== STARTED AT 2025-08-25 15:15:30 ==="
+── Running 21 example files ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── GAMBLR.open ──
 
 > my_metadata = get_gambl_metadata()
 
@@ -468,10 +468,6 @@ Showing first 10 rows:
 > one_region_maf = get_ssm_by_regions(regions_list = "chr2:136875000-136875097", 
 +     streamlined = FALSE, projection = "grch37", these_samples_metadata = my_meta)
 
-> one_region_maf = get_ssm_by_regions(regions_list = "chr2:136875000-136875097", 
-+     streamlined = FALSE, projection = "grch37", these_samples_metadata = my_meta, 
-+     maf_data = ashm_maf)
-
 > cell_line_meta = get_gambl_metadata() %>% dplyr::filter(cohort == 
 +     "DLBCL_cell_lines")
 
@@ -499,4 +495,4 @@ Showing first 10 rows:
 +     head(5)
 
 > these_ids = id_ease(these_samples_metadata = this_metadata)
-[1] "=== COMPLETED AT 2025-08-06 08:45:52 ==="
+[1] "=== COMPLETED AT 2025-08-25 15:18:45 ==="

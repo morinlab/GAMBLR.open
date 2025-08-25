@@ -9,12 +9,12 @@
 #' @param regions_bed A data frame in BED format with the coordinates you want to retrieve (recommended).
 #' This parameter can also accept an additional column with region names that will be added to the return if `use_name_column = TRUE`
 #' @param maf_data Use an already loaded MAF object of class "genomic_data" or "maf_data".
-#' @param this_seq_type The this_seq_type you want back, default is genome.
+#' @param this_seq_type The this_seq_type you want back, default is genome. This will be ignored when `maf_data` is provided.
 #' @param streamlined If set to TRUE (default) only 3 columns will be kept in the returned data frame (start, sample_id and region_name).
 #' @param projection Obtain variants projected to this reference (one of grch37 or hg38), default is grch37.
 #' @param use_name_column If your bed-format data frame has a name column (must be named "name") these can be used to name your regions.
-#' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to 
-#'  return the exact variants as reported in the original papers.
+#' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to
+#'  return the exact variants as reported in the original papers. NOTE: this parameter is ignored when `maf_data` is provided.
 #' @param verbose Set to TRUE to maximize the output to console. Default is FALSE.
 #' This parameter also dictates the verbosity of any helper function internally called inside the main function.
 #' @param ... Any additional parameters.
@@ -31,32 +31,36 @@
 #'                           fix_names = "concat",
 #'                           concat_cols = c("gene","region"),
 #'                           sep="-")
-#' 
+#'
 #' my_meta = get_gambl_metadata()
-#' 
+#'
 #' # Get a full MAF-format data frame for all aSHM regions on grch37 coordinates
 #' ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
 #'                               these_samples_metadata = my_meta,
 #'                               streamlined = FALSE)
-#' 
+#'
 #' # Using a vector of regions in the chr:start-end format
 #' one_region_maf = get_ssm_by_regions(regions_list = "chr2:136875000-136875097",
 #'                          streamlined = FALSE,
 #'                          projection = "grch37",
 #'                          these_samples_metadata = my_meta)
-#' 
-#' # Providing an existing MAF-format data frame
-#' one_region_maf = get_ssm_by_regions(regions_list = "chr2:136875000-136875097",
-#'                          streamlined = FALSE,
-#'                          projection = "grch37",
-#'                          these_samples_metadata = my_meta,
-#'                          maf_data = ashm_maf)
+#'
+#' # Providing an existing MAF-format data frame from a tsv
+#' \dontrun{
+#'  maf_df = read_tsv("existing_grch37_data.tsv")
+#'  maf = GAMBLR.utils::create_maf_data(maf_df, "grch37")
+#'
+#' maf_in_aSHM = get_ssm_by_regions(regions_bed = regions_bed,
+#'                               streamlined = FALSE,
+#'                               maf_data = maf)
+#' }
+#'
 #' \dontrun{
 #' # This example fails, as it should
 #' #ashm_maf = get_ssm_by_regions(regions_bed = regions_bed,
 #' #                              these_samples_metadata = my_meta,
 #' #                               projection="hg38")
-#' # Error in get_ssm_by_regions(regions_bed = regions_bed, these_samples_metadata = my_meta,  : 
+#' # Error in get_ssm_by_regions(regions_bed = regions_bed, these_samples_metadata = my_meta,  :
 #' # requested projection: hg38 and genome_build of regions_bed: grch37 don't match
 #' }
 get_ssm_by_regions <- function(these_samples_metadata,
@@ -79,7 +83,7 @@ get_ssm_by_regions <- function(these_samples_metadata,
     stop("Please provide a valid projection. The following are available: ",
          paste(valid_projections, collapse = ", "), ".")
   }
-  
+
   # check if any invalid parameters are provided
   check_excess_params(...)
 
@@ -133,7 +137,7 @@ get_ssm_by_regions <- function(these_samples_metadata,
       stop("No genome_build found for maf_data! Is it a genomic_data or maf_data Object?")
     }
     if(!get_genome_build(maf_data)==projection){
-      stop(paste("requested projection:",projection,"and genome_build of maf_data:", 
+      stop(paste("requested projection:",projection,"and genome_build of maf_data:",
             get_genome_build(maf_data), "don't match"))
     }
     sample_maf <- maf_data %>%
@@ -185,7 +189,7 @@ get_ssm_by_regions <- function(these_samples_metadata,
           region = paste0(Chromosome, ":", Start_Position, "-", End_Position)
         )
     }
-    
+
 
     maf_df <- cool_overlaps(
       sample_maf,
@@ -212,12 +216,12 @@ get_ssm_by_regions <- function(these_samples_metadata,
     maf_df <- unique(maf_df)
 
     if(streamlined){
-      
+
       maf_df = dplyr::select(maf_df,Start_Position,Tumor_Sample_Barcode,region_name) %>%
         dplyr::rename(c("sample_id"="Tumor_Sample_Barcode","start"="Start_Position"))
-      
+
     }
     return(maf_df)
-    
+
 
 }
