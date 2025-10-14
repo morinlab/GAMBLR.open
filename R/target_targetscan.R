@@ -14,9 +14,12 @@
 #'
 #' @import dplyr tidyr Rcpp GAMBLR.data
 #'
+#' @export
+#' 
+#' \dontrun{
 #' @examples
 #' sample_df = target_targetscan (maf, mirna_target)
-#'
+#'}
 
 
 
