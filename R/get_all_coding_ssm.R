@@ -37,6 +37,7 @@ get_all_coding_ssm = function(these_samples_metadata = NULL,
         get_gambl_metadata(seq_type_filter = c("genome","capture"))) %>%
         GAMBLR.helpers::check_and_clean_metadata(.,duplicate_action = "keep_first")
   }
+  these_samples_metadata = dplyr::filter(these_samples_metadata, seq_type != "mrna")
   capture_ids = dplyr::filter(these_samples_metadata,seq_type=="capture") %>%
     pull(sample_id)
   genome_ids = dplyr::filter(these_samples_metadata,seq_type=="genome") %>%
