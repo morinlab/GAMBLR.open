@@ -25,7 +25,7 @@
 #'
 #' @examples
 #' #load pacakges
-#' library(dplyr)
+#' suppressPackageStartupMessages(library(dplyr))
 #'
 #' #get CN segments for one sample
 #' dohh2_segs = get_sample_cn_segments(these_sample_ids = "DOHH-2",
@@ -49,7 +49,10 @@ get_sample_cn_segments = function(these_sample_ids = NULL,
                                   ...){
 
   #warn/notify the user what version of this function they are using
-  message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
+  if (!isTRUE(getOption("GAMBLR.open.shown_cn_msg"))) {
+    message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
+    options(GAMBLR.open.shown_cn_msg = TRUE)
+  }
 
   #check if any invalid parameters are provided
   check_excess_params(...)

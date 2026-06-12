@@ -24,7 +24,7 @@
 #'
 #' @examples
 #' #load packages
-#' library(dplyr)
+#' suppressPackageStartupMessages(library(dplyr))
 #' 
 #' #return collated results for all available samples
 #' all_collated = collate_results()
@@ -79,7 +79,7 @@ collate_results = function(sample_table,
 
   #horizontally expand the provided metadata with QC results
   if(join_with_full_metadata){
-    full_table = left_join(these_samples_metadata, collated)
+    full_table = left_join(these_samples_metadata, collated, by = "sample_id")
     return(full_table)
   }
   return(collated)

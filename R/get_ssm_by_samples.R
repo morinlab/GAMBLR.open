@@ -53,7 +53,10 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
                                ...) {
 
   #warn/notify the user what version of this function they are using
-  message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
+  if (!isTRUE(getOption("GAMBLR.open.shown_ssm_msg"))) {
+    message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
+    options(GAMBLR.open.shown_ssm_msg = TRUE)
+  }
 
   #check if any invalid parameters are provided
   check_excess_params(...)

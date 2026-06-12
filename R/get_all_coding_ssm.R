@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-#' library(GAMBLR.open)
+#' suppressPackageStartupMessages(library(GAMBLR.open))
 #' my_meta = get_gambl_metadata(seq_type_filter = c("genome","capture"))
 #' my_meta = check_and_clean_metadata(my_meta,duplicate_action="keep_first")
 #' maf_all_seqtype = get_all_coding_ssm(my_meta)
