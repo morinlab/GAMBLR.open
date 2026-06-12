@@ -43,7 +43,7 @@ As with all GAMBLR functions, providing a curated metadata table to any GAMBLR f
 }
 \examples{
 #load packages
-library(dplyr)
+suppressPackageStartupMessages(library(dplyr))
 
 #give the function nothing (i.e return all sample IDs in the metadata for the default seq type)
 #return metadata for all samples in the default seq type

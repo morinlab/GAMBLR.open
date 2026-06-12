@@ -17,6 +17,7 @@ calc_mutation_frequency_bin_region(
   min_count_per_bin = 0,
   return_count = TRUE,
   drop_unmutated = FALSE,
+  verbose = FALSE,
   ...
 )
 }
