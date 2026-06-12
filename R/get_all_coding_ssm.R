@@ -51,12 +51,12 @@ get_all_coding_ssm = function(these_samples_metadata = NULL,
     GAMBLR.utils::create_maf_data(.,projection) %>%
     mutate(.,maf_seq_type = "genome")
 
-  if(length(capture_ids)>1 && length(genome_ids) > 1){
+  if(length(capture_ids) > 0 && length(genome_ids) > 0){
     merged_ssm = GAMBLR.utils::bind_genomic_data(capture_maf,genome_maf)
     return(merged_ssm)
-  }else if(length(capture_ids)>1){
+  }else if(length(capture_ids) > 0){
     return(capture_maf)
-  }else if(length(genome_ids) > 1){
+  }else if(length(genome_ids) > 0){
     return(genome_maf)
   }
 }
