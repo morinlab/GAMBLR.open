@@ -32,6 +32,7 @@ get_all_coding_ssm = function(these_samples_metadata = NULL,
                               include_silent=FALSE,
                               projection = "grch37"){
   if(missing(these_samples_metadata)){
+    warning("No metadata supplied. Returning SSMs for all available samples. Supply these_samples_metadata to limit results to samples matching desired clinical features.")
     these_samples_metadata = suppressMessages(
         get_gambl_metadata(seq_type_filter = c("genome","capture"))) %>%
         GAMBLR.helpers::check_and_clean_metadata(.,duplicate_action = "keep_first")
