@@ -55,7 +55,10 @@ collate_results = function(sample_table,
   check_excess_params(...)
   
   #warn/notify the user what version of this function they are using
-  message("Using the bundled collated results in GAMBLR.data...")
+  if (!isTRUE(getOption("GAMBLR.open.shown_collated_msg"))) {
+    message("Using the bundled collated results in GAMBLR.data...")
+    options(GAMBLR.open.shown_collated_msg = TRUE)
+  }
   
   if(missing(these_samples_metadata)){
     these_samples_metadata = get_gambl_metadata(seq_type_filter = seq_type_filter)
