@@ -8,8 +8,8 @@
 <title>GAMBLR.data • GAMBLR.open</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="bundled_data_files/libs/quarto-html/popper.min.js"></script><script src="bundled_data_files/libs/quarto-html/tippy.umd.min.js"></script><link href="bundled_data_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="bundled_data_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="GAMBLR.data">
@@ -41,6 +41,7 @@
     <li><a class="dropdown-item" href="../articles/glossary.html">GAMBLR terms and concepts</a></li>
     <li><a class="dropdown-item" href="../articles/mutation_summary.html">Exploring simple somatic mutations</a></li>
     <li><a class="dropdown-item" href="../articles/feature_matrix.html">Summarizing mutation status as a feature matrix</a></li>
+    <li><a class="dropdown-item" href="../articles/driver_hotspot.html">Driver mutations and hot spots</a></li>
     <li><a class="dropdown-item" href="../articles/genetic_classification.html">Genetic classification of tumours</a></li>
     <li><a class="dropdown-item" href="../articles/bundled_data.html">GAMBLR.data</a></li>
   </ul>
@@ -95,7 +96,7 @@
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Look at 15 randomly sampled genes in the blacklist</span></span>
-<span><span class="fu">slice_sample</span><span class="op">(</span><span class="va">gene_blacklist</span>,n<span class="op">=</span><span class="fl">15</span><span class="op">)</span> </span></code></pre></div>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span><span class="va">gene_blacklist</span>,n<span class="op">=</span><span class="fl">15</span><span class="op">)</span> </span></code></pre></div>
 <div class="cell-output-display">
 <table class="table caption-top" data-quarto-postprocess="true">
 <thead><tr class="header">
@@ -103,49 +104,49 @@
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">KRTAP20-2</td>
+<td style="text-align: left;">RP1L1</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">PABPC1</td>
+<td style="text-align: left;">KIR2DS2</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">GYPB</td>
+<td style="text-align: left;">KRTAP3-2</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">MUC22</td>
+<td style="text-align: left;">DMRTB1</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">MUC17</td>
+<td style="text-align: left;">RYR1</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">IGKV1D-8</td>
+<td style="text-align: left;">RP11</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">RPL10</td>
+<td style="text-align: left;">KIR2DL1</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">MUC6</td>
+<td style="text-align: left;">RYR3</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">KRTAP10-8</td>
+<td style="text-align: left;">ZFAT-AS1_2</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">KRTAP1-5</td>
+<td style="text-align: left;">MED15</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">NFATC4</td>
+<td style="text-align: left;">HSP90B2P</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">KRTAP4-5</td>
+<td style="text-align: left;">KRTAP5-14P</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">OR2L9P</td>
+<td style="text-align: left;">KRTAP20-4</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">PCDHB13</td>
+<td style="text-align: left;">OBSCN-AS1</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">HSP90AB1</td>
+<td style="text-align: left;">XIRP2</td>
 </tr>
 </tbody>
 </table>
@@ -159,7 +160,7 @@
 <div class="sourceCode cell-code" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Look at the first 15 DLBCL genes in Tier 1</span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">lymphoma_genes</span>,<span class="va">DLBCL_Tier</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>    <span class="fu">slice_head</span><span class="op">(</span>n<span class="op">=</span><span class="fl">15</span><span class="op">)</span> </span></code></pre></div>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_head</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">15</span><span class="op">)</span> </span></code></pre></div>
 <div class="cell-output-display">
 <table class="table caption-top" data-quarto-postprocess="true">
 <thead><tr class="header">
@@ -469,7 +470,7 @@
 <div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Peek at the first 15 rows</span></span>
 <span><span class="va">grch37_ashm_regions</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>    <span class="fu">slice_head</span><span class="op">(</span>n<span class="op">=</span><span class="fl">15</span><span class="op">)</span> </span></code></pre></div>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_head</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">15</span><span class="op">)</span> </span></code></pre></div>
 <div class="cell-output-display">
 <table class="table caption-top" data-quarto-postprocess="true">
 <thead><tr class="header">
@@ -546,7 +547,7 @@
 <td style="text-align: left;">NA</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">chr2</td>
+<td style="text-align: left;">chr1</td>
 <td style="text-align: right;">157669490</td>
 <td style="text-align: right;">157671299</td>
 <td style="text-align: left;">FCRL3</td>
@@ -563,21 +564,13 @@
 </tr>
 <tr class="odd">
 <td style="text-align: left;">chr1</td>
-<td style="text-align: right;">206285239</td>
-<td style="text-align: right;">206288105</td>
-<td style="text-align: left;">RHEX</td>
-<td style="text-align: left;">TSS</td>
-<td style="text-align: left;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">chr1</td>
 <td style="text-align: right;">226864857</td>
 <td style="text-align: right;">226873452</td>
 <td style="text-align: left;">ITPKB</td>
 <td style="text-align: left;">intron</td>
 <td style="text-align: left;">weak_enhancer</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">chr1</td>
 <td style="text-align: right;">226920563</td>
 <td style="text-align: right;">226927885</td>
@@ -585,7 +578,7 @@
 <td style="text-align: left;">TSS</td>
 <td style="text-align: left;">active_promoter</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">chr1</td>
 <td style="text-align: right;">226921088</td>
 <td style="text-align: right;">226927982</td>
@@ -593,13 +586,21 @@
 <td style="text-align: left;">intron-1</td>
 <td style="text-align: left;">enhancer</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">chr1</td>
 <td style="text-align: right;">245023502</td>
 <td style="text-align: right;">245029083</td>
 <td style="text-align: left;">HNRNPU</td>
 <td style="text-align: left;">TSS</td>
 <td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">chr2</td>
+<td style="text-align: right;">60773789</td>
+<td style="text-align: right;">60783486</td>
+<td style="text-align: left;">BCL11A</td>
+<td style="text-align: left;">TSS</td>
+<td style="text-align: left;">active_promoter</td>
 </tr>
 </tbody>
 </table>
@@ -613,7 +614,7 @@
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Peek at the first 15 rows</span></span>
 <span><span class="va">hg38_ashm_regions</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>    <span class="fu">slice_head</span><span class="op">(</span>n<span class="op">=</span><span class="fl">15</span><span class="op">)</span> </span></code></pre></div>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_head</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">15</span><span class="op">)</span> </span></code></pre></div>
 <div class="cell-output-display">
 <table class="table caption-top" data-quarto-postprocess="true">
 <thead><tr class="header">
@@ -690,9 +691,9 @@
 <td style="text-align: left;">NA</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">chr2</td>
-<td style="text-align: right;">156812978</td>
-<td style="text-align: right;">156814787</td>
+<td style="text-align: left;">chr1</td>
+<td style="text-align: right;">157699700</td>
+<td style="text-align: right;">157701509</td>
 <td style="text-align: left;">FCRL3</td>
 <td style="text-align: left;">TSS</td>
 <td style="text-align: left;">NA</td>
@@ -707,21 +708,13 @@
 </tr>
 <tr class="odd">
 <td style="text-align: left;">chr1</td>
-<td style="text-align: right;">206053265</td>
-<td style="text-align: right;">206054139</td>
-<td style="text-align: left;">RHEX</td>
-<td style="text-align: left;">TSS</td>
-<td style="text-align: left;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">chr1</td>
 <td style="text-align: right;">226677156</td>
 <td style="text-align: right;">226685751</td>
 <td style="text-align: left;">ITPKB</td>
 <td style="text-align: left;">intron</td>
 <td style="text-align: left;">weak_enhancer</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">chr1</td>
 <td style="text-align: right;">226732862</td>
 <td style="text-align: right;">226740184</td>
@@ -729,7 +722,7 @@
 <td style="text-align: left;">TSS</td>
 <td style="text-align: left;">active_promoter</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">chr1</td>
 <td style="text-align: right;">226733387</td>
 <td style="text-align: right;">226740281</td>
@@ -737,13 +730,21 @@
 <td style="text-align: left;">intron-1</td>
 <td style="text-align: left;">enhancer</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">chr1</td>
 <td style="text-align: right;">244860200</td>
 <td style="text-align: right;">244865781</td>
 <td style="text-align: left;">HNRNPU</td>
 <td style="text-align: left;">TSS</td>
 <td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">chr2</td>
+<td style="text-align: right;">60546654</td>
+<td style="text-align: right;">60556351</td>
+<td style="text-align: left;">BCL11A</td>
+<td style="text-align: left;">TSS</td>
+<td style="text-align: left;">active_promoter</td>
 </tr>
 </tbody>
 </table>
@@ -882,7 +883,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

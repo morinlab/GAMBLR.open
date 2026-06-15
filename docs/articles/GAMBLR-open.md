@@ -1,0 +1,195 @@
+# Why GAMBLR.open?
+
+## Open data access, simplified!
+
+GAMBLR.open is designed to make open-access genomic data of mature
+B-cell lymphomas more accessible and easier to analyze. Whether you’re a
+researcher, data scientist, or student, this package provides a seamless
+interface for querying, retrieving, and preprocessing genomic data, so
+you can focus on analysis rather than data wrangling.
+
+GAMBLR.open is part of a larger family of R tools for the analysis of
+lymphoma genomic data (*the GAMBLRverse*, if you will). GAMBLR began as
+a toolkit for analysts participating in the **G**enomic **A**nalysis of
+**M**ature **B**-cell **L**ymphomas project, led by the [Morin
+Lab](https://morinlab.github.io/) at BC Cancer and Simon Fraser
+University.
+
+      /$$$$$$     /$$$$$$    /$$      /$$   /$$$$$$$    /$$        .:::::::
+     /$$__  $$   /$$__  $$  | $$$    /$$$  | $$__  $$  | $$        .::    .::
+    | $$  \__/  | $$  \ $$  | $$$$  /$$$$  | $$  \ $$  | $$        .::    .::
+    | $$ /$$$$  | $$$$$$$$  | $$ $$/$$ $$  | $$$$$$$   | $$   <-   .: .::
+    | $$|_  $$  | $$__  $$  | $$  $$$| $$  | $$__  $$  | $$        .::  .::
+    | $$  \ $$  | $$  | $$  | $$\  $ | $$  | $$  \ $$  | $$        .::    .::
+    |  $$$$$$/  | $$  | $$  | $$ \/  | $$  | $$$$$$$/  | $$$$$$$$  .::      .::
+     \______/   |__/  |__/  |__/     |__/  |_______/   |________/
+     ~GENOMIC~~~~~~~~~~~~~OF~~~~~~~~~~~~~~~~~B-CELL~~~~~~~~~~~~~~~~~~IN~~~~~~
+     ~~~~~~~~~~~~ANALYSIS~~~~~~MATURE~~~~~~~~~~~~~~~~~~~LYMPHOMAS~~~~~~~~~~R~ 
+
+## Who Is It For?
+
+The GAMBLR.open primarily caters to:
+
+- researchers who need rapid access to standardized genomic datasets.
+- data scientists and bioinformaticians looking for structured and
+  easily queryable cancer genomics data.
+- students who want to explore real-world genomic data in a learning
+  environment.
+
+## What does GAMBLR.open offer?
+
+Some of the advantages of GAMBLR.open are:
+
+- Access to preprocessed genomic data: retrieve genomic datasets without
+  worrying about complex file handling.
+- Standardized data queries: easily search and filter genomic data using
+  a consistent and intuitive API.
+- Integration of GAMBLR ecosystem: work seamlessly with the broader
+  [GAMBLR
+  suite](https://morinlab.github.io/GAMBLR.open/articles/concepts/GAMBLR_family.md)
+  of packages to design analytical workflows.
+- Reproducibility and transparency: leverage a well-documented
+  [pipelines](https://github.com/LCR-BCCRC/lcr-modules) to ensure
+  consistent and transparent data retrieval.
+
+## The GAMBLR.open family includes:
+
+### Overview
+
+- **GAMBLR.open** - this package.
+
+- **GAMBLR.data** - a “storage unit” with various types of bundled data
+  including curated resources.
+
+- **GAMBLR.viz** - A collection of functions to help generate visual
+  representations of lymphoma genomic data.
+
+- **GAMBLR.helpers** - a set of low-level functions for data operation.
+
+- **GAMBLR.utils** - higher level set of somewhat generic functions to
+  facilitate some common cancer genomic data analysis tasks.
+
+- **GAMBLR.predict** - a collection of machine learning algorithms and
+  functions to pre-format inputs for these models. Contains classifiers
+  of [Burkitt](https://doi.org/10.1182/blood.2022016534) and
+  [Follicular](https://doi.org/10.1182/blood.2022018719) lymphomas
+  originally published, as well as reproduced of DLBCL classification by
+  the groupings of [Chapuy et
+  al](https://doi.org/10.1038/s41591-018-0016-8), [Lacy et
+  al](https://doi.org/10.1182/blood.2019003535), and [Runge et
+  al](https://doi.org/10.1111/bjh.17132).
+
+### Code
+
+- [**GAMBLR.open**](https://github.com/morinlab/GAMBLR.open)
+
+- [**GAMBLR.data**](https://github.com/morinlab/GAMBLR.data)
+
+- [**GAMBLR.viz**](https://github.com/morinlab/GAMBLR.viz)
+
+- [**GAMBLR.helpers**](https://github.com/morinlab/GAMBLR.helpers)
+
+- [**GAMBLR.utils**](https://github.com/morinlab/GAMBLR.utils)
+
+- [**GAMBLR.predict**](https://github.com/morinlab/GAMBLR.predict)
+
+### Documentation and tutorials
+
+- [**GAMBLR.open**](https://morinlab.github.io/GAMBLR.open)
+
+- [**GAMBLR.data**](https://morinlab.github.io/GAMBLR.data/resources/bundled_data.html)
+
+- [**GAMBLR.viz**](https://morinlab.github.io/GAMBLR.viz)
+
+## Dependencies
+
+This diagram illustrates in a simplified way the dependency relationship
+of different packages in the GAMBLR family:
+
+``` mermaid
+%%{
+    init : {
+        "flowchart" : { "curve" : "monotoneX" },
+        'themeVariables': {'fontSize': '24px'}
+    }
+
+}%%
+flowchart LR
+  A("GAMBLR.data") ==> B("GAMBLR.helpers")
+  B ==> C("GAMBLR.utils")
+  B ==> D("GAMBLR.predict")
+  D ==> E("GAMBLR.open")
+  C ==> F("GAMBLR.viz")
+  F ==> E
+  classDef A,B font-size:18pt;
+  style E fill:#6aa84f,stroke:#333,stroke-width:4,font-size:20px
+```
+
+## Quickstart
+
+The quick and easy way to get started is to make sure the `devtools`
+dependency is installed, then install the GAMBLR.open and run the
+simplest functions to confirm successful setup:
+
+``` r
+# Verify devtools is installed
+if (!require("devtools")) install.packages("devtools")
+
+# Install GAMBLR.open
+devtools::install_github(
+    "morinlab/GAMBLR.open",
+    repos = BiocManager::repositories()
+)
+```
+
+We recommend restarting your R session after the installation.
+
+``` r
+library(GAMBLR.open)
+
+# Confirm successful setup
+metadata <- get_gambl_metadata()
+maf <- get_coding_ssm()
+```
+
+## Installation for developers
+
+The easiest way to obtain and contribute to GAMBLR.open is to do this
+via cloning the repository
+
+``` bash
+cd
+git clone git@github.com:morinlab/GAMBLR.open.git
+```
+
+In your R editor of choice (which is ****hopefully**** [VS
+Code](https://code.visualstudio.com/)), set your working directory to
+the directory you just cloned the repo into.
+
+``` bash
+setwd("~/GAMBLR.open")
+```
+
+Install the package in R by running the following command (requires the
+`devtools` package):
+
+``` r
+devtools::install()
+```
+
+After applying your modifications to the code, use the following command
+to quickly test your changes without directly installing the package
+(requires the `devtools` dependency):
+
+``` r
+devtools::load_all()
+```
+
+## Community
+
+GAMBLR.open is a free open-source package, but the Master branch is
+protected. We welcome contributions (pull request, bug report, feature
+request, PR review) from all levels of users. All commits must be
+submitted via pull request on a branch. Please refer to the GitHub
+[documentation](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)
+for details on how to do pull request.

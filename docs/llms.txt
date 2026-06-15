@@ -1,0 +1,99 @@
+# GAMBLR.open
+
+![Build](https://github.com/morinlab/GAMBLR.open/actions/workflows/build_check.yaml/badge.svg)![R
+package
+version](https://img.shields.io/github/r-package/v/morinlab/GAMBLR.open)![Commit
+activity](https://img.shields.io/github/commit-activity/m/morinlab/GAMBLR.open)![Last
+commit](https://img.shields.io/github/last-commit/morinlab/GAMBLR.open)
+
+Hello GAMBLRs!
+
+![](GAMBLR.open.png)
+
+Database, mining, manipulation and convenience functions for working
+with genomic data of mature B-cell lymphomas. This package is a wrapper
+that provides a convenient one-stop access to load the following
+packages from the GAMBLR family:
+
+- [GAMBLR.open](https://morinlab.github.io/GAMBLR.open) - this package
+
+- [GAMBLR.data](https://github.com/morinlab/GAMBLR.data) - collection of
+  genomic data for analysis of Mature B-cell neoplasms
+
+- [GAMBLR.helpers](https://github.com/morinlab/GAMBLR.helpers) - a set
+  of low-level functions for data operation
+
+- [GAMBLR.utils](https://github.com/morinlab/GAMBLR.utils) - higher
+  level set of functions to operate on genomic data
+
+- [GAMBLR.viz](https://github.com/morinlab/GAMBLR.viz) - set of
+  functions used mostly for visualizations
+
+- [GAMBLR.predict](https://github.com/morinlab/GAMBLR.predict) -
+  collection of functions and helpers to classify B-cell lymphomas
+
+# Package index
+
+## get\_ functions
+
+- [`get_all_coding_ssm()`](https://morinlab.github.io/GAMBLR.open/reference/get_all_coding_ssm.md)
+  : Get all Coding SSMs
+- [`get_ashm_count_matrix()`](https://morinlab.github.io/GAMBLR.open/reference/get_ashm_count_matrix.md)
+  : Get ASHM Count Matrix.
+- [`get_cn_segments()`](https://morinlab.github.io/GAMBLR.open/reference/get_cn_segments.md)
+  : Get CN Segments.
+- [`get_cnv_and_ssm_status()`](https://morinlab.github.io/GAMBLR.open/reference/get_cnv_and_ssm_status.md)
+  : Get CNV and coding SSM combined status
+- [`get_coding_ssm()`](https://morinlab.github.io/GAMBLR.open/reference/get_coding_ssm.md)
+  : Get Coding SSMs
+- [`get_coding_ssm_status()`](https://morinlab.github.io/GAMBLR.open/reference/get_coding_ssm_status.md)
+  : Get Coding SSM Status.
+- [`get_gambl_metadata()`](https://morinlab.github.io/GAMBLR.open/reference/get_gambl_metadata.md)
+  : Get GAMBL Metadata.
+- [`get_manta_sv()`](https://morinlab.github.io/GAMBLR.open/reference/get_manta_sv.md)
+  : Get Manta SVs
+- [`get_sample_cn_segments()`](https://morinlab.github.io/GAMBLR.open/reference/get_sample_cn_segments.md)
+  : Get Sample CN Segments.
+- [`get_ssm_by_patients()`](https://morinlab.github.io/GAMBLR.open/reference/get_ssm_by_patients.md)
+  : Get SSM By Patients.
+- [`get_ssm_by_region()`](https://morinlab.github.io/GAMBLR.open/reference/get_ssm_by_region.md)
+  : Get SSM By Region.
+- [`get_ssm_by_regions()`](https://morinlab.github.io/GAMBLR.open/reference/get_ssm_by_regions.md)
+  : Get SSM By Regions.
+- [`get_ssm_by_sample()`](https://morinlab.github.io/GAMBLR.open/reference/get_ssm_by_sample.md)
+  : Get SSM By Sample.
+- [`get_ssm_by_samples()`](https://morinlab.github.io/GAMBLR.open/reference/get_ssm_by_samples.md)
+  : Get SSM By Samples.
+
+## Other
+
+- [`annotate_hotspots()`](https://morinlab.github.io/GAMBLR.open/reference/annotate_hotspots.md)
+  : Annotate Hotspots.
+- [`assign_cn_to_ssm()`](https://morinlab.github.io/GAMBLR.open/reference/assign_cn_to_ssm.md)
+  : Assign CN to SSM.
+- [`calc_mutation_frequency_bin_region()`](https://morinlab.github.io/GAMBLR.open/reference/calc_mutation_frequency_bin_region.md)
+  : Calculate Mutation Frequency By Sliding Window.
+- [`calc_mutation_frequency_bin_regions()`](https://morinlab.github.io/GAMBLR.open/reference/calc_mutation_frequency_bin_regions.md)
+  : Mutation counts across sliding windows for multiple regions.
+- [`check_excess_params()`](https://morinlab.github.io/GAMBLR.open/reference/check_excess_params.md)
+  : Check Excess Params
+- [`collate_results()`](https://morinlab.github.io/GAMBLR.open/reference/collate_results.md)
+  : Collate Results
+- [`id_ease()`](https://morinlab.github.io/GAMBLR.open/reference/id_ease.md)
+  : ID Ease
+
+# Articles
+
+### Guides
+
+- [GAMBLR terms and
+  concepts](https://morinlab.github.io/GAMBLR.open/articles/glossary.md):
+- [Exploring simple somatic
+  mutations](https://morinlab.github.io/GAMBLR.open/articles/mutation_summary.md):
+- [Summarizing mutation status as a feature
+  matrix](https://morinlab.github.io/GAMBLR.open/articles/feature_matrix.md):
+- [Driver mutations and hot
+  spots](https://morinlab.github.io/GAMBLR.open/articles/driver_hotspot.md):
+- [Genetic classification of
+  tumours](https://morinlab.github.io/GAMBLR.open/articles/genetic_classification.md):
+- [GAMBLR.data](https://morinlab.github.io/GAMBLR.open/articles/bundled_data.md):

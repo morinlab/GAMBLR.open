@@ -8,8 +8,8 @@
 <title>GAMBLR terms and concepts • GAMBLR.open</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="glossary_files/libs/quarto-html/popper.min.js"></script><script src="glossary_files/libs/quarto-html/tippy.umd.min.js"></script><link href="glossary_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="glossary_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="GAMBLR terms and concepts">
@@ -41,6 +41,7 @@
     <li><a class="dropdown-item" href="../articles/glossary.html">GAMBLR terms and concepts</a></li>
     <li><a class="dropdown-item" href="../articles/mutation_summary.html">Exploring simple somatic mutations</a></li>
     <li><a class="dropdown-item" href="../articles/feature_matrix.html">Summarizing mutation status as a feature matrix</a></li>
+    <li><a class="dropdown-item" href="../articles/driver_hotspot.html">Driver mutations and hot spots</a></li>
     <li><a class="dropdown-item" href="../articles/genetic_classification.html">Genetic classification of tumours</a></li>
     <li><a class="dropdown-item" href="../articles/bundled_data.html">GAMBLR.data</a></li>
   </ul>
@@ -87,7 +88,7 @@
 <col style="width: 16%">
 <col style="width: 8%">
 <col style="width: 9%">
-<col style="width: 17%">
+<col style="width: 16%">
 <col style="width: 3%">
 </colgroup>
 <thead><tr class="header">
@@ -101,96 +102,105 @@
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">SP193005</td>
-<td style="text-align: left;">SP193005</td>
-<td style="text-align: left;">DO228305</td>
-<td style="text-align: left;">genome</td>
-<td style="text-align: left;">DLBCL</td>
-<td style="text-align: left;">DLBCL_ICGC</td>
-<td style="text-align: left;">M</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Reddy_2144T</td>
-<td style="text-align: left;">Reddy_2144T</td>
-<td style="text-align: left;">Reddy_2144</td>
+<td style="text-align: left;">Reddy_2677T</td>
+<td style="text-align: left;">Reddy_2677T</td>
+<td style="text-align: left;">Reddy_2677</td>
 <td style="text-align: left;">capture</td>
 <td style="text-align: left;">DLBCL</td>
 <td style="text-align: left;">dlbcl_reddy</td>
 <td style="text-align: left;">F</td>
 </tr>
-<tr class="odd">
-<td style="text-align: left;">DLBCL11000T</td>
-<td style="text-align: left;">DLBCL11000T</td>
-<td style="text-align: left;">DLBCL11000</td>
-<td style="text-align: left;">capture</td>
-<td style="text-align: left;">DLBCL</td>
-<td style="text-align: left;">dlbcl_schmitz</td>
-<td style="text-align: left;">NA</td>
-</tr>
 <tr class="even">
-<td style="text-align: left;">Reddy_3520T</td>
-<td style="text-align: left;">Reddy_3520T</td>
-<td style="text-align: left;">Reddy_3520</td>
-<td style="text-align: left;">capture</td>
-<td style="text-align: left;">DLBCL</td>
-<td style="text-align: left;">dlbcl_reddy</td>
-<td style="text-align: left;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">DLBCL10780T</td>
-<td style="text-align: left;">DLBCL10780T</td>
-<td style="text-align: left;">DLBCL10780</td>
-<td style="text-align: left;">capture</td>
-<td style="text-align: left;">DLBCL</td>
-<td style="text-align: left;">dlbcl_schmitz</td>
-<td style="text-align: left;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">c_M_1616a</td>
-<td style="text-align: left;">c_M_1616a</td>
-<td style="text-align: left;">c_M_1616a</td>
-<td style="text-align: left;">capture</td>
-<td style="text-align: left;">PMBCL</td>
-<td style="text-align: left;">NCI_DLBCL_Golub</td>
-<td style="text-align: left;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Reddy_3990T</td>
-<td style="text-align: left;">Reddy_3990T</td>
-<td style="text-align: left;">Reddy_3990</td>
-<td style="text-align: left;">capture</td>
-<td style="text-align: left;">DLBCL</td>
-<td style="text-align: left;">dlbcl_reddy</td>
-<td style="text-align: left;">M</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Reddy_2464T</td>
-<td style="text-align: left;">Reddy_2464T</td>
-<td style="text-align: left;">Reddy_2464</td>
+<td style="text-align: left;">Reddy_3540T</td>
+<td style="text-align: left;">Reddy_3540T</td>
+<td style="text-align: left;">Reddy_3540</td>
 <td style="text-align: left;">capture</td>
 <td style="text-align: left;">DLBCL</td>
 <td style="text-align: left;">dlbcl_reddy</td>
 <td style="text-align: left;">M</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">SP193925</td>
-<td style="text-align: left;">SP193925</td>
-<td style="text-align: left;">DO228303</td>
+<td style="text-align: left;">DLBCL10995T</td>
+<td style="text-align: left;">DLBCL10995T</td>
+<td style="text-align: left;">DLBCL10995</td>
+<td style="text-align: left;">capture</td>
+<td style="text-align: left;">DLBCL</td>
+<td style="text-align: left;">dlbcl_schmitz</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Reddy_3742T</td>
+<td style="text-align: left;">Reddy_3742T</td>
+<td style="text-align: left;">Reddy_3742</td>
+<td style="text-align: left;">capture</td>
+<td style="text-align: left;">DLBCL</td>
+<td style="text-align: left;">dlbcl_reddy</td>
+<td style="text-align: left;">M</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Reddy_2899T</td>
+<td style="text-align: left;">Reddy_2899T</td>
+<td style="text-align: left;">Reddy_2899</td>
+<td style="text-align: left;">capture</td>
+<td style="text-align: left;">DLBCL</td>
+<td style="text-align: left;">dlbcl_reddy</td>
+<td style="text-align: left;">F</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Reddy_3781T</td>
+<td style="text-align: left;">Reddy_3781T</td>
+<td style="text-align: left;">Reddy_3781</td>
+<td style="text-align: left;">capture</td>
+<td style="text-align: left;">DLBCL</td>
+<td style="text-align: left;">dlbcl_reddy</td>
+<td style="text-align: left;">M</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">10-36955_tumorC</td>
+<td style="text-align: left;">10-36955_tumorC</td>
+<td style="text-align: left;">10-36955</td>
 <td style="text-align: left;">genome</td>
 <td style="text-align: left;">FL</td>
-<td style="text-align: left;">FL_ICGC</td>
-<td style="text-align: left;">F</td>
+<td style="text-align: left;">DLBCL_LSARP_Trios</td>
+<td style="text-align: left;">M</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">99-27137T</td>
-<td style="text-align: left;">99-27137T</td>
-<td style="text-align: left;">99-27137</td>
-<td style="text-align: left;">genome</td>
+<td style="text-align: left;">Reddy_2781T</td>
+<td style="text-align: left;">Reddy_2781T</td>
+<td style="text-align: left;">Reddy_2781</td>
+<td style="text-align: left;">capture</td>
 <td style="text-align: left;">DLBCL</td>
-<td style="text-align: left;">DLBCL_Marra</td>
+<td style="text-align: left;">dlbcl_reddy</td>
 <td style="text-align: left;">F</td>
 </tr>
 <tr class="odd">
+<td style="text-align: left;">Reddy_3418T</td>
+<td style="text-align: left;">Reddy_3418T</td>
+<td style="text-align: left;">Reddy_3418</td>
+<td style="text-align: left;">capture</td>
+<td style="text-align: left;">DLBCL</td>
+<td style="text-align: left;">dlbcl_reddy</td>
+<td style="text-align: left;">F</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">DO221129</td>
+<td style="text-align: left;">DO221129</td>
+<td style="text-align: left;">DO221129</td>
+<td style="text-align: left;">genome</td>
+<td style="text-align: left;">DLBCL</td>
+<td style="text-align: left;">NA</td>
+<td style="text-align: left;">F</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">DLBCL10987T</td>
+<td style="text-align: left;">DLBCL10987T</td>
+<td style="text-align: left;">DLBCL10987</td>
+<td style="text-align: left;">capture</td>
+<td style="text-align: left;">DLBCL</td>
+<td style="text-align: left;">dlbcl_schmitz</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
 <td style="text-align: left;">Reddy_3948T</td>
 <td style="text-align: left;">Reddy_3948T</td>
 <td style="text-align: left;">Reddy_3948</td>
@@ -199,40 +209,31 @@
 <td style="text-align: left;">dlbcl_reddy</td>
 <td style="text-align: left;">F</td>
 </tr>
-<tr class="even">
-<td style="text-align: left;">Reddy_2805T</td>
-<td style="text-align: left;">Reddy_2805T</td>
-<td style="text-align: left;">Reddy_2805</td>
+<tr class="odd">
+<td style="text-align: left;">Reddy_2540T</td>
+<td style="text-align: left;">Reddy_2540T</td>
+<td style="text-align: left;">Reddy_2540</td>
 <td style="text-align: left;">capture</td>
 <td style="text-align: left;">DLBCL</td>
 <td style="text-align: left;">dlbcl_reddy</td>
 <td style="text-align: left;">M</td>
 </tr>
-<tr class="odd">
-<td style="text-align: left;">DLBCL-RICOVER_102-Tumor</td>
-<td style="text-align: left;">DLBCL-RICOVER_102-Tumor</td>
-<td style="text-align: left;">DLBCL-RICOVER_102</td>
+<tr class="even">
+<td style="text-align: left;">DLBCL-MC_F502_RFK-Tumor</td>
+<td style="text-align: left;">DLBCL-MC_F502_RFK-Tumor</td>
+<td style="text-align: left;">DLBCL-MC_F502_RFK</td>
 <td style="text-align: left;">capture</td>
 <td style="text-align: left;">DLBCL</td>
 <td style="text-align: left;">dlbcl_chapuy</td>
 <td style="text-align: left;">NA</td>
 </tr>
-<tr class="even">
-<td style="text-align: left;">Reddy_2588T</td>
-<td style="text-align: left;">Reddy_2588T</td>
-<td style="text-align: left;">Reddy_2588</td>
+<tr class="odd">
+<td style="text-align: left;">Reddy_2232T</td>
+<td style="text-align: left;">Reddy_2232T</td>
+<td style="text-align: left;">Reddy_2232</td>
 <td style="text-align: left;">capture</td>
 <td style="text-align: left;">DLBCL</td>
 <td style="text-align: left;">dlbcl_reddy</td>
-<td style="text-align: left;">F</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">16-17861T</td>
-<td style="text-align: left;">16-17861T</td>
-<td style="text-align: left;">16-17861</td>
-<td style="text-align: left;">genome</td>
-<td style="text-align: left;">DLBCL</td>
-<td style="text-align: left;">DLBCL_GenomeCanada</td>
 <td style="text-align: left;">F</td>
 </tr>
 </tbody>
@@ -458,7 +459,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
