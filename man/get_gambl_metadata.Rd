@@ -67,7 +67,8 @@ DLBCL_Reddy (all samples from Reddy et al study), DLBCL_Thomas (HTMCP DLBCLs
 from Thomas et al study), BL_Thomas (BL samples from Thomas et al study)
 }
 \examples{
-#return metadata for genome samples (here, the parameter is redundant because 'genome' is the default)
+#return metadata for genome samples (here, the parameter is redundant because 
+# 'genome' is the default)
 genome_meta = get_gambl_metadata(seq_type_filter = "genome")
 
 #return metadata for capture samples.

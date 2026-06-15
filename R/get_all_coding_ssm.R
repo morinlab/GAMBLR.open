@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-#' library(GAMBLR.open)
+#' suppressPackageStartupMessages(library(GAMBLR.open))
 #' my_meta = get_gambl_metadata(seq_type_filter = c("genome","capture"))
 #' my_meta = check_and_clean_metadata(my_meta,duplicate_action="keep_first")
 #' maf_all_seqtype = get_all_coding_ssm(my_meta)
@@ -32,10 +32,12 @@ get_all_coding_ssm = function(these_samples_metadata = NULL,
                               include_silent=FALSE,
                               projection = "grch37"){
   if(missing(these_samples_metadata)){
+    warning("No metadata supplied. Returning SSMs for all available samples. Supply these_samples_metadata to limit results to samples matching desired clinical features.")
     these_samples_metadata = suppressMessages(
         get_gambl_metadata(seq_type_filter = c("genome","capture"))) %>%
         GAMBLR.helpers::check_and_clean_metadata(.,duplicate_action = "keep_first")
   }
+  these_samples_metadata = dplyr::filter(these_samples_metadata, seq_type != "mrna")
   capture_ids = dplyr::filter(these_samples_metadata,seq_type=="capture") %>%
     pull(sample_id)
   genome_ids = dplyr::filter(these_samples_metadata,seq_type=="genome") %>%
@@ -50,12 +52,12 @@ get_all_coding_ssm = function(these_samples_metadata = NULL,
     GAMBLR.utils::create_maf_data(.,projection) %>%
     mutate(.,maf_seq_type = "genome")
 
-  if(length(capture_ids)>1 && length(genome_ids) > 1){
+  if(length(capture_ids) > 0 && length(genome_ids) > 0){
     merged_ssm = GAMBLR.utils::bind_genomic_data(capture_maf,genome_maf)
     return(merged_ssm)
-  }else if(length(capture_ids)>1){
+  }else if(length(capture_ids) > 0){
     return(capture_maf)
-  }else if(length(genome_ids) > 1){
+  }else if(length(genome_ids) > 0){
     return(genome_maf)
   }
 }

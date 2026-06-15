@@ -26,7 +26,7 @@
 #'
 #' @examples
 #' #load packages
-#' library(dplyr)
+#' suppressPackageStartupMessages(library(dplyr))
 #' 
 #' #give the function nothing (i.e return all sample IDs in the metadata for the default seq type)
 #' #return metadata for all samples in the default seq type
@@ -59,7 +59,7 @@ id_ease = function(these_samples_metadata = NULL,
     metadata = dplyr::filter(these_samples_metadata, seq_type %in% this_seq_type)
     not_seq_type = setdiff(these_samples_metadata$sample_id, metadata$sample_id)
     if(length(not_seq_type) > 0){
-      not_seq_type_msg = gettextf("id_ease: WARNING! %i samples in the provided metadata were removed because their seq types are not the same as in the `set_type` argument.",
+      not_seq_type_msg = gettextf("id_ease: WARNING! %i samples in the provided metadata were removed because their seq types are not the same as in the `seq_type` argument.",
                                   length(not_seq_type))
       if(verbose){
         max_to_show <- 100
@@ -74,7 +74,10 @@ id_ease = function(these_samples_metadata = NULL,
         print(not_seq_type)
       }else{
         not_seq_type_msg = gettextf("%s Use `verbose = TRUE` to see their IDs.", not_seq_type_msg)
-        message(not_seq_type_msg)
+        if (!isTRUE(getOption("GAMBLR.open.shown_id_ease_msg"))) {
+          message(not_seq_type_msg)
+          options(GAMBLR.open.shown_id_ease_msg = TRUE)
+        }
       }
     }
   }

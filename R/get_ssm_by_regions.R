@@ -111,7 +111,10 @@ get_ssm_by_regions <- function(these_samples_metadata,
   }
 
   # Warn/notify the user what version of this function they are using
-  message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
+  if (!isTRUE(getOption("GAMBLR.open.shown_ssm_msg"))) {
+    message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
+    options(GAMBLR.open.shown_ssm_msg = TRUE)
+  }
     if (verbose) {
       print("Using the non-default engine for efficiency...")
     }

@@ -103,7 +103,10 @@ get_manta_sv = function(these_samples_metadata = NULL,
     these_samples_metadata = get_gambl_metadata() %>% dplyr::filter(seq_type=="genome")
   }
   #warn/notify the user what version of this function they are using
-  message("Using the bundled Manta SV (.bedpe) calls in GAMBLR.data...")
+  if (!isTRUE(getOption("GAMBLR.open.shown_manta_msg"))) {
+    message("Using the bundled Manta SV (.bedpe) calls in GAMBLR.data...")
+    options(GAMBLR.open.shown_manta_msg = TRUE)
+  }
   
   #check if any invalid parameters are provided
   check_excess_params(...)

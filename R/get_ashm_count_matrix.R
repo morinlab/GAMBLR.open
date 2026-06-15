@@ -119,7 +119,7 @@ get_ashm_count_matrix = function(
         sample_id = pull(all_meta, sample_id),
         region_name = unique(ashm_counted$region_name)
     )
-    all_counts <- left_join(eg, ashm_counted) %>%
+    all_counts <- left_join(eg, ashm_counted, by = c("sample_id", "region_name")) %>%
         mutate(n = replace_na(n, 0)) %>%
         unique() #not sure where the duplicates are coming from but its annoying
 

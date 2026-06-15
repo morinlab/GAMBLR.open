@@ -63,6 +63,7 @@ calc_mutation_frequency_bin_region <- function(region,
                                                min_count_per_bin = 0,
                                                return_count = TRUE,
                                                drop_unmutated = FALSE,
+                                               verbose = FALSE,
                                                ...) {
   
   #check if any invalid parameters are provided
@@ -106,10 +107,12 @@ calc_mutation_frequency_bin_region <- function(region,
   
   region_size <- end_pos - start_pos
   if (region_size < max_region) {
-    message(paste(
-      "processing bins of size", window_size,
-      "across", region_size, "bp region"
-    ))
+    if (verbose) {
+      message(paste(
+        "processing bins of size", window_size,
+        "across", region_size, "bp region"
+      ))
+    }
   } else {
     message(paste("CAUTION!\n", region_size, "exceeds maximum size recommended by this function."))
   }
@@ -138,7 +141,10 @@ calc_mutation_frequency_bin_region <- function(region,
         stop("seq_type must be present in metadata for compatibility with get_ssm_by_samples")
       }
     )
-    message("Using GAMBLR.data::get_ssm_by_region...")
+    if (!isTRUE(getOption("GAMBLR.open.shown_ssm_by_region_msg"))) {
+      message("Using GAMBLR.data::get_ssm_by_region...")
+      options(GAMBLR.open.shown_ssm_by_region_msg = TRUE)
+    }
     region_ssm <- list()
     for (st in unique(metadata$seq_type)) {
       this_seq_type <- get_ssm_by_region(
@@ -188,7 +194,7 @@ calc_mutation_frequency_bin_region <- function(region,
     
     region_ssm <- data.frame(metadata) %>%
       dplyr::select(sample_id) %>%
-      dplyr::left_join(region_ssm) %>%
+      dplyr::left_join(region_ssm, by = "sample_id") %>%
       dplyr::filter(!is.na(mutated))
   }
   
@@ -215,9 +221,9 @@ calc_mutation_frequency_bin_region <- function(region,
     ) %>%
     dplyr::tally() %>%
     dplyr::ungroup() %>%
-    dplyr::full_join(select(metadata, sample_id)) %>%
+    dplyr::full_join(select(metadata, sample_id), by = "sample_id") %>%
     dplyr::arrange(sample_id) %>%
-    dplyr::full_join(select(windows, window_start)) %>%
+    dplyr::full_join(select(windows, window_start), by = "window_start") %>%
     dplyr::distinct() %>%
     tidyr::pivot_wider(
       names_from = window_start,

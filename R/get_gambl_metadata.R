@@ -59,7 +59,8 @@
 #' @export
 #'
 #' @examples
-#' #return metadata for genome samples (here, the parameter is redundant because 'genome' is the default)
+#' #return metadata for genome samples (here, the parameter is redundant because 
+#' # 'genome' is the default)
 #' genome_meta = get_gambl_metadata(seq_type_filter = "genome")
 #'
 #' #return metadata for capture samples.
@@ -80,7 +81,10 @@ get_gambl_metadata = function(
     #check if any invalid parameters are provided
     check_excess_params(...)
 
-    message("Using the bundled metadata in GAMBLR.data...")
+    if (!isTRUE(getOption("GAMBLR.open.shown_metadata_msg"))) {
+      message("Using the bundled metadata in GAMBLR.data...")
+      options(GAMBLR.open.shown_metadata_msg = TRUE)
+    }
     metadata <- GAMBLR.data::sample_data$meta %>%
             dplyr::filter(seq_type %in% seq_type_filter)
 

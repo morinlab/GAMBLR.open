@@ -41,10 +41,11 @@
 #' @return A data frame with CNV and SSM combined status.
 #' 
 #' @import dplyr GAMBLR.utils
+#' @importFrom stats setNames
 #' @export
 #'
 #' @examples
-#' library(GAMBLR.open)
+#' suppressPackageStartupMessages(library(GAMBLR.open))
 #' # Get sample metadata including a mix of seq_type
 #' all_types_meta = suppressMessages(get_gambl_metadata()) %>% 
 #'             dplyr::filter(pathology == "BL")

@@ -33,7 +33,10 @@ get_cn_segments = function(these_samples_metadata,
                            projection = "grch37",
                            this_seq_type, ...) {
   #warn/notify the user what version of this function they are using
-  message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
+  if (!isTRUE(getOption("GAMBLR.open.shown_cn_msg"))) {
+    message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
+    options(GAMBLR.open.shown_cn_msg = TRUE)
+  }
 
   #check if any invalid parameters are provided
   check_excess_params(...)
