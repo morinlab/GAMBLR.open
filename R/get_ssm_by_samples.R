@@ -61,33 +61,31 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
   #check if any invalid parameters are provided
   check_excess_params(...)
 
-  #get samples with the dedicated helper function
-  metadata = id_ease(these_samples_metadata = these_samples_metadata,
-                     these_sample_ids = these_sample_ids,
-                     verbose = verbose,
-                     this_seq_type = this_seq_type)
-
+  # resolve samples of interest (id_ease retired)
+  if(!is.null(these_samples_metadata)){
+    metadata = dplyr::filter(these_samples_metadata, seq_type %in% this_seq_type)
+  }else{
+    metadata = get_gambl_metadata(seq_type_filter = this_seq_type)
+    if(!is.null(these_sample_ids)){
+      metadata = dplyr::filter(metadata, sample_id %in% these_sample_ids)
+    }
+  }
   sample_ids = metadata$sample_id
 
-  #get valid projections
-  valid_projections = grep("meta", names(GAMBLR.data::sample_data),
-                           value = TRUE, invert = TRUE)
-
-  #return SSMs based on the selected projection
-  if(projection %in% valid_projections) {
-    sample_ssm = GAMBLR.data::sample_data[[projection]]$maf %>%
-      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-      dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
-    sample_ssm <- bind_rows(sample_ssm,
-      GAMBLR.data::sample_data[[projection]]$ashm %>%
-        dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-        dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
-    )
-
-  }else {
+  # valid projections (kept static so we never load the multi-GB sample_data)
+  valid_projections = c("grch37", "hg38")
+  if(!projection %in% valid_projections){
     stop(paste("please provide a valid projection. Available options:",
-               paste(valid_projections,collapse=", ")))
+               paste(valid_projections, collapse=", ")))
   }
+
+  # SSMs (coding MAF + aSHM) for the selected samples, filtered in indexed SQL
+  sample_ssm = GAMBLR.data::get_ssm_from_db(
+    projection = projection,
+    sample_ids = sample_ids,
+    tool_name = tool_name,
+    include_ashm = TRUE
+  )
 
 
   # Handle possible duplicates

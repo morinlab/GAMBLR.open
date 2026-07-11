@@ -67,21 +67,23 @@ get_ssm_by_region = function(these_sample_ids = NULL,
   #check if any invalid parameters are provided
   check_excess_params(...)
 
-  #get samples with the dedicated helper function
-  metadata = id_ease(these_samples_metadata = these_samples_metadata,
-                     these_sample_ids = these_sample_ids,
-                     verbose = verbose,
-                     this_seq_type = this_seq_type)
-
+  # Resolve samples of interest (id_ease retired). Build the metadata table
+  # from whichever of these_samples_metadata / these_sample_ids was supplied,
+  # then pull the sample_id vector.
+  if(!is.null(these_samples_metadata)){
+    metadata = dplyr::filter(these_samples_metadata, seq_type %in% this_seq_type)
+  }else{
+    metadata = get_gambl_metadata(seq_type_filter = this_seq_type)
+    if(!is.null(these_sample_ids)){
+      metadata = dplyr::filter(metadata, sample_id %in% these_sample_ids)
+    }
+  }
   sample_ids = metadata$sample_id
 
   
 
-  # Optionally return variants from a particular study
-  if(!missing(this_study)){
-    this_maf <- this_maf %>%
-      dplyr::filter((!!sym("Study")) == this_study)
-  }
+  # Optionally restrict to a particular study (applied in the SQL query below)
+  has_study = !missing(this_study)
 
   #split region into chunks (chr, start, end) and deal with chr prefixes based on the selected projection
   if(length(region) > 1){
@@ -109,16 +111,16 @@ get_ssm_by_region = function(these_sample_ids = NULL,
 
   #return SSMs based on the selected projection
   if(missing(maf_data)){
-    # Filter by position on-the-fly to avoid wastefully building the same large MAF each time
-    this_maf = GAMBLR.data::sample_data[[projection]]$maf %>%
-      dplyr::filter(Chromosome == chromosome & Start_Position > qstart & Start_Position < qend) %>%
-      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-      dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
-    muts_region <- GAMBLR.data::sample_data[[projection]]$ashm %>%
-      dplyr::filter(Chromosome == chromosome & Start_Position > qstart & Start_Position < qend) %>%
-      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-      dplyr::filter((tolower(!!sym("Pipeline")) == tool_name)) %>%
-      bind_rows(this_maf, .)
+    # region + pipeline (+ optional study) + sample filter pushed to indexed SQL,
+    # unioning the coding MAF and the aSHM MAF (see GAMBLR.data::get_ssm_from_db)
+    muts_region = GAMBLR.data::get_ssm_from_db(
+      projection = projection,
+      sample_ids = sample_ids,
+      tool_name = tool_name,
+      include_ashm = TRUE,
+      this_study = if(has_study) this_study else NULL,
+      regions = data.frame(chrom = chromosome, start = qstart, end = qend)
+    )
   }else{
     muts_region = dplyr::filter(maf_data, Tumor_Sample_Barcode %in% sample_ids) %>%
       dplyr::filter(Chromosome == chromosome & Start_Position > qstart & Start_Position < qend)

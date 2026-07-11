@@ -85,7 +85,7 @@ get_gambl_metadata = function(
       message("Using the bundled metadata in GAMBLR.data...")
       options(GAMBLR.open.shown_metadata_msg = TRUE)
     }
-    metadata <- GAMBLR.data::sample_data$meta %>%
+    metadata <- GAMBLR.data::sample_metadata %>%
             dplyr::filter(seq_type %in% seq_type_filter)
 
 

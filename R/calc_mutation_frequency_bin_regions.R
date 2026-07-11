@@ -97,12 +97,15 @@ calc_mutation_frequency_bin_regions <- function(regions_list = NULL,
   ) {
     stop("chr prefixing status of provided regions and specified projection don't match. ")
   }
-  # Harmonize metadata and sample IDs
-  metadata <- id_ease(
-    these_samples_metadata,
-    these_sample_ids,
-    this_seq_type
-  )
+  # Harmonize metadata and sample IDs (id_ease retired)
+  if(!is.null(these_samples_metadata)){
+    metadata <- dplyr::filter(these_samples_metadata, seq_type %in% this_seq_type)
+  }else{
+    metadata <- get_gambl_metadata(seq_type_filter = this_seq_type)
+    if(!is.null(these_sample_ids)){
+      metadata <- dplyr::filter(metadata, sample_id %in% these_sample_ids)
+    }
+  }
   
   these_sample_ids <- metadata$sample_id
   
