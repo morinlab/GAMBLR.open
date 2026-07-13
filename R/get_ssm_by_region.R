@@ -21,7 +21,12 @@
 #' @param this_seq_type The seq_type you want back, default is genome.
 #' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
 #' @param this_study Optionally specify first name of the author for the paper
-#'      from which the variants should be returned for.
+#'      from which the variants should be returned for. Matched against
+#'      GAMBLR.data's sample_study table (sample-level cohort membership),
+#'      not a per-row column -- restricts to that study's samples and
+#'      composes with tool_name (e.g. the default tool_name="slms-3" returns
+#'      that study's samples' SLMS-3 recall; tool_name="publication" returns
+#'      their as-published rows only).
 #' @param verbose Set to FALSE to prevent ANY message to be printed.
 #' In most cases, this parameter should be left to TRUE.
 #' The parameter was added to accommodate for noisy output
