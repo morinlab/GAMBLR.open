@@ -1,4 +1,4 @@
-[1] "=== STARTED AT 2026-07-14 13:27:21 ==="
+[1] "=== STARTED AT 2026-07-14 15:25:08 ==="
 Writing NAMESPACE
 Writing NAMESPACE
 ── Running 21 example files ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── GAMBLR.open ──
@@ -343,13 +343,13 @@ BLGSP-71-06-00001-01A-11D   0       0     1   1     1       0
 genomic_data Object
 Genome Build: grch37 
 Showing first 10 rows:
-  CHROM_A   START_A     END_A CHROM_B   START_B     END_B                  manta_name SCORE STRAND_A STRAND_B tumour_sample_id normal_sample_id VAF_tumour  DP pair_status FILTER
-1       1 161658631 161658631       3  16509907  16509907    MantaBND:21171:0:1:0:0:0   133        +        +         FL2002T1          FL2002N      0.331 127     matched   PASS
-2       1 161663959 161663959       9  37363320  37363320   MantaBND:206628:0:1:0:0:0   122        +        +  09-15842_tumorA  09-15842_normal      0.281 196     matched   PASS
-3       1 161663959 161663959       9  37363320  37363320   MantaBND:195941:0:1:0:0:0   151        +        +  09-15842_tumorB  09-15842_normal      0.364 187     matched   PASS
-4      11  65267283  65267283      14 106110907 106110907 MantaBND:152220:0:1:0:0:0:0    88        +        -        15-38154T        15-38154N      0.150 167     matched   PASS
-5      11  65267422  65267422      14 106110905 106110905 MantaBND:152220:0:1:0:0:0:0   135        -        +        15-38154T        15-38154N      0.290 169     matched   PASS
-6      13  91975699  91975699      16  10980639  10980639   MantaBND:349176:1:2:0:0:0    73        +        +         SP124973         SP124972      0.198  86     matched   PASS
+  CHROM_A   START_A     END_A CHROM_B  START_B    END_B                      manta_name SCORE STRAND_A STRAND_B tumour_sample_id normal_sample_id VAF_tumour DP pair_status FILTER
+1      14 106329450 106329450      18 60774579 60774579      MantaBND:1043376:0:1:0:1:0    87        +        -  00-14595_tumorC  00-14595_normal      0.400 40     matched   PASS
+2      14 106382688 106382688      18 60687237 60687237      MantaBND:1043324:0:1:0:0:0    76        -        +  00-14595_tumorC  00-14595_normal      0.346 26     matched   PASS
+3      14 106329450 106329450      18 60774579 60774579       MantaBND:963121:0:1:0:1:0    70        +        -  00-14595_tumorD  00-14595_normal      0.171 82     matched   PASS
+4       8 134207510 134207517       9 36763818 36763825 MantaBND:13:121255:121342:0:0:0    46        +        -  00-26427_tumorA  00-26427_normal      0.154 39     matched   PASS
+5      14 106177617 106177617      19 45251322 45251322 MantaBND:19:34315:34490:0:2:0:0    54        +        -  01-14774_tumorA  01-14774_normal      0.135 74     matched   PASS
+6       3 187462585 187462585       6 27107409 27107409     MantaBND:242619:0:1:0:0:0:0    78        +        +  01-14774_tumorA  01-14774_normal      0.235 68     matched   PASS
 
 > cohort_meta = suppressMessages(get_gambl_metadata()) %>% 
 +     dplyr::filter(cohort == "DLBCL_cell_lines")
@@ -384,12 +384,12 @@ genomic_data Object
 Genome Build: hg38 
 Showing first 10 rows:
   CHROM_A   START_A     END_A CHROM_B   START_B     END_B                   manta_name SCORE STRAND_A STRAND_B          tumour_sample_id          normal_sample_id VAF_tumour  DP pair_status FILTER
-1    chr2  88860304  88860306    chr8 127751936 127751938  MantaBND:194837:0:1:0:0:0:0   102        +        + BLGSP-71-27-00414-01A-01E BLGSP-71-27-00414-10A-01D      0.171 280     matched   PASS
-2    chr2  88860417  88860417    chr8 127751955 127751955  MantaBND:194837:0:1:0:0:0:0    73        -        - BLGSP-71-27-00414-01A-01E BLGSP-71-27-00414-10A-01D      0.117 230     matched   PASS
-3    chr2  88861500  88861500    chr8 127748752 127748752   MantaBND:1102030:0:1:0:0:0    89        +        + BLGSP-71-30-00647-01A-01E BLGSP-71-06-00286-99A-01D      0.283  46   unmatched   PASS
-4    chr3 187811601 187811601    chr8 127745649 127745649     MantaBND:48510:0:2:0:0:0   106        -        +                  FL1008T2                   FL1008N      0.171 245     matched   PASS
-5    chr8 127713694 127713694   chr14 105857950 105857950 MantaBND:1:10030:23823:0:0:0   109        -        + BLGSP-71-06-00280-01A-01D BLGSP-71-06-00280-99A-01D      0.272 235     matched   PASS
-6    chr8 127716025 127716934   chr14 105862581 105863164   MantaBND:85417:0:1:0:1:0:0   112        +        - BLGSP-71-06-00084-01A-01D BLGSP-71-06-00084-99A-01D      0.373  83     matched   PASS
+1    chr8 127713694 127713694   chr14 105857950 105857950 MantaBND:1:10030:23823:0:0:0   109        -        + BLGSP-71-06-00280-01A-01D BLGSP-71-06-00280-99A-01D      0.272 235     matched   PASS
+2    chr8 127716025 127716934   chr14 105862581 105863164   MantaBND:85417:0:1:0:1:0:0   112        +        - BLGSP-71-06-00084-01A-01D BLGSP-71-06-00084-99A-01D      0.373  83     matched   PASS
+3    chr8 127716405 127716405    chr9  37381161  37381161    MantaBND:116063:0:1:0:0:0   106        -        -                  FL1011T2                   FL1011N      0.165 230     matched   PASS
+4    chr8 127716523 127716523   chr14 105862757 105862757   MantaBND:85417:0:1:0:1:0:0   173        -        + BLGSP-71-06-00084-01A-01D BLGSP-71-06-00084-99A-01D      0.373 153     matched   PASS
+5    chr8 127718148 127718148   chr14 105860256 105860256   MantaBND:90480:0:1:0:0:0:0   152        +        - BLGSP-71-08-00036-01A-01D BLGSP-71-08-00036-10A-01D      0.390 172     matched   PASS
+6    chr8 127718150 127718150   chr14 105860564 105860564   MantaBND:90480:0:1:0:0:0:0   163        -        + BLGSP-71-08-00036-01A-01D BLGSP-71-08-00036-10A-01D      0.325 237     matched   PASS
 
 > nrow(hg38_myc_locus_sv)
 [1] 260
@@ -413,12 +413,12 @@ Showing first 10 rows:
 > head(annotated_myc_hg38)
    chrom1    start1      end1 chrom2    start2      end2   name score strand1 strand2          tumour_sample_id   gene partner   fusion
    <char>     <num>     <num> <char>     <num>     <num> <char> <num>  <char>  <char>                    <char> <char>  <char>   <char>
-1:      3 187811601 187811601      8 127745649 127745649      .   106       -       +                  FL1008T2   BCL6    <NA>  NA-BCL6
-2:      8 127713694 127713694     14 105857950 105857950      .   109       -       + BLGSP-71-06-00280-01A-01D    MYC     IGH  IGH-MYC
-3:      8 127716025 127716934     14 105862581 105863164      .   112       +       - BLGSP-71-06-00084-01A-01D    MYC     IGH  IGH-MYC
-4:      8 127716405 127716405      9  37381161  37381161      .   106       -       -                  FL1011T2    MYC    PAX5 PAX5-MYC
-5:      8 127716523 127716523     14 105862757 105862757      .   173       -       + BLGSP-71-06-00084-01A-01D    MYC     IGH  IGH-MYC
-6:      8 127718148 127718148     14 105860256 105860256      .   152       +       - BLGSP-71-08-00036-01A-01D    MYC     IGH  IGH-MYC
+1:      8 127713694 127713694     14 105857950 105857950      .   109       -       + BLGSP-71-06-00280-01A-01D    MYC     IGH  IGH-MYC
+2:      8 127716025 127716934     14 105862581 105863164      .   112       +       - BLGSP-71-06-00084-01A-01D    MYC     IGH  IGH-MYC
+3:      8 127716405 127716405      9  37381161  37381161      .   106       -       -                  FL1011T2    MYC    PAX5 PAX5-MYC
+4:      8 127716523 127716523     14 105862757 105862757      .   173       -       + BLGSP-71-06-00084-01A-01D    MYC     IGH  IGH-MYC
+5:      8 127718148 127718148     14 105860256 105860256      .   152       +       - BLGSP-71-08-00036-01A-01D    MYC     IGH  IGH-MYC
+6:      8 127718150 127718150     14 105860564 105860564      .   163       -       + BLGSP-71-08-00036-01A-01D    MYC     IGH  IGH-MYC
 
 > table(annotated_myc_hg38$partner)
 
@@ -490,4 +490,4 @@ Showing first 10 rows:
 3              OCI-Ly3 31532
 4            SU-DHL-10 26855
 5             SU-DHL-4 32824
-[1] "=== COMPLETED AT 2026-07-14 13:31:58 ==="
+[1] "=== COMPLETED AT 2026-07-14 15:29:30 ==="
