@@ -1,4 +1,4 @@
-[1] "=== STARTED AT 2026-07-14 08:37:13 ==="
+[1] "=== STARTED AT 2026-07-14 13:01:38 ==="
 Writing NAMESPACE
 Writing NAMESPACE
 ── Running 21 example files ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── GAMBLR.open ──
@@ -17,16 +17,16 @@ genomic_data Object
 Genome Build: grch37 
 Showing first 10 rows:
    Hugo_Symbol Entrez_Gene_Id Center NCBI_Build Chromosome HGVSp_Short hot_spot
-1         EZH2              0      .     GRCh37          7     p.Y646F     TRUE
+1         EZH2              0      .     GRCh37          7     p.Y646S     TRUE
 2         EZH2              0      .     GRCh37          7     p.Y646F     TRUE
 3         EZH2              0      .     GRCh37          7     p.Y646F     TRUE
 4         EZH2              0      .     GRCh37          7     p.Y646C     TRUE
 5         EZH2              0      .     GRCh37          7     p.Y646S     TRUE
 6         EZH2              0      .     GRCh37          7     p.Y646S     TRUE
-7         EZH2              0      .     GRCh37          7     p.Y646S     TRUE
-8         EZH2              0      .     GRCh37          7     p.Y646S     TRUE
+7         EZH2              0      .     GRCh37          7     p.Y646F     TRUE
+8         EZH2              0      .     GRCh37          7     p.Y646F     TRUE
 9         EZH2              0      .     GRCh37          7     p.Y646F     TRUE
-10        EZH2              0      .     GRCh37          7     p.Y646S     TRUE
+10        EZH2              0      .     GRCh37          7     p.Y646F     TRUE
 
 > some_meta = get_gambl_metadata() %>% dplyr::filter(study == 
 +     "FL_Dreval", grepl("SP", sample_id))
@@ -38,8 +38,17 @@ Showing first 10 rows:
 genomic_data Object
 Genome Build: grch37 
 Showing first 10 rows:
-[1] Hugo_Symbol    Entrez_Gene_Id Center         NCBI_Build     Chromosome     Start_Position End_Position   Strand        
-<0 rows> (or 0-length row.names)
+   Hugo_Symbol Entrez_Gene_Id Center NCBI_Build Chromosome Start_Position End_Position Strand
+1       HNRNPU              0      .     GRCh37          1      245027102    245027102      +
+2         PCLO              0      .     GRCh37          7       82784068     82784068      +
+3        MYOM2              0      .     GRCh37          8        2063762      2063762      +
+4       CREBBP              0      .     GRCh37         16        3786740      3786740      +
+5        IGLL5              0      .     GRCh37         22       23230399     23230400      +
+6    HIST1H2BC              0      .     GRCh37          6       26123774     26123774      +
+7        SETD2              0      .     GRCh37          3       47088059     47088059      +
+8         IRF8              0      .     GRCh37         16       85942737     85942737      +
+9       ARID5B              0      .     GRCh37         10       63661999     63661999      +
+10      ARID5B              0      .     GRCh37         10       63810677     63810677      +
 
 > cn_list = assign_cn_to_ssm(some_meta, ssm_genomes_grch37)
 
@@ -47,8 +56,17 @@ Showing first 10 rows:
 genomic_data Object
 Genome Build: grch37 
 Showing first 10 rows:
- [1] Hugo_Symbol    Entrez_Gene_Id Center         NCBI_Build     Chromosome     Start_Position End_Position   Strand         log.ratio      CN            
-<0 rows> (or 0-length row.names)
+   Hugo_Symbol Entrez_Gene_Id Center NCBI_Build Chromosome Start_Position End_Position Strand log.ratio CN
+1       HNRNPU              0      .     GRCh37          1      245027102    245027102      + 0.4306932  3
+2         PCLO              0      .     GRCh37          7       82784068     82784068      + 0.0000000  2
+3        MYOM2              0      .     GRCh37          8        2063762      2063762      + 0.0000000  2
+4       CREBBP              0      .     GRCh37         16        3786740      3786740      + 0.0000000  2
+5        IGLL5              0      .     GRCh37         22       23230399     23230400      + 0.0000000  2
+6    HIST1H2BC              0      .     GRCh37          6       26123774     26123774      + 0.0000000  2
+7        SETD2              0      .     GRCh37          3       47088059     47088059      + 0.0000000  2
+8         IRF8              0      .     GRCh37         16       85942737     85942737      + 1.3219281  5
+9       ARID5B              0      .     GRCh37         10       63661999     63661999      + 0.5849625  3
+10      ARID5B              0      .     GRCh37         10       63810677     63810677      + 0.5849625  3
 
 > myc_region = "8:128747680-128753674"
 
@@ -59,16 +77,16 @@ Showing first 10 rows:
 # A tibble: 524,400 × 3
    sample_id bin         mutation_count
    <chr>     <chr>                <int>
- 1 14-35026T 8_128747680             68
- 2 14-35026T 8_128747690             68
- 3 14-35026T 8_128747700             68
- 4 14-35026T 8_128747710             68
- 5 14-35026T 8_128747720             68
- 6 14-35026T 8_128747730             68
- 7 14-35026T 8_128747740             68
- 8 14-35026T 8_128747750             68
- 9 14-35026T 8_128747760             68
-10 14-35026T 8_128747770             68
+ 1 14-35026T 8_128747680             70
+ 2 14-35026T 8_128747690             70
+ 3 14-35026T 8_128747700             70
+ 4 14-35026T 8_128747710             70
+ 5 14-35026T 8_128747720             70
+ 6 14-35026T 8_128747730             70
+ 7 14-35026T 8_128747740             70
+ 8 14-35026T 8_128747750             70
+ 9 14-35026T 8_128747760             70
+10 14-35026T 8_128747770             70
 # ℹ 524,390 more rows
 
 > my_meta = get_gambl_metadata()
@@ -138,24 +156,24 @@ Showing first 10 rows:
 > table(maf_all_seqtype$maf_seq_type)
 
 capture  genome 
-  24676    7235 
+  24676   12240 
 
 > dplyr::group_by(maf_all_seqtype, Hugo_Symbol, Variant_Classification) %>% 
 +     dplyr::count() %>% dplyr::arrange(desc(n))
 genomic_data Object
 Genome Build: grch37 
 Showing first 10 rows:
-   Hugo_Symbol Variant_Classification   n
-1         PIM1      Missense_Mutation 810
-2        IGLL5      Missense_Mutation 806
-3          MYC      Missense_Mutation 641
-4         BCL2      Missense_Mutation 611
-5         PCLO      Missense_Mutation 483
-6     HIST1H1E      Missense_Mutation 459
-7         TP53      Missense_Mutation 396
-8        MYD88      Missense_Mutation 372
-9        SOCS1      Missense_Mutation 371
-10        SGK1      Missense_Mutation 353
+   Hugo_Symbol Variant_Classification    n
+1        IGLL5      Missense_Mutation 1061
+2         PIM1      Missense_Mutation  911
+3         BCL2      Missense_Mutation  829
+4          MYC      Missense_Mutation  671
+5     HIST1H1E      Missense_Mutation  541
+6         PCLO      Missense_Mutation  524
+7        SOCS1      Missense_Mutation  469
+8         TP53      Missense_Mutation  445
+9         SGK1      Missense_Mutation  411
+10       MYD88      Missense_Mutation  404
 
 > regions_bed = create_bed_data(GAMBLR.data::grch37_ashm_regions, 
 +     fix_names = "concat", concat_cols = c("gene", "region"), 
@@ -225,16 +243,16 @@ Showing first 10 rows:
 
 > head(genome_cnv_ssm_status)
                           MYC MIR17HG CCND3 ID3 DDX3X SYNCRIP
-Akata                       0       1     0   0     0       0
-BL2                         0       1     0   0     0       0
-BL30                        1       1     0   1     0       0
-BL41                        0       1     0   0     0       0
-BL70                        0       1     0   0     0       0
-BLGSP-71-06-00001-01A-11D   0       0     0   0     0       0
+Akata                       1       1     0   1     1       0
+BL2                         1       1     0   1     1       0
+BL30                        1       1     0   1     1       0
+BL41                        1       1     1   1     0       0
+BL70                        1       1     1   1     1       0
+BLGSP-71-06-00001-01A-11D   0       0     1   1     1       0
 
 > colSums(genome_cnv_ssm_status)
     MYC MIR17HG   CCND3     ID3   DDX3X SYNCRIP 
-     74      41       2      19       4       7 
+    173      41      68     112     118       7 
 
 > all_path_meta = suppressMessages(get_gambl_metadata())
 
@@ -256,7 +274,7 @@ BLGSP-71-06-00001-01A-11D   0       0     0   0     0       0
 > head(all_pathology_status)
           MYC MIR17HG CCND3 ID3 DDX3X SYNCRIP
 01-20260T   1       0     0   0     0       0
-02-13135T   1       0     0   0     0       0
+02-13135T   1       0     0   0     1       0
 02-20170T   0       1     0   0     0       1
 02-22991T   1       0     0   0     0       0
 03-34157T   0       0     0   0     0       0
@@ -264,7 +282,7 @@ BLGSP-71-06-00001-01A-11D   0       0     0   0     0       0
 
 > colSums(all_pathology_status)
     MYC MIR17HG   CCND3     ID3   DDX3X SYNCRIP 
-    136     100       0       0       0      91 
+    150     100      23       5      23      91 
 
 > ssm_exomes_grch37 = get_coding_ssm(projection = "grch37", 
 +     this_seq_type = "capture")
@@ -472,4 +490,4 @@ Showing first 10 rows:
 3              OCI-Ly3 31532
 4            SU-DHL-10 26855
 5             SU-DHL-4 32824
-[1] "=== COMPLETED AT 2026-07-14 08:41:50 ==="
+[1] "=== COMPLETED AT 2026-07-14 13:13:13 ==="
