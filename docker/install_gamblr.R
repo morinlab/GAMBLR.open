@@ -15,6 +15,12 @@
 # Refs default to "master" (a normal release build, once PRs are merged);
 # override via env vars for pre-merge testing of open PR branches.
 
+# R's download.file() defaults to a 60s timeout, which GitHub's on-demand
+# tarball generation for install_github() can occasionally exceed (seen in
+# practice: a GAMBLR.data@rmorin-dev fetch failed at exactly 60.7s during
+# an early test build). 600s gives ample headroom.
+options(timeout = 600)
+
 refs <- list(
   GAMBLR.data    = Sys.getenv("GAMBLR_DATA_REF", "master"),
   GAMBLR.helpers = Sys.getenv("GAMBLR_HELPERS_REF", "master"),
@@ -24,14 +30,37 @@ refs <- list(
   GAMBLR.open    = Sys.getenv("GAMBLR_OPEN_REF", "master")
 )
 
-repos <- paste0("morinlab/", names(refs), "@", unlist(refs))
-message("Installing: ", paste(repos, collapse = ", "))
+install_with_retry <- function(repo, max_tries = 3) {
+  for (i in seq_len(max_tries)) {
+    ok <- tryCatch({
+      remotes::install_github(repo, dependencies = FALSE, upgrade = "never")
+      TRUE
+    }, error = function(e) {
+      if (i < max_tries) {
+        message("Install of ", repo, " failed (attempt ", i, "/", max_tries,
+                "): ", conditionMessage(e), " -- retrying in ", 5 * i, "s...")
+        Sys.sleep(5 * i)
+        FALSE
+      } else {
+        stop(e)
+      }
+    })
+    if (isTRUE(ok)) return(invisible())
+  }
+}
 
-remotes::install_github(repos, dependencies = FALSE, upgrade = "never")
-
-# Fail the build loudly if anything didn't actually install, rather than
-# only discovering it the first time someone tries to use the image.
+# Installed one at a time, in dependency order (the order `refs` is
+# defined in), rather than as a single install_github() vector call --
+# GAMBLR.open and several others declare version-pinned Imports on the
+# rest, checked at install time, so a failure needs to stop the build
+# immediately rather than cascading into five more doomed downstream
+# installs (which is what a whole-vector call did in practice: GAMBLR.data
+# failing still let remotes plow ahead into GAMBLR.helpers/utils/viz/
+# predict/open, all of which then failed too, for a less useful log).
 for (pkg in names(refs)) {
+  repo <- paste0("morinlab/", pkg, "@", refs[[pkg]])
+  message("Installing ", repo)
+  install_with_retry(repo)
   if (!requireNamespace(pkg, quietly = TRUE)) {
     stop("Package failed to install: ", pkg, call. = FALSE)
   }
