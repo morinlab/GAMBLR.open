@@ -56,7 +56,7 @@ dohh2_segs = get_sample_cn_segments(these_sample_ids = "DOHH-2",
                                     streamlined = TRUE)
 
 #get CN segments for DLBCL cell line
-cell_line_meta = GAMBLR.data::sample_data$meta \%>\%
+cell_line_meta = get_gambl_metadata() \%>\%
   dplyr::filter(cohort == "DLBCL_cell_lines")
 
 dlbcl_segs = get_sample_cn_segments(these_samples_metadata = cell_line_meta,

@@ -33,7 +33,7 @@
 #'                                     streamlined = TRUE)
 #'
 #' #get CN segments for DLBCL cell line
-#' cell_line_meta = GAMBLR.data::sample_data$meta %>%
+#' cell_line_meta = get_gambl_metadata() %>%
 #'   dplyr::filter(cohort == "DLBCL_cell_lines")
 #'
 #' dlbcl_segs = get_sample_cn_segments(these_samples_metadata = cell_line_meta,
@@ -69,13 +69,13 @@ get_sample_cn_segments = function(these_sample_ids = NULL,
 
   sample_ids = metadata$sample_id
 
-  #get valid projections
-  valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
+  #valid projections (kept static so we never load the multi-GB sample_data)
+  valid_projections = c("grch37", "hg38")
 
   #return CN segments based on the selected projection
   if(projection %in% valid_projections){
-    all_segs = GAMBLR.data::sample_data[[projection]]$seg %>%
-      dplyr::filter(ID %in% sample_ids)
+    all_segs = GAMBLR.data::get_cn_segments_from_db(projection = projection,
+                                                    sample_ids = sample_ids)
   }else{
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))
