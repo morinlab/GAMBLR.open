@@ -43,20 +43,32 @@ Apptainer-specific build step or definition file.
    on disk, so an uncommitted bump would tag an image nobody else's
    checkout can reproduce.
 
-4. **Log in to GHCR** with a GitHub PAT that has `write:packages` scope:
+4. **Run the build+push**, via either path -- both run the exact same
+   script, so they can't drift apart:
+
+   **Option A: GitHub Actions** (`.github/workflows/release_container.yaml`)
+   -- no local Docker/disk-space/credentials needed, since it runs on
+   GitHub's own runners and authenticates to GHCR with the built-in
+   `GITHUB_TOKEN`. From the Actions tab, run "Release gamblr-collective
+   container" (leave all ref inputs at their `master` default for a normal
+   release), or via the CLI:
+   ```bash
+   gh workflow run release_container.yaml --repo morinlab/GAMBLR.open
+   ```
+
+   **Option B: locally.** Log in to GHCR with a GitHub PAT that has
+   `write:packages` scope, then run the script from the repo root:
    ```bash
    echo "$GHCR_PAT" | docker login ghcr.io -u <your-github-username> --password-stdin
-   ```
-
-5. **Run the release script from the repo root:**
-   ```bash
    ./docker/release_container.sh
    ```
-   This builds `ghcr.io/morinlab/gamblr-collective:<version>`, pushes it,
-   and also moves the floating `latest` tag to it (since a plain run with
-   no ref overrides is, by definition, a master-based release build).
 
-6. **Verify** by pulling the image fresh and running the same smoke test
+   Either way, this builds `ghcr.io/morinlab/gamblr-collective:<version>`,
+   pushes it, and also moves the floating `latest` tag to it (since a plain
+   run with no ref overrides is, by definition, a master-based release
+   build).
+
+5. **Verify** by pulling the image fresh and running the same smoke test
    used to validate the conda environment:
    ```bash
    docker run --rm ghcr.io/morinlab/gamblr-collective:<version> \
@@ -70,15 +82,25 @@ Apptainer-specific build step or definition file.
 
 ## Testing pre-merge PR branches
 
-Override any of the six ref env vars before running the script, e.g. to
-test both currently-open PRs together:
+**Via GitHub Actions**: set the relevant ref inputs when dispatching the
+workflow, e.g. to test both currently-open PRs together (`gamblr_data_ref`
+and `gamblr_open_ref` set to `rmorin-dev`, tag set to something like
+`test-pr128-pr16`), either from the Actions tab's "Run workflow" form, or:
+```bash
+gh workflow run release_container.yaml --repo morinlab/GAMBLR.open \
+  -f tag=test-pr128-pr16 -f gamblr_data_ref=rmorin-dev -f gamblr_open_ref=rmorin-dev
+```
+
+**Locally**: override any of the six ref env vars before running the
+script:
 ```bash
 GAMBLR_DATA_REF=rmorin-dev GAMBLR_OPEN_REF=rmorin-dev \
   ./docker/release_container.sh test-pr128-pr16
 ```
-This pushes only the custom tag (`test-pr128-pr16` here) and never touches
-`latest`, so it can't be mistaken for a real release by anyone pulling the
-image without an explicit tag.
+
+Either way, this pushes only the custom tag (`test-pr128-pr16` here) and
+never touches `latest`, so it can't be mistaken for a real release by
+anyone pulling the image without an explicit tag.
 
 ## Troubleshooting
 
