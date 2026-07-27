@@ -25,30 +25,45 @@
 #' @return A data frame with metadata, tailored for user without GSC access.
 #'
 #' \describe{
-#'   \item{compression}{Format of the original data used as input for our analysis pipelines (cram, bam or fastq)}
-#'   \item{bam_available}{Whether or not this file was available when last checked.}
-#'   \item{patient_id}{The anonymized unique identifier for this patient. For BC samples, this will be Res ID.}
 #'   \item{sample_id}{A unique identifier for the sample analyzed.}
 #'   \item{seq_type}{The assay type used to produce this data (one of "genome","capture, "mrna", "promethION")}
-#'   \item{genome_build}{The name of the genome reference the data were aligned to.}
-#'   \item{cohort}{Name for a group of samples that were added together (usually from a single study), often in the format {pathology}_{cohort_descriptor}.}
+#'   \item{study}{Which study/cohort block this sample was assembled from (e.g. "DLBCL_Arthur", "FL_Dreval"). Used internally by the `case_set` filters below.}
+#'   \item{patient_id}{The anonymized unique identifier for this patient. For BC samples, this will be Res ID.}
 #'   \item{pathology}{The diagnosis or pathology for the sample}
-#'   \item{time_point}{Timing of biopsy in increasing alphabetical order (A = diagnosis, B = first relapse etc)}
-#'   \item{ffpe_or_frozen}{Whether the nucleic acids were extracted from a frozen or FFPE sample}
+#'   \item{biopsy_res}{Biopsy-level result/classification identifier.}
+#'   \item{genome_build}{The name of the genome reference the data were aligned to.}
+#'   \item{pairing_status}{Matching status of the sample}
+#'   \item{Tumor_Sample_Barcode}{Duplicate of sample_id for simplifying joins to MAF data frames}
+#'   \item{cohort}{Name for a group of samples that were added together (usually from a single study), often in the format {pathology}_{cohort_descriptor}.}
 #'   \item{COO_consensus}{Consensus call of COO between different sources.}
 #'   \item{DHITsig_consensus}{Consensus call of DHIT signature status between different sources.}
 #'   \item{EBV_status_inf}{Inferred EBV status of the tumor}
+#'   \item{ffpe_or_frozen}{Whether the nucleic acids were extracted from a frozen or FFPE sample}
+#'   \item{fl_grade}{Grade of FL samples}
+#'   \item{bcl2_ba}{Result from breakapart FISH for BCL2 locus}
+#'   \item{bcl2_cn}{Result from copy number FISH for BCL2 locus}
+#'   \item{bcl6_ba}{Result from breakapart FISH for BCL6 locus}
+#'   \item{bcl6_cn}{Result from copy number FISH for BCL6 locus}
+#'   \item{myc_ba}{Result from breakapart FISH for MYC locus}
+#'   \item{myc_cn}{Result from copy number FISH for MYC locus}
+#'   \item{lymphgen}{LymphGen label}
+#'   \item{lymphgen_cnv_noA53}{LymphGen label using model with CNV but excluding A53 class}
 #'   \item{lymphgen_no_cnv}{LymphGen label using model without CNV}
 #'   \item{lymphgen_with_cnv}{LymphGen label using model with CNV}
-#'   \item{lymphgen_cnv_noA53}{LymphGen label using model with CNV but excluding A53 class}
 #'   \item{lymphgen_wright}{The LymphGen call for this sample from Wright et all (if applicable)}
-#'   \item{fl_grade}{Grade of FL samples}
 #'   \item{normal_sample_id}{Sample id for normal tissue used in the analysis}
-#'   \item{pairing_status}{Matching status of the sample}
-#'   \item{lymphgen}{LymphGen label}
-#'   \item{Tumor_Sample_Barcode}{Duplicate of sample_id for simplifying joins to MAF data frames}
 #'   \item{sex}{The biological sex of the patient, if available. Allowable options: M, F, NA}
+#'   \item{time_point}{Timing of biopsy in increasing alphabetical order (A = diagnosis, B = first relapse etc)}
+#'   \item{TotalDuplicatedreads}{QC metric: total duplicated reads for this sample.}
+#'   \item{TotalReads}{QC metric: total reads for this sample.}
+#'   \item{TotalUniquelyMapped}{QC metric: total uniquely-mapped reads for this sample.}
+#'   \item{TotalUnmappedreads}{QC metric: total unmapped reads for this sample.}
+#'   \item{transformation}{Whether this case represents a histologic transformation.}
 #' }
+#'
+#' The exact column set is controlled by
+#' `data-raw/public_sample_meta_columns.txt` in GAMBLR.data -- see that
+#' file if a column is missing here after a rebuild.
 #'
 #' @import dplyr
 #'
