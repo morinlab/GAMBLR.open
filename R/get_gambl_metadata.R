@@ -46,15 +46,11 @@
 #'   \item{normal_sample_id}{Sample id for normal tissue used in the analysis}
 #'   \item{pairing_status}{Matching status of the sample}
 #'   \item{lymphgen}{LymphGen label}
-#'   \item{molecular_BL}{label of the sample according to the molecular BL classifier}
 #'   \item{Tumor_Sample_Barcode}{Duplicate of sample_id for simplifying joins to MAF data frames}
-#'   \item{pathology_rank}{Numeric rank for consistent ordering of samples by pathology}
-#'   \item{hiv_status}{HIV status of the sample}
-#'   \item{age_group}{Adult_BL or Pediatric_BL or Other, specific to the BLGSP study}
 #'   \item{sex}{The biological sex of the patient, if available. Allowable options: M, F, NA}
 #' }
 #'
-#' @import dplyr purrr
+#' @import dplyr
 #'
 #' @export
 #'
@@ -82,11 +78,13 @@ get_gambl_metadata = function(
     check_excess_params(...)
 
     if (!isTRUE(getOption("GAMBLR.open.shown_metadata_msg"))) {
-      message("Using the bundled metadata in GAMBLR.data...")
+      message("Using the bundled sample_meta table in GAMBLR.data...")
       options(GAMBLR.open.shown_metadata_msg = TRUE)
     }
-    metadata <- GAMBLR.data::sample_metadata %>%
-            dplyr::filter(seq_type %in% seq_type_filter)
+    con <- GAMBLR.data::gambl_mutations_db()
+    metadata <- dplyr::tbl(con, "sample_meta") %>%
+            dplyr::filter(seq_type %in% seq_type_filter) %>%
+            dplyr::collect()
 
 
     if(!missing(case_set)){
@@ -131,22 +129,6 @@ get_gambl_metadata = function(
         }
     }
 
-    metadata <- metadata %>%
-        dplyr::left_join(
-            GAMBLR.data::gambl_metadata,
-            by = "sample_id",
-            suffix = c(".X", ".Y")
-        ) %>%
-        split.default(gsub('.[XY]', '', names(.))) %>%
-        purrr::map_dfc( ~ if (ncol(.x) == 1)
-            .x
-            else
-            dplyr::mutate(.x,!!sym(gsub('.X', '', names(
-                .x
-            )[1])) := dplyr::coalesce(!!!syms(names(
-                .x
-            ))))) %>%
-        dplyr::select(!contains("."))
     #ensure only unique rows are returned
     return(unique(metadata))
 }

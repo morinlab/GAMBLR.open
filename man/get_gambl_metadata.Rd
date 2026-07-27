@@ -40,11 +40,7 @@ A data frame with metadata, tailored for user without GSC access.
 \item{normal_sample_id}{Sample id for normal tissue used in the analysis}
 \item{pairing_status}{Matching status of the sample}
 \item{lymphgen}{LymphGen label}
-\item{molecular_BL}{label of the sample according to the molecular BL classifier}
 \item{Tumor_Sample_Barcode}{Duplicate of sample_id for simplifying joins to MAF data frames}
-\item{pathology_rank}{Numeric rank for consistent ordering of samples by pathology}
-\item{hiv_status}{HIV status of the sample}
-\item{age_group}{Adult_BL or Pediatric_BL or Other, specific to the BLGSP study}
 \item{sex}{The biological sex of the patient, if available. Allowable options: M, F, NA}
 }
 }
