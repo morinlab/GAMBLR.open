@@ -77,8 +77,7 @@ get_ssm_by_regions <- function(these_samples_metadata,
 
   # check provided projection
   # first, get valid projections
-  valid_projections = grep("meta", names(GAMBLR.data::sample_data),
-                           value = TRUE, invert = TRUE)
+  valid_projections = c("grch37", "hg38")
   if (!projection %in% valid_projections) {
     stop("Please provide a valid projection. The following are available: ",
          paste(valid_projections, collapse = ", "), ".")
@@ -128,6 +127,30 @@ get_ssm_by_regions <- function(these_samples_metadata,
     }
   }
 
+  # Build the regions data frame (Chromosome / Start_Position / End_Position / region)
+  if(!missing(regions_bed) && "bed_data" %in% class(regions_bed)){
+    regions_df = dplyr::select(regions_bed,1:4) %>%
+      dplyr::rename(c("Chromosome"="chrom",
+                      "Start_Position"="start",
+                      "End_Position"="end",
+                      "bed_name"="name")) %>%
+      dplyr::mutate(region = paste0(Chromosome, ":", Start_Position, "-", End_Position))
+
+  }else{
+    regions_df <- as.data.frame(regions) %>%
+      `names<-`("regions") %>%
+      separate(
+        regions,
+        c("Chromosome", "Start_Position", "End_Position"),
+        ":|-"
+      ) %>%
+      mutate(
+        Start_Position = as.numeric(Start_Position),
+        End_Position = as.numeric(End_Position),
+        region = paste0(Chromosome, ":", Start_Position, "-", End_Position)
+      )
+  }
+
   if(!missing(maf_data)){
     # Warn/notify the user what version of this function they are using
     message("Using the supplied maf_data")
@@ -155,40 +178,39 @@ get_ssm_by_regions <- function(these_samples_metadata,
     }
   } else{
     # Warn/notify the user what version of this function they are using
-    message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
+    if (!isTRUE(getOption("GAMBLR.open.shown_ssm_msg"))) {
+      message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
+      options(GAMBLR.open.shown_ssm_msg = TRUE)
+    }
     if (verbose) {
       print("Using the non-default engine for efficiency...")
     }
-    sample_maf <- get_ssm_by_samples(
-      these_samples_metadata = these_samples_metadata,
-      this_seq_type = this_seq_type,
-      projection = projection,
-      tool_name = tool_name
-    )
-  }
 
-    if(!missing(regions_bed) && "bed_data" %in% class(regions_bed)){
-      regions_df = dplyr::select(regions_bed,1:4) %>%
-        dplyr::rename(c("Chromosome"="chrom",
-                        "Start_Position"="start",
-                        "End_Position"="end",
-                        "bed_name"="name")) %>%
-        dplyr::mutate(region = paste0(Chromosome, ":", Start_Position, "-", End_Position))
-
+    # Resolve samples of interest (id_ease retired)
+    if(!missing(these_samples_metadata) && !is.null(these_samples_metadata)){
+      metadata = dplyr::filter(these_samples_metadata, seq_type %in% this_seq_type)
     }else{
-      regions_df <- as.data.frame(regions) %>%
-        `names<-`("regions") %>%
-        separate(
-          regions,
-          c("Chromosome", "Start_Position", "End_Position"),
-          ":|-"
-        ) %>%
-        mutate(
-          Start_Position = as.numeric(Start_Position),
-          End_Position = as.numeric(End_Position),
-          region = paste0(Chromosome, ":", Start_Position, "-", End_Position)
-        )
+      metadata = get_gambl_metadata(seq_type_filter = this_seq_type)
     }
+
+    # Pull only the mutations inside the requested regions from indexed SQL,
+    # rather than the genome-wide MAF, then attribute each mutation to its region.
+    # Widen by 1 bp so the (strict) SQL range is inclusive; cool_overlaps refines.
+    # get_ssm_from_db() already returns a deduplicated result (maf and ashm
+    # were merged into one table with one write-time dedup pass), so no
+    # post-hoc distinct() is needed here anymore.
+    sample_maf <- GAMBLR.data::get_ssm_from_db(
+      projection = projection,
+      sample_ids = metadata$sample_id,
+      tool_name = tool_name,
+      regions = dplyr::transmute(regions_df,
+                                 chrom = as.character(Chromosome),
+                                 start = as.numeric(Start_Position) - 1,
+                                 end   = as.numeric(End_Position) + 1)
+    ) %>%
+      create_maf_data(projection) %>%
+      mutate(maf_seq_type = this_seq_type)
+  }
 
 
     maf_df <- cool_overlaps(

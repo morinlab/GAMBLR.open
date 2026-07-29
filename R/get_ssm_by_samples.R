@@ -53,47 +53,41 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
                                ...) {
 
   #warn/notify the user what version of this function they are using
-  message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
+  if (!isTRUE(getOption("GAMBLR.open.shown_ssm_msg"))) {
+    message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
+    options(GAMBLR.open.shown_ssm_msg = TRUE)
+  }
 
   #check if any invalid parameters are provided
   check_excess_params(...)
 
-  #get samples with the dedicated helper function
-  metadata = id_ease(these_samples_metadata = these_samples_metadata,
-                     these_sample_ids = these_sample_ids,
-                     verbose = verbose,
-                     this_seq_type = this_seq_type)
-
+  # resolve samples of interest (id_ease retired)
+  if(!is.null(these_samples_metadata)){
+    metadata = dplyr::filter(these_samples_metadata, seq_type %in% this_seq_type)
+  }else{
+    metadata = get_gambl_metadata(seq_type_filter = this_seq_type)
+    if(!is.null(these_sample_ids)){
+      metadata = dplyr::filter(metadata, sample_id %in% these_sample_ids)
+    }
+  }
   sample_ids = metadata$sample_id
 
-  #get valid projections
-  valid_projections = grep("meta", names(GAMBLR.data::sample_data),
-                           value = TRUE, invert = TRUE)
-
-  #return SSMs based on the selected projection
-  if(projection %in% valid_projections) {
-    sample_ssm = GAMBLR.data::sample_data[[projection]]$maf %>%
-      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-      dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
-    sample_ssm <- bind_rows(sample_ssm,
-      GAMBLR.data::sample_data[[projection]]$ashm %>%
-        dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-        dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
-    )
-
-  }else {
+  # valid projections (kept static so we never load the multi-GB sample_data)
+  valid_projections = c("grch37", "hg38")
+  if(!projection %in% valid_projections){
     stop(paste("please provide a valid projection. Available options:",
-               paste(valid_projections,collapse=", ")))
+               paste(valid_projections, collapse=", ")))
   }
 
-
-  # Handle possible duplicates
-  sample_ssm <- sample_ssm %>%
-    distinct(Tumor_Sample_Barcode,
-             Chromosome,
-             Start_Position,
-             End_Position,
-             .keep_all = TRUE)
+  # SSMs (coding MAF + aSHM) for the selected samples, filtered in indexed SQL
+  # -- get_ssm_from_db() already returns a deduplicated result (maf and ashm
+  # were merged into one table with one write-time dedup pass), so no
+  # post-hoc distinct() is needed here anymore.
+  sample_ssm = GAMBLR.data::get_ssm_from_db(
+    projection = projection,
+    sample_ids = sample_ids,
+    tool_name = tool_name
+  )
   # bundle genome_build with the maf_data
   sample_ssm = create_maf_data(sample_ssm,projection)
   # use S3-safe version of dplyr function

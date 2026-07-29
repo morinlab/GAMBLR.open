@@ -33,22 +33,24 @@ get_cn_segments = function(these_samples_metadata,
                            projection = "grch37",
                            this_seq_type, ...) {
   #warn/notify the user what version of this function they are using
-  message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
+  if (!isTRUE(getOption("GAMBLR.open.shown_cn_msg"))) {
+    message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
+    options(GAMBLR.open.shown_cn_msg = TRUE)
+  }
 
   #check if any invalid parameters are provided
   check_excess_params(...)
 
-  #get valid projections
-  valid_projections = grep("meta", names(GAMBLR.data::sample_data),
-                           value = TRUE, invert = TRUE)
+  #valid projections (kept static so we never load the multi-GB sample_data)
+  valid_projections = c("grch37", "hg38")
 
   metadata = these_samples_metadata
 
   sample_ids = metadata$sample_id
   #return CN segments based on the selected projection
   if (projection %in% valid_projections) {
-    all_segs = GAMBLR.data::sample_data[[projection]]$seg %>%
-      dplyr::filter(ID %in% sample_ids)
+    all_segs = GAMBLR.data::get_cn_segments_from_db(projection = projection,
+                                                    sample_ids = sample_ids)
   }else {
     stop(paste("please provide a valid projection.",
                paste(valid_projections, collapse = ", ")))

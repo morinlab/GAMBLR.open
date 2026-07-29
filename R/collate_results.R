@@ -24,7 +24,7 @@
 #'
 #' @examples
 #' #load packages
-#' library(dplyr)
+#' suppressPackageStartupMessages(library(dplyr))
 #' 
 #' #return collated results for all available samples
 #' all_collated = collate_results()
@@ -55,7 +55,10 @@ collate_results = function(sample_table,
   check_excess_params(...)
   
   #warn/notify the user what version of this function they are using
-  message("Using the bundled collated results in GAMBLR.data...")
+  if (!isTRUE(getOption("GAMBLR.open.shown_collated_msg"))) {
+    message("Using the bundled collated results in GAMBLR.data...")
+    options(GAMBLR.open.shown_collated_msg = TRUE)
+  }
   
   if(missing(these_samples_metadata)){
     these_samples_metadata = get_gambl_metadata(seq_type_filter = seq_type_filter)
@@ -76,7 +79,7 @@ collate_results = function(sample_table,
 
   #horizontally expand the provided metadata with QC results
   if(join_with_full_metadata){
-    full_table = left_join(these_samples_metadata, collated)
+    full_table = left_join(these_samples_metadata, collated, by = "sample_id")
     return(full_table)
   }
   return(collated)

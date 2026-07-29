@@ -2,14 +2,15 @@
 #' @title Get Coding SSMs
 #'
 #' @description Convenience function for loading coding Simple Somatic Mutations
-#'      (SSM) from the bundled data [GAMBLR.data::sample_data].
+#'      (SSM) from the bundled `gambl_mutations.db` (see
+#'      [GAMBLR.data::gambl_mutations_db()]).
 #'
 #' @details This "bare bones" function was developed to retrieve coding SSM
 #'      calls for non-GSC-users. Effectively retrieve coding SSM calls. Multiple
 #'      filtering parameters are available for this function. For more
 #'      information on how to implement the filtering parameters, refer to the
 #'      parameter descriptions as well as examples in the vignettes. This
-#'      function depends on the bundled sample data in this package.
+#'      function depends on the bundled `gambl_mutations.db` in this package.
 #'
 #' @param these_sample_ids Optional, a vector of multiple sample_id (or a single
 #'      sample ID as a string) that you want results for.
@@ -62,62 +63,41 @@ get_coding_ssm = function(
 ){
 
     # Warn/notify the user what version of this function they are using
-    message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
+    if (!isTRUE(getOption("GAMBLR.open.shown_ssm_msg"))) {
+      message("Using the bundled SSM calls (.maf) calls in GAMBLR.data...")
+      options(GAMBLR.open.shown_ssm_msg = TRUE)
+    }
 
     #check if any invalid parameters are provided
     check_excess_params(...)
 
-    # Get valid projections
-    valid_projections = grep(
-        "meta",
-        names(GAMBLR.data::sample_data),
-        value = TRUE,
-        invert = TRUE
-    )
+    # valid projections (kept static so we never load the multi-GB sample_data)
+    valid_projections = c("grch37", "hg38")
+    if(!projection %in% valid_projections){
+        stop(paste("Provide a valid projection. The following are available:",
+                   paste(valid_projections, collapse = ", ")))
+    }
 
-    #get samples with the dedicated helper function
-    metadata = id_ease(
-        these_samples_metadata = these_samples_metadata,
-        these_sample_ids = these_sample_ids,
-        verbose = verbose,
-        this_seq_type = this_seq_type
-    )
-
+    # resolve samples of interest (id_ease retired)
+    if(!is.null(these_samples_metadata)){
+        metadata = dplyr::filter(these_samples_metadata, seq_type %in% this_seq_type)
+    }else{
+        metadata = get_gambl_metadata(seq_type_filter = this_seq_type)
+        if(!is.null(these_sample_ids)){
+            metadata = dplyr::filter(metadata, sample_id %in% these_sample_ids)
+        }
+    }
     sample_ids = metadata$sample_id
 
-
-    if(!projection %in% valid_projections){
-        stop(
-            paste(
-                "Provide a valid projection. The following are available:",
-                paste(
-                    valid_projections,
-                    collapse = ", "
-                )
-            )
-        )
-    }
-
-    #return SSMs based on the selected projection
-    muts = GAMBLR.data::sample_data[[projection]]$maf %>% 
-        dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-        dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
-    
-    if(!include_silent){
-        coding_class = coding_class[coding_class != "Silent"]
-    }
-
-    sample_ids = pull(metadata, sample_id)
-
-    # Drop variants with low read support (default is 3),
-    # enforce sample IDs and keep only coding variants
-    muts = dplyr::filter(muts, t_alt_count >= min_read_support) %>%
-        dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-        dplyr::filter(Variant_Classification %in% coding_class)
-
-    # Filter maf on selected sample ids
-    muts = muts %>%
-        dplyr::filter(Tumor_Sample_Barcode %in% sample_ids)
+    # coding SSMs for the selected samples, filtered down in indexed SQL
+    muts = GAMBLR.data::get_ssm_from_db(
+        projection = projection,
+        sample_ids = sample_ids,
+        tool_name = tool_name,
+        coding_only = TRUE,
+        include_silent = include_silent,
+        min_read_support = min_read_support
+    )
 
     mutated_samples = length(unique(muts$Tumor_Sample_Barcode))
     message(

@@ -25,7 +25,7 @@
 #'
 #' @examples
 #' #load pacakges
-#' library(dplyr)
+#' suppressPackageStartupMessages(library(dplyr))
 #'
 #' #get CN segments for one sample
 #' dohh2_segs = get_sample_cn_segments(these_sample_ids = "DOHH-2",
@@ -33,7 +33,7 @@
 #'                                     streamlined = TRUE)
 #'
 #' #get CN segments for DLBCL cell line
-#' cell_line_meta = GAMBLR.data::sample_data$meta %>%
+#' cell_line_meta = get_gambl_metadata() %>%
 #'   dplyr::filter(cohort == "DLBCL_cell_lines")
 #'
 #' dlbcl_segs = get_sample_cn_segments(these_samples_metadata = cell_line_meta,
@@ -49,26 +49,33 @@ get_sample_cn_segments = function(these_sample_ids = NULL,
                                   ...){
 
   #warn/notify the user what version of this function they are using
-  message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
+  if (!isTRUE(getOption("GAMBLR.open.shown_cn_msg"))) {
+    message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
+    options(GAMBLR.open.shown_cn_msg = TRUE)
+  }
 
   #check if any invalid parameters are provided
   check_excess_params(...)
 
-  #get samples with the dedicated helper function
-  metadata = id_ease(these_samples_metadata = these_samples_metadata,
-                     these_sample_ids = these_sample_ids,
-                     verbose = verbose,
-                     this_seq_type = this_seq_type)
+  # resolve samples of interest (id_ease retired)
+  if(!is.null(these_samples_metadata)){
+    metadata = dplyr::filter(these_samples_metadata, seq_type %in% this_seq_type)
+  }else{
+    metadata = get_gambl_metadata(seq_type_filter = this_seq_type)
+    if(!is.null(these_sample_ids)){
+      metadata = dplyr::filter(metadata, sample_id %in% these_sample_ids)
+    }
+  }
 
   sample_ids = metadata$sample_id
 
-  #get valid projections
-  valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
+  #valid projections (kept static so we never load the multi-GB sample_data)
+  valid_projections = c("grch37", "hg38")
 
   #return CN segments based on the selected projection
   if(projection %in% valid_projections){
-    all_segs = GAMBLR.data::sample_data[[projection]]$seg %>%
-      dplyr::filter(ID %in% sample_ids)
+    all_segs = GAMBLR.data::get_cn_segments_from_db(projection = projection,
+                                                    sample_ids = sample_ids)
   }else{
     stop(paste("please provide a valid projection. The following are available:",
                paste(valid_projections,collapse=", ")))

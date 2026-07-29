@@ -45,7 +45,7 @@
 #' @export
 #'
 #' @examples
-#' library(GAMBLR.open)
+#' suppressPackageStartupMessages(library(GAMBLR.open))
 #' # Get sample metadata including a mix of seq_type
 #' all_types_meta = suppressMessages(get_gambl_metadata()) %>% 
 #'             dplyr::filter(pathology == "BL")

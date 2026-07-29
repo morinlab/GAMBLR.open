@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-#' library(GAMBLR.open)
+#' suppressPackageStartupMessages(library(GAMBLR.open))
 #' my_meta = get_gambl_metadata(seq_type_filter = c("genome","capture"))
 #' my_meta = check_and_clean_metadata(my_meta,duplicate_action="keep_first")
 #' maf_all_seqtype = get_all_coding_ssm(my_meta)
@@ -32,30 +32,38 @@ get_all_coding_ssm = function(these_samples_metadata = NULL,
                               include_silent=FALSE,
                               projection = "grch37"){
   if(missing(these_samples_metadata)){
+    warning("No metadata supplied. Returning SSMs for all available samples. Supply these_samples_metadata to limit results to samples matching desired clinical features.")
     these_samples_metadata = suppressMessages(
         get_gambl_metadata(seq_type_filter = c("genome","capture"))) %>%
         GAMBLR.helpers::check_and_clean_metadata(.,duplicate_action = "keep_first")
   }
+  these_samples_metadata = dplyr::filter(these_samples_metadata, seq_type != "mrna")
   capture_ids = dplyr::filter(these_samples_metadata,seq_type=="capture") %>%
     pull(sample_id)
   genome_ids = dplyr::filter(these_samples_metadata,seq_type=="genome") %>%
     pull(sample_id)
 
-  capture_maf = GAMBLR.data::sample_data[[projection]]$maf %>%
-    dplyr::filter(Tumor_Sample_Barcode %in% capture_ids) %>%
-    GAMBLR.utils::create_maf_data(.,projection) %>%
-    mutate(.,maf_seq_type = "capture")
-  genome_maf = GAMBLR.data::sample_data[[projection]]$maf  %>%
-    dplyr::filter(Tumor_Sample_Barcode %in% genome_ids) %>%
-    GAMBLR.utils::create_maf_data(.,projection) %>%
-    mutate(.,maf_seq_type = "genome")
+  # Return coding SSMs from the slms-3 pipeline, honouring `include_silent`.
+  # (Historically this function applied no Pipeline or coding-class filter despite
+  # its name, returning redundant rows from every pipeline; that is now fixed.)
+  make_maf <- function(ids, seqtype){
+    if(length(ids) == 0) return(NULL)
+    GAMBLR.data::get_ssm_from_db(projection = projection,
+                                 sample_ids = ids,
+                                 tool_name = "slms-3",
+                                 coding_only = TRUE,
+                                 include_silent = include_silent) %>%
+      GAMBLR.utils::create_maf_data(projection) %>%
+      mutate(maf_seq_type = seqtype)
+  }
+  capture_maf = make_maf(capture_ids, "capture")
+  genome_maf  = make_maf(genome_ids, "genome")
 
-  if(length(capture_ids)>1 && length(genome_ids) > 1){
-    merged_ssm = GAMBLR.utils::bind_genomic_data(capture_maf,genome_maf)
-    return(merged_ssm)
-  }else if(length(capture_ids)>1){
+  if(!is.null(capture_maf) && !is.null(genome_maf)){
+    return(GAMBLR.utils::bind_genomic_data(capture_maf, genome_maf))
+  }else if(!is.null(capture_maf)){
     return(capture_maf)
-  }else if(length(genome_ids) > 1){
+  }else if(!is.null(genome_maf)){
     return(genome_maf)
   }
 }

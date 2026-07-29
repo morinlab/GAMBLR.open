@@ -1,5 +1,7 @@
-[1] "=== STARTED AT 2025-08-25 15:15:30 ==="
-── Running 21 example files ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── GAMBLR.open ──
+[1] "=== STARTED AT 2026-07-16 06:51:40 ==="
+Writing NAMESPACE
+Writing NAMESPACE
+── Running 21 example files ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── GAMBLR.open ──
 
 > my_metadata = get_gambl_metadata()
 
@@ -15,16 +17,16 @@ genomic_data Object
 Genome Build: grch37 
 Showing first 10 rows:
    Hugo_Symbol Entrez_Gene_Id Center NCBI_Build Chromosome HGVSp_Short hot_spot
-1         EZH2              0      .     GRCh37          7     p.Y646H     TRUE
-2         EZH2              0      .     GRCh37          7     p.Y646S     TRUE
-3         EZH2              0      .     GRCh37          7     p.Y646C     TRUE
-4         EZH2              0      .     GRCh37          7     p.Y646N     TRUE
-5         EZH2              0      .     GRCh37          7     p.Y646N     TRUE
-6         EZH2              0      .     GRCh37          7     p.Y646N     TRUE
-7         EZH2              0      .     GRCh37          7     p.Y646S     TRUE
-8         EZH2              0      .     GRCh37          7     p.Y646S     TRUE
-9         EZH2              0      .     GRCh37          7     p.Y646N     TRUE
-10        EZH2              0      .     GRCh37          7     p.Y646N     TRUE
+1         EZH2              0      .     GRCh37          7     p.Y646S     TRUE
+2         EZH2              0      .     GRCh37          7     p.Y646F     TRUE
+3         EZH2              0      .     GRCh37          7     p.Y646F     TRUE
+4         EZH2              0      .     GRCh37          7     p.Y646C     TRUE
+5         EZH2              0      .     GRCh37          7     p.Y646S     TRUE
+6         EZH2              0      .     GRCh37          7     p.Y646S     TRUE
+7         EZH2              0      .     GRCh37          7     p.Y646F     TRUE
+8         EZH2              0      .     GRCh37          7     p.Y646F     TRUE
+9         EZH2              0      .     GRCh37          7     p.Y646F     TRUE
+10        EZH2              0      .     GRCh37          7     p.Y646F     TRUE
 
 > some_meta = get_gambl_metadata() %>% dplyr::filter(study == 
 +     "FL_Dreval", grepl("SP", sample_id))
@@ -37,16 +39,16 @@ genomic_data Object
 Genome Build: grch37 
 Showing first 10 rows:
    Hugo_Symbol Entrez_Gene_Id Center NCBI_Build Chromosome Start_Position End_Position Strand
-1       FBXO11              0      .     GRCh37          2       48050367     48050368      +
-2       ZNF608              0      .     GRCh37          5      124079933    124079933      +
-3       ZNF608              0      .     GRCh37          5      124079935    124079935      +
-4     HIST1H1E              0      .     GRCh37          6       26156823     26156823      +
-5         PIM1              0      .     GRCh37          6       37138950     37138950      +
-6        CCND3              0      .     GRCh37          6       41903710     41903710      +
-7         SGK1              0      .     GRCh37          6      134491506    134491506      +
-8          MYC              0      .     GRCh37          8      128750681    128750681      +
-9          MYC              0      .     GRCh37          8      128750878    128750878      +
-10         MYC              0      .     GRCh37          8      128750962    128750962      +
+1       HNRNPU              0      .     GRCh37          1      245027102    245027102      +
+2         PCLO              0      .     GRCh37          7       82784068     82784068      +
+3        MYOM2              0      .     GRCh37          8        2063762      2063762      +
+4       CREBBP              0      .     GRCh37         16        3786740      3786740      +
+5        IGLL5              0      .     GRCh37         22       23230399     23230400      +
+6    HIST1H2BC              0      .     GRCh37          6       26123774     26123774      +
+7        SETD2              0      .     GRCh37          3       47088059     47088059      +
+8         IRF8              0      .     GRCh37         16       85942737     85942737      +
+9       ARID5B              0      .     GRCh37         10       63661999     63661999      +
+10      ARID5B              0      .     GRCh37         10       63810677     63810677      +
 
 > cn_list = assign_cn_to_ssm(some_meta, ssm_genomes_grch37)
 
@@ -55,16 +57,16 @@ genomic_data Object
 Genome Build: grch37 
 Showing first 10 rows:
    Hugo_Symbol Entrez_Gene_Id Center NCBI_Build Chromosome Start_Position End_Position Strand log.ratio CN
-1       FBXO11              0      .     GRCh37          2       48050367     48050368      + 0.0000000  2
-2       ZNF608              0      .     GRCh37          5      124079933    124079933      + 0.0000000  2
-3       ZNF608              0      .     GRCh37          5      124079935    124079935      + 0.0000000  2
-4     HIST1H1E              0      .     GRCh37          6       26156823     26156823      + 0.0000000  2
-5         PIM1              0      .     GRCh37          6       37138950     37138950      + 0.0000000  2
-6        CCND3              0      .     GRCh37          6       41903710     41903710      + 0.0000000  2
-7         SGK1              0      .     GRCh37          6      134491506    134491506      + 0.0000000  2
-8          MYC              0      .     GRCh37          8      128750681    128750681      + 0.1008947  2
-9          MYC              0      .     GRCh37          8      128750878    128750878      + 0.1008947  2
-10         MYC              0      .     GRCh37          8      128750962    128750962      + 0.1008947  2
+1       HNRNPU              0      .     GRCh37          1      245027102    245027102      + 0.4306932  3
+2         PCLO              0      .     GRCh37          7       82784068     82784068      + 0.0000000  2
+3        MYOM2              0      .     GRCh37          8        2063762      2063762      + 0.0000000  2
+4       CREBBP              0      .     GRCh37         16        3786740      3786740      + 0.0000000  2
+5        IGLL5              0      .     GRCh37         22       23230399     23230400      + 0.0000000  2
+6    HIST1H2BC              0      .     GRCh37          6       26123774     26123774      + 0.0000000  2
+7        SETD2              0      .     GRCh37          3       47088059     47088059      + 0.0000000  2
+8         IRF8              0      .     GRCh37         16       85942737     85942737      + 1.3219281  5
+9       ARID5B              0      .     GRCh37         10       63661999     63661999      + 0.5849625  3
+10      ARID5B              0      .     GRCh37         10       63810677     63810677      + 0.5849625  3
 
 > myc_region = "8:128747680-128753674"
 
@@ -72,20 +74,20 @@ Showing first 10 rows:
 +     slide_by = 10, window_size = 10000)
 
 > dplyr::arrange(myc_mut_freq, desc(mutation_count))
-# A tibble: 612,000 × 3
-   sample_id                 bin         mutation_count
-   <chr>                     <chr>                <int>
- 1 BLGSP-71-26-00399-01A-01E 8_128747680             41
- 2 BLGSP-71-26-00399-01A-01E 8_128747690             41
- 3 BLGSP-71-26-00399-01A-01E 8_128747700             41
- 4 BLGSP-71-26-00399-01A-01E 8_128747710             41
- 5 BLGSP-71-26-00399-01A-01E 8_128747720             41
- 6 BLGSP-71-26-00399-01A-01E 8_128747730             41
- 7 BLGSP-71-26-00399-01A-01E 8_128747740             41
- 8 BLGSP-71-26-00399-01A-01E 8_128747750             41
- 9 BLGSP-71-26-00399-01A-01E 8_128747760             41
-10 BLGSP-71-26-00399-01A-01E 8_128747770             41
-# ℹ 611,990 more rows
+# A tibble: 524,400 × 3
+   sample_id bin         mutation_count
+   <chr>     <chr>                <int>
+ 1 14-35026T 8_128747680             70
+ 2 14-35026T 8_128747690             70
+ 3 14-35026T 8_128747700             70
+ 4 14-35026T 8_128747710             70
+ 5 14-35026T 8_128747720             70
+ 6 14-35026T 8_128747730             70
+ 7 14-35026T 8_128747740             70
+ 8 14-35026T 8_128747750             70
+ 9 14-35026T 8_128747760             70
+10 14-35026T 8_128747770             70
+# ℹ 524,390 more rows
 
 > my_meta = get_gambl_metadata()
 
@@ -116,7 +118,7 @@ Showing first 10 rows:
 +     regions_bed = some_regions)
 
 > dim(mut_count_matrix)
-[1]   763 14408
+[1]   620 14408
 
 > tail(mut_count_matrix[, c(1:10)])
 # A tibble: 6 × 10
@@ -129,7 +131,7 @@ Showing first 10 rows:
 5 Seraphina           0           0           0           0           0           0           0           0           0
 6 Thomas              0           0           0           0           0           0           0           0           0
 
-> library(dplyr)
+> suppressPackageStartupMessages(library(dplyr))
 
 > all_collated = collate_results()
 
@@ -142,7 +144,7 @@ Showing first 10 rows:
 
 > all_meta_collated = collate_results(join_with_full_metadata = TRUE)
 
-> library(GAMBLR.open)
+> suppressPackageStartupMessages(library(GAMBLR.open))
 
 > my_meta = get_gambl_metadata(seq_type_filter = c("genome", 
 +     "capture"))
@@ -154,24 +156,24 @@ Showing first 10 rows:
 > table(maf_all_seqtype$maf_seq_type)
 
 capture  genome 
-  57951 3185525 
+  24676   12240 
 
 > dplyr::group_by(maf_all_seqtype, Hugo_Symbol, Variant_Classification) %>% 
 +     dplyr::count() %>% dplyr::arrange(desc(n))
 genomic_data Object
 Genome Build: grch37 
 Showing first 10 rows:
-   Hugo_Symbol Variant_Classification       n
-1      Unknown                    IGR 1306295
-2        PTPRD                 Intron   21916
-3        IGLL5                 Intron   12689
-4         PCLO                 Intron    6479
-5        UNC5D                 Intron    5997
-6         BCL6                 Intron    5579
-7        ROBO2                 Intron    4850
-8         BCL2                 Intron    4810
-9        PTPRK                 Intron    4798
-10      BRINP3                 Intron    4774
+   Hugo_Symbol Variant_Classification    n
+1        IGLL5      Missense_Mutation 1061
+2         PIM1      Missense_Mutation  911
+3         BCL2      Missense_Mutation  829
+4          MYC      Missense_Mutation  671
+5     HIST1H1E      Missense_Mutation  541
+6         PCLO      Missense_Mutation  524
+7        SOCS1      Missense_Mutation  469
+8         TP53      Missense_Mutation  445
+9         SGK1      Missense_Mutation  411
+10       MYD88      Missense_Mutation  404
 
 > regions_bed = create_bed_data(GAMBLR.data::grch37_ashm_regions, 
 +     fix_names = "concat", concat_cols = c("gene", "region"), 
@@ -201,7 +203,7 @@ Showing first 10 rows:
 +     projection = "hg38")
 
 > print(dim(matrix_hg38))
-[1] 2312  126
+[1] 2169  127
 
 > print(head(matrix_hg38[, c(1:8)]))
           chr1-203305570-203306650 chr1-226732862-226740184 chr1-226733387-226740281 chr1-28506039-28509827 chr1-30756165-30759164 chr11-102317439-102319346 chr11-111377353-111379499 chr11-118883749-118885805
@@ -217,7 +219,7 @@ Showing first 10 rows:
 > genome_segments_hg38 = get_cn_segments(these_samples_metadata = genome_metadata, 
 +     projection = "hg38")
 
-> library(GAMBLR.open)
+> suppressPackageStartupMessages(library(GAMBLR.open))
 
 > all_types_meta = suppressMessages(get_gambl_metadata()) %>% 
 +     dplyr::filter(pathology == "BL")
@@ -250,7 +252,7 @@ BLGSP-71-06-00001-01A-11D   0       0     1   1     1       0
 
 > colSums(genome_cnv_ssm_status)
     MYC MIR17HG   CCND3     ID3   DDX3X SYNCRIP 
-    172      38      68     112     118      12 
+    173      41      68     112     118       7 
 
 > all_path_meta = suppressMessages(get_gambl_metadata())
 
@@ -280,7 +282,7 @@ BLGSP-71-06-00001-01A-11D   0       0     1   1     1       0
 
 > colSums(all_pathology_status)
     MYC MIR17HG   CCND3     ID3   DDX3X SYNCRIP 
-    111      59      23       5      23     133 
+    150     100      23       5      23      91 
 
 > ssm_exomes_grch37 = get_coding_ssm(projection = "grch37", 
 +     this_seq_type = "capture")
@@ -292,24 +294,24 @@ BLGSP-71-06-00001-01A-11D   0       0     1   1     1       0
 +     gene_symbols = c("EZH2", "KMT2D", "CREBBP", "MYC"))
 
 > head(coding_tabulated_df)
-                  sample_id KMT2D CREBBP EZH2 MYC CREBBPHOTSPOT FOXO1HOTSPOT MYD88HOTSPOT
-1                     Akata     0      0    0   1             0            1            0
-2                       BL2     0      0    0   1             0            1            1
-3                      BL30     1      0    0   1             0            0            0
-4                      BL41     0      0    0   1             0            0            0
-5                      BL70     0      0    0   1             0            0            0
-6 BLGSP-71-06-00001-01A-11D     0      0    0   0             0            1            0
+                  sample_id KMT2D CREBBP EZH2 MYC FOXO1HOTSPOT CREBBPHOTSPOT MYD88HOTSPOT
+1                     Akata     0      0    0   1            1             0            0
+2                       BL2     0      0    0   1            1             0            1
+3                      BL30     1      0    0   1            0             0            0
+4                      BL41     0      0    0   1            0             0            0
+5                      BL70     0      0    0   1            0             0            0
+6 BLGSP-71-06-00001-01A-11D     0      0    0   0            1             0            0
 
 > coding_tabulated_df = get_coding_ssm_status(maf_data = get_coding_ssm())
 
 > head(coding_tabulated_df[, c(1:10)])
-                  sample_id HIST1H2BC CDKN2A KMT2D STAT6 SMEK1 CREBBP ZNF423 IRF8 BCL2
-1                     Akata         0      1     0     0     0      0      0    0    0
-2                       BL2         0      0     0     0     0      0      0    0    0
-3                      BL30         0      0     1     0     0      0      0    0    0
-4                      BL41         0      0     0     0     0      0      0    0    0
-5                      BL70         0      0     0     0     0      0      0    0    0
-6 BLGSP-71-06-00001-01A-11D         0      0     0     0     0      0      0    0    0
+                  sample_id TNFRSF14 NOL9 CAMTA1 PIK3CD MTOR SPEN ID3 ARID1A ZC3H12A
+1                     Akata        0    0      0      0    0    1   1      0       0
+2                       BL2        0    0      0      0    0    0   1      0       0
+3                      BL30        0    0      0      0    0    0   1      1       0
+4                      BL41        0    0      0      0    0    0   1      1       0
+5                      BL70        0    0      0      0    0    0   1      0       0
+6 BLGSP-71-06-00001-01A-11D        0    0      0      0    0    0   1      1       0
 
 > genome_meta = get_gambl_metadata(seq_type_filter = "genome")
 
@@ -326,13 +328,13 @@ BLGSP-71-06-00001-01A-11D   0       0     1   1     1       0
  1 BL_Adult           genome      91
  2 BL_Pediatric       genome     121
  3 BL_cell_lines      genome      22
- 4 DLBCL_Gascoyne     genome      21
- 5 DLBCL_GenomeCanada genome      59
+ 4 DLBCL_Gascoyne     genome      42
+ 5 DLBCL_GenomeCanada genome     110
  6 DLBCL_HTMCP        genome      43
- 7 DLBCL_ICGC         genome      84
+ 7 DLBCL_ICGC         genome     125
  8 DLBCL_LSARP_Trios  capture     12
- 9 DLBCL_LSARP_Trios  genome     142
-10 DLBCL_Marra        genome      38
+ 9 DLBCL_LSARP_Trios  genome     147
+10 DLBCL_Marra        genome      77
 # ℹ 11 more rows
 
 > all_sv <- get_manta_sv()
@@ -341,13 +343,13 @@ BLGSP-71-06-00001-01A-11D   0       0     1   1     1       0
 genomic_data Object
 Genome Build: grch37 
 Showing first 10 rows:
-  CHROM_A   START_A     END_A CHROM_B   START_B     END_B                       manta_name SCORE STRAND_A STRAND_B tumour_sample_id normal_sample_id VAF_tumour  DP pair_status FILTER
-1       1 161658631 161658631       3  16509907  16509907         MantaBND:21171:0:1:0:0:0   133        +        +         FL2002T1          FL2002N      0.331 127     matched   PASS
-2       1 161663959 161663959       9  37363320  37363320        MantaBND:206628:0:1:0:0:0   122        +        +  09-15842_tumorA  09-15842_normal      0.281 196     matched   PASS
-3       1 161663959 161663959       9  37363320  37363320        MantaBND:195941:0:1:0:0:0   151        +        +  09-15842_tumorB  09-15842_normal      0.364 187     matched   PASS
-4      11  65267283  65267283      14 106110907 106110907      MantaBND:152220:0:1:0:0:0:0    88        +        -        15-38154T        15-38154N      0.150 167     matched   PASS
-5      11  65267422  65267422      14 106110905 106110905      MantaBND:152220:0:1:0:0:0:0   135        -        +        15-38154T        15-38154N      0.290 169     matched   PASS
-6      14 106029118 106029118      18  60994852  60994852 MantaBND:7:134969:682549:0:1:0:0   112        +        -  19-16466_tumorA  19-16466_normal      0.247  77     matched   PASS
+  CHROM_A   START_A     END_A CHROM_B  START_B    END_B                      manta_name SCORE STRAND_A STRAND_B tumour_sample_id normal_sample_id VAF_tumour DP pair_status FILTER
+1      14 106329450 106329450      18 60774579 60774579      MantaBND:1043376:0:1:0:1:0    87        +        -  00-14595_tumorC  00-14595_normal      0.400 40     matched   PASS
+2      14 106382688 106382688      18 60687237 60687237      MantaBND:1043324:0:1:0:0:0    76        -        +  00-14595_tumorC  00-14595_normal      0.346 26     matched   PASS
+3      14 106329450 106329450      18 60774579 60774579       MantaBND:963121:0:1:0:1:0    70        +        -  00-14595_tumorD  00-14595_normal      0.171 82     matched   PASS
+4       8 134207510 134207517       9 36763818 36763825 MantaBND:13:121255:121342:0:0:0    46        +        -  00-26427_tumorA  00-26427_normal      0.154 39     matched   PASS
+5      14 106177617 106177617      19 45251322 45251322 MantaBND:19:34315:34490:0:2:0:0    54        +        -  01-14774_tumorA  01-14774_normal      0.135 74     matched   PASS
+6       3 187462585 187462585       6 27107409 27107409     MantaBND:242619:0:1:0:0:0:0    78        +        +  01-14774_tumorA  01-14774_normal      0.235 68     matched   PASS
 
 > cohort_meta = suppressMessages(get_gambl_metadata()) %>% 
 +     dplyr::filter(cohort == "DLBCL_cell_lines")
@@ -361,12 +363,14 @@ Genome Build: grch37
 Showing first 10 rows:
   CHROM_A   START_A     END_A CHROM_B   START_B     END_B                  manta_name SCORE STRAND_A STRAND_B tumour_sample_id normal_sample_id VAF_tumour DP pair_status FILTER
 1      14 106329465 106329465      18  60793497  60793497   MantaBND:194451:1:2:0:0:0   103        +        -           DOHH-2        14-11247N      0.290 69   unmatched   PASS
-2       3  72551428  72551428       3  72551541  72551541    MantaDEL:39707:0:0:0:0:0    45        +        -        SU-DHL-10        14-11247N      1.000 16   unmatched   PASS
-3       3 189255439 189255439       3 189255440 189255440    MantaINS:48107:0:0:0:0:0    64        +        -         SU-DHL-4        14-11247N      0.686 70   unmatched   PASS
-4       8 128748200 128748200      14 106114286 106114286 MantaBND:135279:0:1:0:0:0:0    84        +        -           DOHH-2        14-11247N      0.700 20   unmatched   PASS
+2      14 106379091 106379091      18  60793492  60793492   MantaBND:194451:0:1:0:0:0    91        -        +           DOHH-2        14-11247N      0.300 60   unmatched   PASS
+3       8 128748200 128748200      14 106114286 106114286 MantaBND:135279:0:1:0:0:0:0    84        +        -           DOHH-2        14-11247N      0.700 20   unmatched   PASS
+4       8 128748204 128748205      14 106114282 106114283 MantaBND:135279:0:1:0:0:0:0    83        -        +           DOHH-2        14-11247N      0.650 20   unmatched   PASS
+5      14 106329462 106329462      18  60774579  60774579   MantaBND:220769:1:2:0:0:0   134        +        -        SU-DHL-10        14-11247N      0.318 66   unmatched   PASS
+6      14 106380227 106380227      18  60774578  60774578   MantaBND:220769:0:1:0:0:0   169        -        +        SU-DHL-10        14-11247N      0.578 45   unmatched   PASS
 
 > nrow(some_sv)
-[1] 4
+[1] 13
 
 > myc_region_hg38 = "chr8:127710883-127761821"
 
@@ -379,16 +383,16 @@ Showing first 10 rows:
 genomic_data Object
 Genome Build: hg38 
 Showing first 10 rows:
-  CHROM_A   START_A     END_A CHROM_B   START_B     END_B                 manta_name SCORE STRAND_A STRAND_B          tumour_sample_id          normal_sample_id VAF_tumour  DP pair_status FILTER
-1    chr8 127716025 127716934   chr14 105862581 105863164 MantaBND:85417:0:1:0:1:0:0   112        +        - BLGSP-71-06-00084-01A-01D BLGSP-71-06-00084-99A-01D      0.373  83     matched   PASS
-2    chr8 127716523 127716523   chr14 105862757 105862757 MantaBND:85417:0:1:0:1:0:0   173        -        + BLGSP-71-06-00084-01A-01D BLGSP-71-06-00084-99A-01D      0.373 153     matched   PASS
-3    chr8 127718148 127718148   chr14 105860256 105860256 MantaBND:90480:0:1:0:0:0:0   152        +        - BLGSP-71-08-00036-01A-01D BLGSP-71-08-00036-10A-01D      0.390 172     matched   PASS
-4    chr8 127718150 127718150   chr14 105860564 105860564 MantaBND:90480:0:1:0:0:0:0   163        -        + BLGSP-71-08-00036-01A-01D BLGSP-71-08-00036-10A-01D      0.325 237     matched   PASS
-5    chr8 127720983 127720983   chr14 105859144 105859144  MantaBND:640107:0:1:2:1:0   129        +        - BLGSP-71-23-00408-01A-01E BLGSP-71-06-00286-99A-01D      0.320 100   unmatched   PASS
-6    chr8 127721754 127721755   chr14 105863234 105863235   MantaBND:85092:0:1:0:0:0   112        -        + BLGSP-71-08-00023-01A-01D BLGSP-71-08-00023-12A-01D      0.241 199     matched   PASS
+  CHROM_A   START_A     END_A CHROM_B   START_B     END_B                   manta_name SCORE STRAND_A STRAND_B          tumour_sample_id          normal_sample_id VAF_tumour  DP pair_status FILTER
+1    chr8 127713694 127713694   chr14 105857950 105857950 MantaBND:1:10030:23823:0:0:0   109        -        + BLGSP-71-06-00280-01A-01D BLGSP-71-06-00280-99A-01D      0.272 235     matched   PASS
+2    chr8 127716025 127716934   chr14 105862581 105863164   MantaBND:85417:0:1:0:1:0:0   112        +        - BLGSP-71-06-00084-01A-01D BLGSP-71-06-00084-99A-01D      0.373  83     matched   PASS
+3    chr8 127716405 127716405    chr9  37381161  37381161    MantaBND:116063:0:1:0:0:0   106        -        -                  FL1011T2                   FL1011N      0.165 230     matched   PASS
+4    chr8 127716523 127716523   chr14 105862757 105862757   MantaBND:85417:0:1:0:1:0:0   173        -        + BLGSP-71-06-00084-01A-01D BLGSP-71-06-00084-99A-01D      0.373 153     matched   PASS
+5    chr8 127718148 127718148   chr14 105860256 105860256   MantaBND:90480:0:1:0:0:0:0   152        +        - BLGSP-71-08-00036-01A-01D BLGSP-71-08-00036-10A-01D      0.390 172     matched   PASS
+6    chr8 127718150 127718150   chr14 105860564 105860564   MantaBND:90480:0:1:0:0:0:0   163        -        + BLGSP-71-08-00036-01A-01D BLGSP-71-08-00036-10A-01D      0.325 237     matched   PASS
 
 > nrow(hg38_myc_locus_sv)
-[1] 200
+[1] 260
 
 > incorrect_myc_locus_sv <- get_manta_sv(region = myc_region_grch37, 
 +     projection = "hg38", verbose = FALSE)
@@ -407,21 +411,21 @@ Showing first 10 rows:
 +     genome_build = "hg38"))
 
 > head(annotated_myc_hg38)
-   chrom1    start1      end1 chrom2    start2      end2   name score strand1 strand2          tumour_sample_id   gene partner  fusion
-   <char>     <num>     <num> <char>     <num>     <num> <char> <num>  <char>  <char>                    <char> <char>  <char>  <char>
-1:      8 127716025 127716934     14 105862581 105863164      .   112       +       - BLGSP-71-06-00084-01A-01D    MYC     IGH IGH-MYC
-2:      8 127716523 127716523     14 105862757 105862757      .   173       -       + BLGSP-71-06-00084-01A-01D    MYC     IGH IGH-MYC
-3:      8 127718148 127718148     14 105860256 105860256      .   152       +       - BLGSP-71-08-00036-01A-01D    MYC     IGH IGH-MYC
-4:      8 127718150 127718150     14 105860564 105860564      .   163       -       + BLGSP-71-08-00036-01A-01D    MYC     IGH IGH-MYC
-5:      8 127720983 127720983     14 105859144 105859144      .   129       +       - BLGSP-71-23-00408-01A-01E    MYC     IGH IGH-MYC
-6:      8 127721754 127721755     14 105863234 105863235      .   112       -       + BLGSP-71-08-00023-01A-01D    MYC     IGH IGH-MYC
+   chrom1    start1      end1 chrom2    start2      end2   name score strand1 strand2          tumour_sample_id   gene partner   fusion
+   <char>     <num>     <num> <char>     <num>     <num> <char> <num>  <char>  <char>                    <char> <char>  <char>   <char>
+1:      8 127713694 127713694     14 105857950 105857950      .   109       -       + BLGSP-71-06-00280-01A-01D    MYC     IGH  IGH-MYC
+2:      8 127716025 127716934     14 105862581 105863164      .   112       +       - BLGSP-71-06-00084-01A-01D    MYC     IGH  IGH-MYC
+3:      8 127716405 127716405      9  37381161  37381161      .   106       -       -                  FL1011T2    MYC    PAX5 PAX5-MYC
+4:      8 127716523 127716523     14 105862757 105862757      .   173       -       + BLGSP-71-06-00084-01A-01D    MYC     IGH  IGH-MYC
+5:      8 127718148 127718148     14 105860256 105860256      .   152       +       - BLGSP-71-08-00036-01A-01D    MYC     IGH  IGH-MYC
+6:      8 127718150 127718150     14 105860564 105860564      .   163       -       + BLGSP-71-08-00036-01A-01D    MYC     IGH  IGH-MYC
 
 > table(annotated_myc_hg38$partner)
 
-IGH 
-198 
+BCL6  DMD  IGH  IGK  IGL LRMP PAX5 
+   1    2  247    3    2    1    4 
 
-> library(dplyr)
+> suppressPackageStartupMessages(library(dplyr))
 
 > dohh2_segs = get_sample_cn_segments(these_sample_ids = "DOHH-2", 
 +     projection = "hg38", streamlined = TRUE)
@@ -465,8 +469,10 @@ Showing first 10 rows:
 > ashm_maf = get_ssm_by_regions(regions_bed = regions_bed, 
 +     these_samples_metadata = my_meta, streamlined = FALSE)
 
-> one_region_maf = get_ssm_by_regions(regions_list = "chr2:136875000-136875097", 
+> one_region_maf = get_ssm_by_regions(regions_list = "2:136875000-136875097", 
 +     streamlined = FALSE, projection = "grch37", these_samples_metadata = my_meta)
+
+> maf = get_ssm_by_sample(this_sample_id = "DOHH-2")
 
 > cell_line_meta = get_gambl_metadata() %>% dplyr::filter(cohort == 
 +     "DLBCL_cell_lines")
@@ -484,15 +490,4 @@ Showing first 10 rows:
 3              OCI-Ly3 31532
 4            SU-DHL-10 26855
 5             SU-DHL-4 32824
-
-> library(dplyr)
-
-> all_meta = id_ease()
-
-> sample_meta = id_ease(these_sample_ids = "94-15772_tumorA")
-
-> this_metadata = get_gambl_metadata(seq_type_filter = "genome") %>% 
-+     head(5)
-
-> these_ids = id_ease(these_samples_metadata = this_metadata)
-[1] "=== COMPLETED AT 2025-08-25 15:18:45 ==="
+[1] "=== COMPLETED AT 2026-07-16 06:54:14 ==="
