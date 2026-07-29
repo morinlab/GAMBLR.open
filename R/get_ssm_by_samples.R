@@ -80,21 +80,14 @@ get_ssm_by_samples <- function(these_sample_ids = NULL,
   }
 
   # SSMs (coding MAF + aSHM) for the selected samples, filtered in indexed SQL
+  # -- get_ssm_from_db() already returns a deduplicated result (maf and ashm
+  # were merged into one table with one write-time dedup pass), so no
+  # post-hoc distinct() is needed here anymore.
   sample_ssm = GAMBLR.data::get_ssm_from_db(
     projection = projection,
     sample_ids = sample_ids,
-    tool_name = tool_name,
-    include_ashm = TRUE
+    tool_name = tool_name
   )
-
-
-  # Handle possible duplicates
-  sample_ssm <- sample_ssm %>%
-    distinct(Tumor_Sample_Barcode,
-             Chromosome,
-             Start_Position,
-             End_Position,
-             .keep_all = TRUE)
   # bundle genome_build with the maf_data
   sample_ssm = create_maf_data(sample_ssm,projection)
   # use S3-safe version of dplyr function

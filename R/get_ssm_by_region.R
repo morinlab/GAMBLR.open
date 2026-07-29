@@ -116,13 +116,12 @@ get_ssm_by_region = function(these_sample_ids = NULL,
 
   #return SSMs based on the selected projection
   if(missing(maf_data)){
-    # region + pipeline (+ optional study) + sample filter pushed to indexed SQL,
-    # unioning the coding MAF and the aSHM MAF (see GAMBLR.data::get_ssm_from_db)
+    # region + pipeline (+ optional study) + sample filter pushed to indexed SQL
+    # (see GAMBLR.data::get_ssm_from_db -- maf and ashm are one table there now)
     muts_region = GAMBLR.data::get_ssm_from_db(
       projection = projection,
       sample_ids = sample_ids,
       tool_name = tool_name,
-      include_ashm = TRUE,
       this_study = if(has_study) this_study else NULL,
       regions = data.frame(chrom = chromosome, start = qstart, end = qend)
     )
@@ -130,8 +129,9 @@ get_ssm_by_region = function(these_sample_ids = NULL,
     muts_region = dplyr::filter(maf_data, Tumor_Sample_Barcode %in% sample_ids) %>%
       dplyr::filter(Chromosome == chromosome & Start_Position > qstart & Start_Position < qend)
   }
-  
-  # Handle possible duplicates
+
+  # Handle possible duplicates (only relevant for the user-supplied maf_data
+  # path above -- the get_ssm_from_db() path is already deduplicated)
   muts_region <- muts_region %>%
     distinct(Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, .keep_all = TRUE)
 

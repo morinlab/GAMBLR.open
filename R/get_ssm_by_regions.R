@@ -196,18 +196,18 @@ get_ssm_by_regions <- function(these_samples_metadata,
     # Pull only the mutations inside the requested regions from indexed SQL,
     # rather than the genome-wide MAF, then attribute each mutation to its region.
     # Widen by 1 bp so the (strict) SQL range is inclusive; cool_overlaps refines.
+    # get_ssm_from_db() already returns a deduplicated result (maf and ashm
+    # were merged into one table with one write-time dedup pass), so no
+    # post-hoc distinct() is needed here anymore.
     sample_maf <- GAMBLR.data::get_ssm_from_db(
       projection = projection,
       sample_ids = metadata$sample_id,
       tool_name = tool_name,
-      include_ashm = TRUE,
       regions = dplyr::transmute(regions_df,
                                  chrom = as.character(Chromosome),
                                  start = as.numeric(Start_Position) - 1,
                                  end   = as.numeric(End_Position) + 1)
     ) %>%
-      dplyr::distinct(Tumor_Sample_Barcode, Chromosome,
-                      Start_Position, End_Position, .keep_all = TRUE) %>%
       create_maf_data(projection) %>%
       mutate(maf_seq_type = this_seq_type)
   }
