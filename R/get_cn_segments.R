@@ -12,6 +12,10 @@
 #' @param projection Desired genome coordinate system for returned CN segments.
 #' Default is "grch37".
 #' @param this_seq_type Deprecated.
+#' @param overlap_action What to do if a sample has overlapping segments,
+#' which should never happen and would cause double counting downstream:
+#' "warn" (default, naming the samples), "error", "resolve" (clean up with
+#' [GAMBLR.utils::resolve_segment_overlaps]) or "none".
 #' @param ... Additional parameters to be passed to the function.
 #'
 #' @return A data frame with CN segments for the specified region.
@@ -31,7 +35,8 @@
 #'
 get_cn_segments = function(these_samples_metadata,
                            projection = "grch37",
-                           this_seq_type, ...) {
+                           this_seq_type,
+                           overlap_action = "warn", ...) {
   #warn/notify the user what version of this function they are using
   if (!isTRUE(getOption("GAMBLR.open.shown_cn_msg"))) {
     message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
@@ -69,6 +74,8 @@ get_cn_segments = function(these_samples_metadata,
     }
   }
 
+  #segments of a sample (profile) should never overlap
+  all_segs = GAMBLR.utils::handle_segment_overlaps(all_segs, action = overlap_action)
   #return S3 class with CN segments and genome_build
   all_segs = create_seg_data(all_segs, projection)
   return(all_segs)
