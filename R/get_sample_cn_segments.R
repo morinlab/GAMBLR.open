@@ -67,21 +67,13 @@ get_sample_cn_segments = function(these_sample_ids = NULL,
     }
   }
 
-  sample_ids = metadata$sample_id
+  # delegate the actual fetch, projection validation, and seg_data class
+  # wrapping to get_cn_segments() rather than duplicating that logic here
+  all_segs = get_cn_segments(these_samples_metadata = metadata, projection = projection)
 
-  #valid projections (kept static so we never load the multi-GB sample_data)
-  valid_projections = c("grch37", "hg38")
-
-  #return CN segments based on the selected projection
-  if(projection %in% valid_projections){
-    all_segs = GAMBLR.data::get_cn_segments_from_db(projection = projection,
-                                                    sample_ids = sample_ids)
-  }else{
-    stop(paste("please provide a valid projection. The following are available:",
-               paste(valid_projections,collapse=", ")))
-  }
-
-  #deal with chr prefixes
+  #deal with chr prefixes (this function's own convention: an explicit
+  #override on top of get_cn_segments()'s projection-aware default,
+  #preserved here for backward compatibility)
   if(!with_chr_prefix){
     all_segs = all_segs %>%
       dplyr::mutate(chrom = gsub("chr", "", chrom))
