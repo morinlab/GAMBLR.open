@@ -6,7 +6,7 @@
 #'
 #' @param these_samples_metadata Optional, a metadata table (with sample IDs in a column) to subset the return to.
 #' @param regions_list A vector of regions in the chr:start-end format to restrict the returned SSM calls to.
-#' @param regions_bed A data frame in BED format with the coordinates you want to retrieve (recommended).
+#' @param regions_bed A data frame in BED format (a bed_data object or a plain data frame, with columns chrom, start and end, or those as its first three columns) with the coordinates you want to retrieve (recommended).
 #' This parameter can also accept an additional column with region names that will be added to the return if `use_name_column = TRUE`
 #' @param maf_data Use an already loaded MAF object of class "genomic_data" or "maf_data".
 #' @param this_seq_type The this_seq_type you want back, default is genome. This will be ignored when `maf_data` is provided.
@@ -110,7 +110,7 @@ get_ssm_by_regions <- function(these_samples_metadata,
                       concat_cols = c("gene","region"),
                       sep="-")
       }else if(projection == "hg38"){
-        regions_bed = create_bed_data(grch37_ashm_regions,
+        regions_bed = create_bed_data(hg38_ashm_regions,
                                       genome_build = projection,
                                       fix_names="concat",
                                       concat_cols = c("gene","region"),
@@ -128,13 +128,22 @@ get_ssm_by_regions <- function(these_samples_metadata,
   }
 
   # Build the regions data frame (Chromosome / Start_Position / End_Position / region)
-  if(!missing(regions_bed) && "bed_data" %in% class(regions_bed)){
-    regions_df = dplyr::select(regions_bed,1:4) %>%
-      dplyr::rename(c("Chromosome"="chrom",
-                      "Start_Position"="start",
-                      "End_Position"="end",
-                      "bed_name"="name")) %>%
-      dplyr::mutate(region = paste0(Chromosome, ":", Start_Position, "-", End_Position))
+  # Any BED-like data frame works (bed_data or not): coordinates from the
+  # chrom/start/end columns (or the first three), names from a "name" column
+  if(!missing(regions_bed)){
+    bed = as.data.frame(regions_bed)
+    coord_cols = if(all(c("chrom", "start", "end") %in% colnames(bed))) c("chrom", "start", "end") else colnames(bed)[1:3]
+    regions_df = data.frame(Chromosome = as.character(bed[[coord_cols[1]]]),
+                            Start_Position = as.numeric(bed[[coord_cols[2]]]),
+                            End_Position = as.numeric(bed[[coord_cols[3]]]),
+                            stringsAsFactors = FALSE)
+    if(projection == "grch37"){
+      regions_df$Chromosome = gsub("chr", "", regions_df$Chromosome)
+    }
+    regions_df$region = paste0(regions_df$Chromosome, ":", regions_df$Start_Position, "-", regions_df$End_Position)
+    if("name" %in% colnames(bed)){
+      regions_df$bed_name = as.character(bed$name)
+    }
 
   }else{
     regions_df <- as.data.frame(regions) %>%
@@ -221,16 +230,15 @@ get_ssm_by_regions <- function(these_samples_metadata,
       dplyr::select(all_of(c(names(sample_maf), "region")), any_of("bed_name"))
 
     if(use_name_column){
-      if(!missing(regions_bed)){
-        maf_df = maf_df %>%
-          dplyr::mutate(region = bed_name) %>%
-          dplyr::select(-bed_name)
-      }else{
-        stop("use_name_column = TRUE can only be used with regions_bed")
+      if(!"bed_name" %in% colnames(regions_df)){
+        stop("use_name_column = TRUE needs regions_bed with a column named \"name\"")
       }
-    }else if(!missing(regions_bed)){
       maf_df = maf_df %>%
+        dplyr::mutate(region = bed_name) %>%
         dplyr::select(-bed_name)
+    }else{
+      maf_df = maf_df %>%
+        dplyr::select(-dplyr::any_of("bed_name"))
     }
     maf_df = dplyr::rename(maf_df,c("region_name"="region"))
 

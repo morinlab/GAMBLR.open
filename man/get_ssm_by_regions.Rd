@@ -23,7 +23,7 @@ get_ssm_by_regions(
 
 \item{regions_list}{A vector of regions in the chr:start-end format to restrict the returned SSM calls to.}
 
-\item{regions_bed}{A data frame in BED format with the coordinates you want to retrieve (recommended).
+\item{regions_bed}{A data frame in BED format (a bed_data object or a plain data frame, with columns chrom, start and end, or those as its first three columns) with the coordinates you want to retrieve (recommended).
 This parameter can also accept an additional column with region names that will be added to the return if \code{use_name_column = TRUE}}
 
 \item{maf_data}{Use an already loaded MAF object of class "genomic_data" or "maf_data".}
