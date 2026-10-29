@@ -74,7 +74,7 @@ In the case of returning NA values, this is due to the \code{get_cn_segments} fu
 return any copy number segments from the specified chromosome region.
 }
 \examples{
-library(GAMBLR.open)
+suppressPackageStartupMessages(library(GAMBLR.open))
 # Get sample metadata including a mix of seq_type
 all_types_meta = suppressMessages(get_gambl_metadata()) \%>\% 
             dplyr::filter(pathology == "BL")

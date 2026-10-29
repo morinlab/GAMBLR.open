@@ -8,6 +8,7 @@ get_cn_segments(
   these_samples_metadata,
   projection = "grch37",
   this_seq_type,
+  overlap_action = "warn",
   ...
 )
 }
@@ -22,6 +23,11 @@ represents the seq_type of the data}
 Default is "grch37".}
 
 \item{this_seq_type}{Deprecated.}
+
+\item{overlap_action}{What to do if a sample has overlapping segments,
+which should never happen and would cause double counting downstream:
+"warn" (default, naming the samples), "error", "resolve" (clean up with
+\link[GAMBLR.utils:resolve_segment_overlaps]{GAMBLR.utils::resolve_segment_overlaps}) or "none".}
 
 \item{...}{Additional parameters to be passed to the function.}
 }

@@ -51,7 +51,8 @@ data frame
 }
 \description{
 Convenience function for loading coding Simple Somatic Mutations
-(SSM) from the bundled data \link[GAMBLR.data:sample_data]{GAMBLR.data::sample_data}.
+(SSM) from the bundled \code{gambl_mutations.db} (see
+\code{\link[GAMBLR.data:gambl_mutations_db]{GAMBLR.data::gambl_mutations_db()}}).
 }
 \details{
 This "bare bones" function was developed to retrieve coding SSM
@@ -59,7 +60,7 @@ calls for non-GSC-users. Effectively retrieve coding SSM calls. Multiple
 filtering parameters are available for this function. For more
 information on how to implement the filtering parameters, refer to the
 parameter descriptions as well as examples in the vignettes. This
-function depends on the bundled sample data in this package.
+function depends on the bundled \code{gambl_mutations.db} in this package.
 }
 \examples{
 

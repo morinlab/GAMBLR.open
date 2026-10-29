@@ -21,7 +21,12 @@
 #' @param this_seq_type The seq_type you want back, default is genome.
 #' @param tool_name Optionally specify which tool to report variant from. The default is slms-3, also supports "publication" to return the exact variants as reported in the original papers.
 #' @param this_study Optionally specify first name of the author for the paper
-#'      from which the variants should be returned for.
+#'      from which the variants should be returned for. Matched against
+#'      GAMBLR.data's sample_study table (sample-level cohort membership),
+#'      not a per-row column -- restricts to that study's samples and
+#'      composes with tool_name (e.g. the default tool_name="slms-3" returns
+#'      that study's samples' SLMS-3 recall; tool_name="publication" returns
+#'      their as-published rows only).
 #' @param verbose Set to FALSE to prevent ANY message to be printed.
 #' In most cases, this parameter should be left to TRUE.
 #' The parameter was added to accommodate for noisy output
@@ -67,21 +72,23 @@ get_ssm_by_region = function(these_sample_ids = NULL,
   #check if any invalid parameters are provided
   check_excess_params(...)
 
-  #get samples with the dedicated helper function
-  metadata = id_ease(these_samples_metadata = these_samples_metadata,
-                     these_sample_ids = these_sample_ids,
-                     verbose = verbose,
-                     this_seq_type = this_seq_type)
-
+  # Resolve samples of interest (id_ease retired). Build the metadata table
+  # from whichever of these_samples_metadata / these_sample_ids was supplied,
+  # then pull the sample_id vector.
+  if(!is.null(these_samples_metadata)){
+    metadata = dplyr::filter(these_samples_metadata, seq_type %in% this_seq_type)
+  }else{
+    metadata = get_gambl_metadata(seq_type_filter = this_seq_type)
+    if(!is.null(these_sample_ids)){
+      metadata = dplyr::filter(metadata, sample_id %in% these_sample_ids)
+    }
+  }
   sample_ids = metadata$sample_id
 
   
 
-  # Optionally return variants from a particular study
-  if(!missing(this_study)){
-    this_maf <- this_maf %>%
-      dplyr::filter((!!sym("Study")) == this_study)
-  }
+  # Optionally restrict to a particular study (applied in the SQL query below)
+  has_study = !missing(this_study)
 
   #split region into chunks (chr, start, end) and deal with chr prefixes based on the selected projection
   if(length(region) > 1){
@@ -109,22 +116,22 @@ get_ssm_by_region = function(these_sample_ids = NULL,
 
   #return SSMs based on the selected projection
   if(missing(maf_data)){
-    # Filter by position on-the-fly to avoid wastefully building the same large MAF each time
-    this_maf = GAMBLR.data::sample_data[[projection]]$maf %>%
-      dplyr::filter(Chromosome == chromosome & Start_Position > qstart & Start_Position < qend) %>%
-      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-      dplyr::filter((tolower(!!sym("Pipeline")) == tool_name))
-    muts_region <- GAMBLR.data::sample_data[[projection]]$ashm %>%
-      dplyr::filter(Chromosome == chromosome & Start_Position > qstart & Start_Position < qend) %>%
-      dplyr::filter(Tumor_Sample_Barcode %in% sample_ids) %>%
-      dplyr::filter((tolower(!!sym("Pipeline")) == tool_name)) %>%
-      bind_rows(this_maf, .)
+    # region + pipeline (+ optional study) + sample filter pushed to indexed SQL
+    # (see GAMBLR.data::get_ssm_from_db -- maf and ashm are one table there now)
+    muts_region = GAMBLR.data::get_ssm_from_db(
+      projection = projection,
+      sample_ids = sample_ids,
+      tool_name = tool_name,
+      this_study = if(has_study) this_study else NULL,
+      regions = data.frame(chrom = chromosome, start = qstart, end = qend)
+    )
   }else{
     muts_region = dplyr::filter(maf_data, Tumor_Sample_Barcode %in% sample_ids) %>%
       dplyr::filter(Chromosome == chromosome & Start_Position > qstart & Start_Position < qend)
   }
-  
-  # Handle possible duplicates
+
+  # Handle possible duplicates (only relevant for the user-supplied maf_data
+  # path above -- the get_ssm_from_db() path is already deduplicated)
   muts_region <- muts_region %>%
     distinct(Tumor_Sample_Barcode, Chromosome, Start_Position, End_Position, .keep_all = TRUE)
 

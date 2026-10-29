@@ -40,7 +40,7 @@ Potentially, in the future, additional collated results can be added by this fun
 }
 \examples{
 #load packages
-library(dplyr)
+suppressPackageStartupMessages(library(dplyr))
 
 #return collated results for all available samples
 all_collated = collate_results()

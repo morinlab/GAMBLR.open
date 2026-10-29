@@ -1,0 +1,106 @@
+# Full runtime dependency environment for the GAMBLR collective --
+# GAMBLR.data, GAMBLR.helpers, GAMBLR.utils, GAMBLR.viz, GAMBLR.predict, and
+# GAMBLR.open. Installs every CRAN/Bioconductor package these six packages
+# Import, as prebuilt binaries from conda-forge/bioconda, so that installing
+# the GAMBLR packages themselves on top of this environment (e.g. via
+# remotes::install_github(), already included below) requires no source
+# compilation of their dependencies -- this is what makes it suitable for
+# automated pipeline installs (e.g. Snakemake/LCR-modules), where compiling
+# ~50 CRAN/Bioconductor packages from scratch on every deploy is both slow
+# and fragile.
+#
+# This is NOT the same file as envs/r.yaml, which is CI-only (build/check
+# tooling for this repo, e.g. roxygen2/rcmdcheck) and pins an older R.
+#
+# Deliberately does NOT hand-pin system libraries (libgcc-ng, libstdcxx-ng,
+# the compiler packages, etc.) the way GAMBLR.data's envs/r.yaml historically
+# did -- only r-base is pinned, to a major.minor version. That lets conda's
+# solver pick a current, mutually-consistent set of builds for everything
+# else, rather than an exact multi-year-old snapshot that silently drifts
+# out of sync with conda-forge/bioconda's own evolution (see GAMBLR.data's
+# envs/r.yaml commit history for a concrete example of that failure mode --
+# an old rigid libgcc-ng pin conflicting with a newer RSQLite build's
+# requirements).
+#
+# Usage:
+#   mamba env create -f envs/gamblr_collective.yaml
+#   conda activate gamblr_collective
+#   Rscript -e 'remotes::install_github(c(
+#     "morinlab/GAMBLR.data", "morinlab/GAMBLR.helpers", "morinlab/GAMBLR.utils",
+#     "morinlab/GAMBLR.viz", "morinlab/GAMBLR.predict", "morinlab/GAMBLR.open"
+#   ), dependencies = FALSE, upgrade = "never")'
+name: gamblr_collective
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - r-base=4.3
+  - r-remotes
+
+  # --- GAMBLR.data ---
+  - r-dbi
+  - r-dbplyr
+  - r-dplyr
+  - r-ggplot2
+  - r-rlang
+  - r-rsqlite
+  - r-tidyr
+
+  # --- GAMBLR.helpers ---
+  - r-config
+  - r-ggthemes
+  - r-magrittr
+  - r-readr
+  - r-stringr
+  - r-tibble
+
+  # --- GAMBLR.utils ---
+  - bioconductor-annotationdbi
+  - r-data.table
+  - bioconductor-genomicdistributions
+  - bioconductor-genomicranges
+  - r-ggpubr
+  - r-ggrepel
+  - r-glmnet
+  - bioconductor-org.hs.eg.db
+  - bioconductor-rtracklayer
+  - bioconductor-s4vectors
+
+  # --- GAMBLR.viz ---
+  - bioconductor-bsgenome
+  - r-circlize
+  - bioconductor-complexheatmap
+  - r-cowplot
+  - r-ggbeeswarm
+  - r-ggcorrplot
+  - r-ggextra
+  - r-ggseqlogo
+  - bioconductor-iranges
+  - r-purrr
+  - r-rcolorbrewer
+  - bioconductor-rsamtools
+  - r-wordcloud
+  - r-wordcloud2
+
+  # --- GAMBLR.open ---
+  - r-cli
+
+  # --- GAMBLR.predict ---
+  - r-caret
+  - r-dt
+  - r-fnn
+  - r-ggalluvial
+  - r-ggside
+  - r-mclust
+  - r-plotly
+  - r-randomforest
+  - r-readxl
+  - r-shiny
+  - r-shinybusy
+  - r-shinyjs
+  - r-tidyselect
+  - r-uwot
+
+  # methods, parallel, and grid (also required, by GAMBLR.utils/GAMBLR.viz/
+  # GAMBLR.predict respectively) ship with r-base itself -- no package needed.

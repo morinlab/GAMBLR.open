@@ -103,80 +103,64 @@ get_manta_sv = function(these_samples_metadata = NULL,
     these_samples_metadata = get_gambl_metadata() %>% dplyr::filter(seq_type=="genome")
   }
   #warn/notify the user what version of this function they are using
-  message("Using the bundled Manta SV (.bedpe) calls in GAMBLR.data...")
+  if (!isTRUE(getOption("GAMBLR.open.shown_manta_msg"))) {
+    message("Using the bundled Manta SV (.bedpe) calls in GAMBLR.data...")
+    options(GAMBLR.open.shown_manta_msg = TRUE)
+  }
   
   #check if any invalid parameters are provided
   check_excess_params(...)
   
-  #get valid projections
-  valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
-  
-  metadata = these_samples_metadata
-  
-  sample_ids = metadata$sample_id
-  
-  #return manta SV based on the selected projection
-  if(projection %in% valid_projections){
-    manta_sv = GAMBLR.data::sample_data[[projection]]$bedpe %>% 
-      dplyr::filter(tumour_sample_id %in% sample_ids)
-  }else{
-    stop(paste("please provide a valid projection.
-    The following are available:",
-               paste(valid_projections,collapse=", ")))
+  #valid projections (kept static so we never load the multi-GB sample_data)
+  valid_projections = c("grch37", "hg38")
+  if(!projection %in% valid_projections){
+    stop(paste("please provide a valid projection.\n    The following are available:",
+               paste(valid_projections, collapse=", ")))
   }
-  
+
+  metadata = these_samples_metadata
+  sample_ids = metadata$sample_id
+
+  #parse an optional region and reconcile chr-prefix with the projection
+  region_filter = NULL
   if(!missing(region)){
     region = gsub(",", "", region)
     split_chunks = unlist(strsplit(region, ":"))
     chromosome = split_chunks[1]
     startend = unlist(strsplit(split_chunks[2], "-"))
-    qstart = startend[1]
-    qend = startend[2]
+    qstart = as.numeric(startend[1])
+    qend = as.numeric(startend[2])
+    if(projection == "grch37"){
+      chromosome = gsub("chr", "", chromosome)
+    }else if(projection == "hg38" && !grepl("chr", chromosome)){
+      chromosome = paste0("chr", chromosome)
+    }
+    region_filter = list(chrom = chromosome, start = qstart, end = qend)
   }
-  
-  manta_sv = manta_sv %>%
-    dplyr::filter(VAF_tumour >= min_vaf,
-                  SCORE >= min_score)
-  
+
+  #breakpoint query pushed to SQL (sample / VAF / score / PASS / region)
+  manta_sv = GAMBLR.data::get_sv_from_db(
+    projection = projection,
+    sample_ids = sample_ids,
+    min_vaf = min_vaf,
+    min_score = min_score,
+    pass_only = pass_filters,
+    region = region_filter
+  )
+
   if(verbose){
     no_manta = setdiff(metadata$sample_id, manta_sv$tumour_sample_id)
-    
     if(length(no_manta) > 0){
       message(paste0("No Manta results found for ", length(no_manta), " samples..."))
       print(no_manta)
     }
-  }
-  
-  #deal with chr prefixes based on the selected projection (if return is to be subset to regions...)
-  if(!missing(region) || !missing(chromosome)){
-    if(projection == "grch37"){
-      if(grepl("chr", chromosome)){
-        chromosome = gsub("chr", "", chromosome)
-      }
-    }else if(projection == "hg38"){
-      if(!grepl("chr", chromosome)){
-        chromosome = paste0("chr", chromosome)
-      }
-    }
-    
-    manta_sv = manta_sv %>%
-      dplyr::filter((CHROM_A == chromosome & START_A >= qstart & START_A <= qend) | (CHROM_B == chromosome & START_B >= qstart & START_B <= qend))
-  }
-  
-  if(verbose){
     message("\nThe following VCF filters are applied;")
     message(paste0("  Minimum VAF: ", min_vaf))
     message(paste0("  Minimum Score: ", min_score))
-    message(paste0("  Only keep variants passing the quality filter: ", pass))
+    message(paste0("  Only keep variants passing the quality filter: ", pass_filters))
   }
-  
-  #PASS filter
-  if(pass_filters){
-    manta_sv = manta_sv %>%
-      dplyr::filter(FILTER == "PASS")
-  }
-  
-  #attach genome_build 
+
+  #attach genome_build
   manta_sv = create_genomic_data(manta_sv, projection)
   
   if(verbose){

@@ -41,7 +41,7 @@
 #' 
 #' @return A table of mutation counts for sliding windows across one or more regions. May be long or wide.
 #'
-#' @import dplyr tidyr tibble parallel
+#' @import dplyr tidyr tibble
 #' @export
 #'
 #' @examples
@@ -97,17 +97,55 @@ calc_mutation_frequency_bin_regions <- function(regions_list = NULL,
   ) {
     stop("chr prefixing status of provided regions and specified projection don't match. ")
   }
-  # Harmonize metadata and sample IDs
-  metadata <- id_ease(
-    these_samples_metadata,
-    these_sample_ids,
-    this_seq_type
-  )
+  # Harmonize metadata and sample IDs (id_ease retired)
+  if(!is.null(these_samples_metadata)){
+    metadata <- dplyr::filter(these_samples_metadata, seq_type %in% this_seq_type)
+  }else{
+    metadata <- get_gambl_metadata(seq_type_filter = this_seq_type)
+    if(!is.null(these_sample_ids)){
+      metadata <- dplyr::filter(metadata, sample_id %in% these_sample_ids)
+    }
+  }
   
   these_sample_ids <- metadata$sample_id
-  
-  # Obtain sliding window mutation frequencies for all regions
-  dfs <- mclapply(names(regions), function(x) {
+
+  # Pre-fetch all mutations across every requested (padded) region in a
+  # single query, instead of letting the per-region loop below call
+  # calc_mutation_frequency_bin_region() -> get_ssm_by_region() once per
+  # region -- each a separate database round trip. For the full aSHM region
+  # set (100+ regions) this was by far the largest cost in the GAMBLR.open
+  # example suite (~140s of a ~240s total run). get_ssm_by_regions()
+  # (plural) already consolidates a whole regions_bed into one query;
+  # passing its result down as maf_data makes every per-region call below
+  # take calc_mutation_frequency_bin_region()'s existing in-memory
+  # subsetting path (cool_overlaps(), which already matches on inclusive
+  # start/end boundaries -- same semantics either way, so this doesn't
+  # change what gets counted) instead of querying the database again.
+  #
+  # process_regions() deliberately leaves regions_bed itself un-padded --
+  # only `regions` (the per-region loop input, built from regions_bed a few
+  # lines above) has region_padding applied -- so it has to be re-applied
+  # here too, or this pre-fetch would miss mutations that fall inside the
+  # padding but outside the raw region.
+  if (is.null(maf_data)) {
+    padded_regions_bed <- regions_bed %>%
+      dplyr::mutate(start = start - region_padding, end = end + region_padding)
+    maf_data <- get_ssm_by_regions(
+      regions_bed = padded_regions_bed,
+      these_samples_metadata = metadata,
+      this_seq_type = unique(metadata$seq_type),
+      streamlined = FALSE,
+      projection = projection
+    )
+  }
+
+  # Obtain sliding window mutation frequencies for all regions. Sequential
+  # (not mclapply()) now that maf_data is pre-fetched: each iteration below
+  # is just fast in-memory subsetting, not a database call, so there's
+  # little left to parallelize -- and mclapply()'s fork-per-worker model
+  # both multiplies peak memory use (each fork copies the parent's memory)
+  # and is a poor fit for sharing one open DB connection across processes.
+  dfs <- lapply(names(regions), function(x) {
     df <- calc_mutation_frequency_bin_region(
       region = regions[x],
       these_samples_metadata = metadata,

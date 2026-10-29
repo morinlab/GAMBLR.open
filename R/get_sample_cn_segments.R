@@ -25,7 +25,7 @@
 #'
 #' @examples
 #' #load pacakges
-#' library(dplyr)
+#' suppressPackageStartupMessages(library(dplyr))
 #'
 #' #get CN segments for one sample
 #' dohh2_segs = get_sample_cn_segments(these_sample_ids = "DOHH-2",
@@ -33,7 +33,7 @@
 #'                                     streamlined = TRUE)
 #'
 #' #get CN segments for DLBCL cell line
-#' cell_line_meta = GAMBLR.data::sample_data$meta %>%
+#' cell_line_meta = get_gambl_metadata() %>%
 #'   dplyr::filter(cohort == "DLBCL_cell_lines")
 #'
 #' dlbcl_segs = get_sample_cn_segments(these_samples_metadata = cell_line_meta,
@@ -49,32 +49,31 @@ get_sample_cn_segments = function(these_sample_ids = NULL,
                                   ...){
 
   #warn/notify the user what version of this function they are using
-  message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
+  if (!isTRUE(getOption("GAMBLR.open.shown_cn_msg"))) {
+    message("Using the bundled CN segments (.seg) calls in GAMBLR.data...")
+    options(GAMBLR.open.shown_cn_msg = TRUE)
+  }
 
   #check if any invalid parameters are provided
   check_excess_params(...)
 
-  #get samples with the dedicated helper function
-  metadata = id_ease(these_samples_metadata = these_samples_metadata,
-                     these_sample_ids = these_sample_ids,
-                     verbose = verbose,
-                     this_seq_type = this_seq_type)
-
-  sample_ids = metadata$sample_id
-
-  #get valid projections
-  valid_projections = grep("meta", names(GAMBLR.data::sample_data), value = TRUE, invert = TRUE)
-
-  #return CN segments based on the selected projection
-  if(projection %in% valid_projections){
-    all_segs = GAMBLR.data::sample_data[[projection]]$seg %>%
-      dplyr::filter(ID %in% sample_ids)
+  # resolve samples of interest (id_ease retired)
+  if(!is.null(these_samples_metadata)){
+    metadata = dplyr::filter(these_samples_metadata, seq_type %in% this_seq_type)
   }else{
-    stop(paste("please provide a valid projection. The following are available:",
-               paste(valid_projections,collapse=", ")))
+    metadata = get_gambl_metadata(seq_type_filter = this_seq_type)
+    if(!is.null(these_sample_ids)){
+      metadata = dplyr::filter(metadata, sample_id %in% these_sample_ids)
+    }
   }
 
-  #deal with chr prefixes
+  # delegate the actual fetch, projection validation, and seg_data class
+  # wrapping to get_cn_segments() rather than duplicating that logic here
+  all_segs = get_cn_segments(these_samples_metadata = metadata, projection = projection)
+
+  #deal with chr prefixes (this function's own convention: an explicit
+  #override on top of get_cn_segments()'s projection-aware default,
+  #preserved here for backward compatibility)
   if(!with_chr_prefix){
     all_segs = all_segs %>%
       dplyr::mutate(chrom = gsub("chr", "", chrom))
