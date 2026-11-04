@@ -16,9 +16,30 @@
 #' which should never happen and would cause double counting downstream:
 #' "warn" (default, naming the samples), "error", "resolve" (clean up with
 #' [GAMBLR.utils::resolve_segment_overlaps]) or "none".
+#' @param pipeline Optional: segments from published analyses instead of
+#' the bundled GAMBL segments, e.g. "dlbclass" (DLBClass/Chapuy et al.) or
+#' "schmitz_array" (Schmitz et al. arrays); see
+#' [GAMBLR.data::published_cn_sources]. These cover capture samples of the
+#' dlbcl_chapuy and dlbcl_schmitz cohorts, under GAMBL sample_ids. "all"
+#' returns the bundled GAMBL segments (as pipeline "gambl") and every
+#' published source side by side, e.g. for
+#' GAMBLR.viz::plot_sample_cn_comparison. Default NULL: the bundled GAMBL
+#' segments only.
+#' @param source_rule How each sample's GAMBL segmentation is chosen, as in
+#' GAMBLR.results::get_cn_segments: "cnv_master" (default), "qc_score",
+#' "preference", or a
+#' saved selection (a table, or the path of a TSV of one, with sample_id and
+#' pipeline). GAMBLR.data bundles one GAMBL segmentation per sample (the
+#' combined merge's), so every rule returns it: "qc_score" and "preference"
+#' say so, and with a
+#' saved selection, samples it lacks are dropped and those it assigns to
+#' another pipeline get the bundled segments, with a message. Not used with
+#' `pipeline`.
 #' @param ... Additional parameters to be passed to the function.
 #'
-#' @return A data frame with CN segments for the specified region.
+#' @return A data frame with CN segments for the specified region, with a
+#' `pipeline` column naming each segment's source ("gambl" for the bundled
+#' segments; published sources add source_id, purity and ploidy columns).
 #'
 #' @import dplyr
 #' @export
@@ -32,9 +53,15 @@
 #'                              these_samples_metadata = genome_metadata,
 #'                              projection="hg38")
 #'
+#' # the DLBClass (Chapuy et al.) segments of the Chapuy samples
+#' chapuy = get_gambl_metadata(seq_type_filter = "capture") %>%
+#'   dplyr::filter(cohort == "dlbcl_chapuy")
+#' dlbclass_segments = get_cn_segments(chapuy, pipeline = "dlbclass")
 #'
 get_cn_segments = function(these_samples_metadata,
                            projection = "grch37",
+                           pipeline = NULL,
+                           source_rule = "cnv_master",
                            this_seq_type,
                            overlap_action = "warn", ...) {
   #warn/notify the user what version of this function they are using
@@ -51,14 +78,75 @@ get_cn_segments = function(these_samples_metadata,
 
   metadata = these_samples_metadata
 
+  #source_rule: GAMBLR.data has one GAMBL segmentation per sample, so only a
+  #saved selection changes anything (the samples kept)
+  if (!identical(source_rule, "cnv_master")) {
+    if (!is.null(pipeline)) stop("give pipeline or source_rule, not both")
+    if (is.character(source_rule) && length(source_rule) == 1 && source_rule %in% c("qc_score", "preference")) {
+      message("GAMBLR.data bundles one GAMBL segmentation per sample (the combined merge's), ",
+              "so source_rule = \"", source_rule, "\" returns it; choosing among pipelines needs GAMBLR.results")
+    } else {
+      sel = if (is.character(source_rule)) {
+        if (!file.exists(source_rule)) stop("source_rule must be \"cnv_master\", \"qc_score\", \"preference\", ",
+                                            "a selection table or the path of a saved one; not found: ", source_rule)
+        utils::read.delim(source_rule, comment.char = "#", stringsAsFactors = FALSE)
+      } else as.data.frame(source_rule)
+      if (!"sample_id" %in% colnames(sel) && "ID" %in% colnames(sel)) sel$sample_id = sel$ID
+      if (!all(c("sample_id", "pipeline") %in% colnames(sel))) {
+        stop("source_rule selection needs sample_id and pipeline columns")
+      }
+      if ("selected" %in% colnames(sel)) sel = sel[sel$selected %in% TRUE, , drop = FALSE]
+      lacking = !metadata$sample_id %in% sel$sample_id
+      if (any(lacking)) {
+        message("dropping ", length(unique(metadata$sample_id[lacking])),
+                " sample(s) with no pipeline chosen by source_rule")
+        metadata = metadata[!lacking, , drop = FALSE]
+      }
+      n_other = sum(sel$sample_id %in% metadata$sample_id & !sel$pipeline %in% "gambl")
+      if (n_other > 0) {
+        message(n_other, " sample(s) get the bundled GAMBL segments in place of the pipeline chosen in ",
+                "source_rule (GAMBLR.data bundles one GAMBL segmentation per sample)")
+      }
+    }
+  }
+
   sample_ids = metadata$sample_id
-  #return CN segments based on the selected projection
-  if (projection %in% valid_projections) {
-    all_segs = GAMBLR.data::get_cn_segments_from_db(projection = projection,
-                                                    sample_ids = sample_ids)
-  }else {
+  if (!projection %in% valid_projections) {
     stop(paste("please provide a valid projection.",
                paste(valid_projections, collapse = ", ")))
+  }
+  #segments from published analyses (pipeline), and/or the bundled GAMBL ones
+  published = NULL
+  with_gambl = is.null(pipeline) || identical(pipeline, "all")
+  if (!is.null(pipeline)) {
+    if (!"get_published_cn_segments" %in% getNamespaceExports("GAMBLR.data")) {
+      stop("pipeline needs a GAMBLR.data with get_published_cn_segments(); please update GAMBLR.data")
+    }
+    sources = GAMBLR.data::published_cn_sources()$source
+    wanted = if (identical(pipeline, "all")) sources else pipeline
+    unknown = setdiff(wanted, sources)
+    if (length(unknown) > 0) {
+      stop("unknown pipeline(s): ", paste(unknown, collapse = ", "),
+           "; available: ", paste(c(sources, "all"), collapse = ", "))
+    }
+    published = GAMBLR.data::get_published_cn_segments(wanted, projection = projection,
+                                                       sample_ids = sample_ids)
+    published = dplyr::rename(published, pipeline = source)
+    missing_ids = setdiff(sample_ids, published$ID)
+    if (length(missing_ids) > 0) {
+      message(length(missing_ids), " sample(s) have no ", paste(wanted, collapse = "/"),
+              " segments (published sources cover capture samples of dlbcl_chapuy and dlbcl_schmitz)")
+    }
+  }
+  if (with_gambl) {
+    all_segs = GAMBLR.data::get_cn_segments_from_db(projection = projection,
+                                                    sample_ids = sample_ids)
+    all_segs$pipeline = rep("gambl", nrow(all_segs))
+    if (!is.null(published)) {
+      all_segs = dplyr::bind_rows(all_segs, published)
+    }
+  } else {
+    all_segs = published
   }
 
   #ensure chr prefixes are there when necessary
@@ -74,8 +162,10 @@ get_cn_segments = function(these_samples_metadata,
     }
   }
 
-  #segments of a sample (profile) should never overlap
-  all_segs = GAMBLR.utils::handle_segment_overlaps(all_segs, action = overlap_action)
+  #segments of a sample (profile) should never overlap (per pipeline, when several)
+  overlap_by = if ("pipeline" %in% colnames(all_segs)) c("ID", "pipeline") else NULL
+  all_segs = GAMBLR.utils::handle_segment_overlaps(all_segs, action = overlap_action,
+                                                   by = overlap_by)
   #return S3 class with CN segments and genome_build
   all_segs = create_seg_data(all_segs, projection)
   return(all_segs)
