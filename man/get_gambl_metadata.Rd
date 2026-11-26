@@ -30,7 +30,7 @@ A data frame with metadata, tailored for user without GSC access.
 \item{Tumor_Sample_Barcode}{Duplicate of sample_id for simplifying joins to MAF data frames}
 \item{cohort}{Name for a group of samples that were added together (usually from a single study), often in the format {pathology}_{cohort_descriptor}.}
 \item{COO_consensus}{Consensus call of COO between different sources.}
-\item{DHITsig_consensus}{Consensus call of DHIT signature status between different sources.}
+\item{DHITsig_consensus}{Consensus call of DHIT signature (DHITsig, also called DZsig) status between different sources: POS, NEG or UNCLASS. DHITsig is defined within GCB DLBCL, but this column also has calls for ABC and COO-unclassified tumours, so comparing DHITsig groups with it across all DLBCL mostly compares GCB with ABC. Restrict to GCB tumours (\code{COO_consensus == "GCB"}) or use consensus_coo_dhitsig.}
 \item{consensus_coo_dhitsig}{Cell of origin and DHITsig combined: "ABC" for ABC DLBCLs, otherwise the DHITsig call ("DHITsigPos" or "DHITsigNeg"); NA outside DLBCL. DHITsig is a GCB signature, so compare DHITsig groups with this column rather than DHITsig_consensus, which also labels ABC tumours. Present in gambl_mutations.db builds made after 2026-11-26.}
 \item{EBV_status_inf}{Inferred EBV status of the tumor}
 \item{ffpe_or_frozen}{Whether the nucleic acids were extracted from a frozen or FFPE sample}
