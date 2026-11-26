@@ -81,6 +81,15 @@ get_coding_ssm = function(
     # resolve samples of interest (id_ease retired)
     if(!is.null(these_samples_metadata)){
         metadata = dplyr::filter(these_samples_metadata, seq_type %in% this_seq_type)
+        # the metadata's samples of other seq_types are dropped: say so
+        other = setdiff(unique(these_samples_metadata$seq_type), this_seq_type)
+        if(length(other) > 0){
+            n_dropped = sum(!these_samples_metadata$seq_type %in% this_seq_type)
+            warning(n_dropped, " of ", nrow(these_samples_metadata), " samples in these_samples_metadata ",
+                    "are dropped because their seq_type (", paste(other, collapse = ", "),
+                    ") isn't this_seq_type (\"", paste(this_seq_type, collapse = "\", \""),
+                    "\"); set this_seq_type to include them", call. = FALSE)
+        }
     }else{
         metadata = get_gambl_metadata(seq_type_filter = this_seq_type)
         if(!is.null(these_sample_ids)){
