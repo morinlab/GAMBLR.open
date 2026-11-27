@@ -20,6 +20,10 @@
 #' Default is "genome".
 #' @param case_set Optionally specify study details to return samples from a
 #' particular case set. See function description for supported case sets.
+#' @param with_outcomes Set to TRUE to add the published patient-level
+#' outcome columns of [get_gambl_outcomes] (e.g. CODE_OS, OS_YEARS,
+#' CODE_PFS, PFS_YEARS, IPI), joined by patient_id. Patients without
+#' released outcome data have NA. Default: FALSE.
 #' @param ... Any additional parameters.
 #'
 #' @return A data frame with metadata, tailored for user without GSC access.
@@ -53,13 +57,22 @@
 #'   \item{lymphgen_with_cnv}{LymphGen label using model with CNV}
 #'   \item{lymphgen_wright}{The LymphGen call for this sample from Wright et all (if applicable)}
 #'   \item{normal_sample_id}{Sample id for normal tissue used in the analysis}
-#'   \item{sex}{The biological sex of the patient, if available. Allowable options: M, F, NA}
+#'   \item{sex}{The biological sex of the patient (M, F or NA): one value per patient, from GAMBL's patient-level table.}
 #'   \item{time_point}{Timing of biopsy in increasing alphabetical order (A = diagnosis, B = first relapse etc)}
 #'   \item{TotalDuplicatedreads}{QC metric: total duplicated reads for this sample.}
 #'   \item{TotalReads}{QC metric: total reads for this sample.}
 #'   \item{TotalUniquelyMapped}{QC metric: total uniquely-mapped reads for this sample.}
 #'   \item{TotalUnmappedreads}{QC metric: total unmapped reads for this sample.}
-#'   \item{transformation}{Whether this case represents a histologic transformation.}
+#'   \item{transformation}{Transformation status of the biopsy (BC Cancer patients; NA elsewhere): "de novo", "pre-transformation" (an indolent biopsy before the patient's first aggressive biopsy), "transformed" (an aggressive biopsy of a patient who transformed) or "post-transformation".}
+#'   \item{genetic_subgroup}{Genetic subgroup from the source paper: Thomas et al. BL subgroups (DGG-BL, IC-BL, Q53-BL, DLBCL-A/B/C) and Dreval et al. FL (cFL, dFL); NA for other studies.}
+#'   \item{MeanCorrectedCoverage}{QC metric: mean coverage after duplicate removal.}
+#'   \item{n_ssm}{Number of SLMS-3 somatic SNV and indel calls. Not comparable between genomes and exomes.}
+#'   \item{burden_per_mb}{Mutation burden: calls per Mb of the territory (burden_territory). Includes germline variants for unmatched samples (pairing_status); NA for samples under 15x MeanCorrectedCoverage.}
+#'   \item{burden_snv_per_mb}{As burden_per_mb, SNVs only.}
+#'   \item{burden_indel_per_mb}{As burden_per_mb, indels only.}
+#'   \item{burden_territory}{Region the burden was measured over: "genome" (all calls over the non-N genome), "capture_targets" (calls in the capture kit's targets) or "coding_fallback" (coding calls over the protein-coding CDS, for exomes of unknown kit).}
+#'   \item{burden_mb}{Size of that territory in Mb.}
+#'   \item{burden_kit}{Capture kit whose targets were the territory, for "capture_targets".}
 #' }
 #'
 #' The exact column set is controlled by
@@ -87,6 +100,7 @@
 get_gambl_metadata = function(
     seq_type_filter = c("genome","capture"),
     case_set,
+    with_outcomes = FALSE,
     ...
 ){
 
@@ -143,6 +157,13 @@ get_gambl_metadata = function(
             message(paste("case set", case_set, "not available"))
             return()
         }
+    }
+
+    if(with_outcomes){
+        # by patient_id only, so no other shared column can become a join key
+        outcomes <- get_gambl_outcomes()
+        outcomes <- dplyr::select(outcomes, -dplyr::any_of(setdiff(colnames(metadata), "patient_id")))
+        metadata <- dplyr::left_join(metadata, outcomes, by = "patient_id")
     }
 
     #ensure only unique rows are returned
