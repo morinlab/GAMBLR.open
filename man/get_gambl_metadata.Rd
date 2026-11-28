@@ -4,7 +4,12 @@
 \alias{get_gambl_metadata}
 \title{Get GAMBL Metadata.}
 \usage{
-get_gambl_metadata(seq_type_filter = c("genome", "capture"), case_set, ...)
+get_gambl_metadata(
+  seq_type_filter = c("genome", "capture"),
+  case_set,
+  with_outcomes = FALSE,
+  ...
+)
 }
 \arguments{
 \item{seq_type_filter}{Specify the seq type you want to return metadata for.
@@ -12,6 +17,11 @@ Default is "genome".}
 
 \item{case_set}{Optionally specify study details to return samples from a
 particular case set. See function description for supported case sets.}
+
+\item{with_outcomes}{Set to TRUE to add the published patient-level
+outcome columns of \link{get_gambl_outcomes} (e.g. CODE_OS, OS_YEARS,
+CODE_PFS, PFS_YEARS, IPI), joined by patient_id. Patients without
+released outcome data have NA. Default: FALSE.}
 
 \item{...}{Any additional parameters.}
 }
@@ -30,7 +40,8 @@ A data frame with metadata, tailored for user without GSC access.
 \item{Tumor_Sample_Barcode}{Duplicate of sample_id for simplifying joins to MAF data frames}
 \item{cohort}{Name for a group of samples that were added together (usually from a single study), often in the format {pathology}_{cohort_descriptor}.}
 \item{COO_consensus}{Consensus call of COO between different sources.}
-\item{DHITsig_consensus}{Consensus call of DHIT signature status between different sources.}
+\item{DHITsig_consensus}{Consensus call of DHIT signature (DHITsig, also called DZsig) status between different sources: POS, NEG or UNCLASS. DHITsig is defined within GCB DLBCL, but this column also has calls for ABC and COO-unclassified tumours, so comparing DHITsig groups with it across all DLBCL mostly compares GCB with ABC. Restrict to GCB tumours (\code{COO_consensus == "GCB"}) or use consensus_coo_dhitsig.}
+\item{consensus_coo_dhitsig}{Cell of origin and DHITsig combined: "ABC" for ABC DLBCLs, otherwise the DHITsig call ("DHITsigPos" or "DHITsigNeg"); NA outside DLBCL. DHITsig is a GCB signature, so compare DHITsig groups with this column rather than DHITsig_consensus, which also labels ABC tumours. Present in gambl_mutations.db builds made after 2026-11-26.}
 \item{EBV_status_inf}{Inferred EBV status of the tumor}
 \item{ffpe_or_frozen}{Whether the nucleic acids were extracted from a frozen or FFPE sample}
 \item{fl_grade}{Grade of FL samples}
@@ -46,13 +57,22 @@ A data frame with metadata, tailored for user without GSC access.
 \item{lymphgen_with_cnv}{LymphGen label using model with CNV}
 \item{lymphgen_wright}{The LymphGen call for this sample from Wright et all (if applicable)}
 \item{normal_sample_id}{Sample id for normal tissue used in the analysis}
-\item{sex}{The biological sex of the patient, if available. Allowable options: M, F, NA}
+\item{sex}{The biological sex of the patient (M, F or NA): one value per patient, from GAMBL's patient-level table.}
 \item{time_point}{Timing of biopsy in increasing alphabetical order (A = diagnosis, B = first relapse etc)}
 \item{TotalDuplicatedreads}{QC metric: total duplicated reads for this sample.}
 \item{TotalReads}{QC metric: total reads for this sample.}
 \item{TotalUniquelyMapped}{QC metric: total uniquely-mapped reads for this sample.}
 \item{TotalUnmappedreads}{QC metric: total unmapped reads for this sample.}
-\item{transformation}{Whether this case represents a histologic transformation.}
+\item{transformation}{Transformation status of the biopsy (BC Cancer patients; NA elsewhere): "de novo", "pre-transformation" (an indolent biopsy before the patient's first aggressive biopsy), "transformed" (an aggressive biopsy of a patient who transformed) or "post-transformation".}
+\item{genetic_subgroup}{Genetic subgroup from the source paper: Thomas et al. BL subgroups (DGG-BL, IC-BL, Q53-BL, DLBCL-A/B/C) and Dreval et al. FL (cFL, dFL); NA for other studies.}
+\item{MeanCorrectedCoverage}{QC metric: mean coverage after duplicate removal.}
+\item{n_ssm}{Number of SLMS-3 somatic SNV and indel calls. Not comparable between genomes and exomes.}
+\item{burden_per_mb}{Mutation burden: calls per Mb of the territory (burden_territory). Includes germline variants for unmatched samples (pairing_status); NA for samples under 15x MeanCorrectedCoverage.}
+\item{burden_snv_per_mb}{As burden_per_mb, SNVs only.}
+\item{burden_indel_per_mb}{As burden_per_mb, indels only.}
+\item{burden_territory}{Region the burden was measured over: "genome" (all calls over the non-N genome), "capture_targets" (calls in the capture kit's targets) or "coding_fallback" (coding calls over the protein-coding CDS, for exomes of unknown kit).}
+\item{burden_mb}{Size of that territory in Mb.}
+\item{burden_kit}{Capture kit whose targets were the territory, for "capture_targets".}
 }
 
 The exact column set is controlled by

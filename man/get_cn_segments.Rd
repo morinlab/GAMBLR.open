@@ -7,6 +7,8 @@
 get_cn_segments(
   these_samples_metadata,
   projection = "grch37",
+  pipeline = NULL,
+  source_rule = "cnv_master",
   this_seq_type,
   overlap_action = "warn",
   ...
@@ -22,6 +24,27 @@ represents the seq_type of the data}
 \item{projection}{Desired genome coordinate system for returned CN segments.
 Default is "grch37".}
 
+\item{pipeline}{Optional: segments from published analyses instead of
+the bundled GAMBL segments, e.g. "dlbclass" (DLBClass/Chapuy et al.) or
+"schmitz_array" (Schmitz et al. arrays); see
+\link[GAMBLR.data:published_cn_sources]{GAMBLR.data::published_cn_sources}. These cover capture samples of the
+dlbcl_chapuy and dlbcl_schmitz cohorts, under GAMBL sample_ids. "all"
+returns the bundled GAMBL segments (as pipeline "gambl") and every
+published source side by side, e.g. for
+GAMBLR.viz::plot_sample_cn_comparison. Default NULL: the bundled GAMBL
+segments only.}
+
+\item{source_rule}{How each sample's GAMBL segmentation is chosen, as in
+GAMBLR.results::get_cn_segments: "cnv_master" (default), "qc_score",
+"preference", or a
+saved selection (a table, or the path of a TSV of one, with sample_id and
+pipeline). GAMBLR.data bundles one GAMBL segmentation per sample, chosen
+when the bundle is built by GAMBLR.results' "preference" rule (its
+\code{cn_pipeline} column), so every rule returns it: "qc_score" and
+"cnv_master" say so, and with a saved selection, samples it lacks are
+dropped and those it assigns to another pipeline get the bundled
+segments, with a message. Not used with \code{pipeline}.}
+
 \item{this_seq_type}{Deprecated.}
 
 \item{overlap_action}{What to do if a sample has overlapping segments,
@@ -32,7 +55,13 @@ which should never happen and would cause double counting downstream:
 \item{...}{Additional parameters to be passed to the function.}
 }
 \value{
-A data frame with CN segments for the specified region.
+A data frame with CN segments for the specified region, with a
+\code{pipeline} column naming each segment's source ("gambl" for the bundled
+segments; published sources add source_id, purity and ploidy columns).
+Bundled segments also have \code{cn_pipeline} (the GAMBL pipeline the sample's
+segments come from, e.g. battenberg, purecn, gatk_cnv) and \code{cn_type}
+("absolute", or "relative" for gatk_cnv/cnvkit segments that couldn't be
+calibrated to absolute copy number), in newer GAMBLR.data databases.
 }
 \description{
 Retrieve all copy number segments from the GAMBL outputs
@@ -50,5 +79,9 @@ genome_segments_hg38 = get_cn_segments(
                              these_samples_metadata = genome_metadata,
                              projection="hg38")
 
+# the DLBClass (Chapuy et al.) segments of the Chapuy samples
+chapuy = get_gambl_metadata(seq_type_filter = "capture") \%>\%
+  dplyr::filter(cohort == "dlbcl_chapuy")
+dlbclass_segments = get_cn_segments(chapuy, pipeline = "dlbclass")
 
 }
