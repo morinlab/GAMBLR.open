@@ -38,12 +38,12 @@ segments only.}
 GAMBLR.results::get_cn_segments: "cnv_master" (default), "qc_score",
 "preference", or a
 saved selection (a table, or the path of a TSV of one, with sample_id and
-pipeline). GAMBLR.data bundles one GAMBL segmentation per sample (the
-combined merge's), so every rule returns it: "qc_score" and "preference"
-say so, and with a
-saved selection, samples it lacks are dropped and those it assigns to
-another pipeline get the bundled segments, with a message. Not used with
-\code{pipeline}.}
+pipeline). GAMBLR.data bundles one GAMBL segmentation per sample, chosen
+when the bundle is built by GAMBLR.results' "preference" rule (its
+\code{cn_pipeline} column), so every rule returns it: "qc_score" and
+"cnv_master" say so, and with a saved selection, samples it lacks are
+dropped and those it assigns to another pipeline get the bundled
+segments, with a message. Not used with \code{pipeline}.}
 
 \item{this_seq_type}{Deprecated.}
 
@@ -58,6 +58,10 @@ which should never happen and would cause double counting downstream:
 A data frame with CN segments for the specified region, with a
 \code{pipeline} column naming each segment's source ("gambl" for the bundled
 segments; published sources add source_id, purity and ploidy columns).
+Bundled segments also have \code{cn_pipeline} (the GAMBL pipeline the sample's
+segments come from, e.g. battenberg, purecn, gatk_cnv) and \code{cn_type}
+("absolute", or "relative" for gatk_cnv/cnvkit segments that couldn't be
+calibrated to absolute copy number), in newer GAMBLR.data databases.
 }
 \description{
 Retrieve all copy number segments from the GAMBL outputs

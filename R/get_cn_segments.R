@@ -29,17 +29,21 @@
 #' GAMBLR.results::get_cn_segments: "cnv_master" (default), "qc_score",
 #' "preference", or a
 #' saved selection (a table, or the path of a TSV of one, with sample_id and
-#' pipeline). GAMBLR.data bundles one GAMBL segmentation per sample (the
-#' combined merge's), so every rule returns it: "qc_score" and "preference"
-#' say so, and with a
-#' saved selection, samples it lacks are dropped and those it assigns to
-#' another pipeline get the bundled segments, with a message. Not used with
-#' `pipeline`.
+#' pipeline). GAMBLR.data bundles one GAMBL segmentation per sample, chosen
+#' when the bundle is built by GAMBLR.results' "preference" rule (its
+#' `cn_pipeline` column), so every rule returns it: "qc_score" and
+#' "cnv_master" say so, and with a saved selection, samples it lacks are
+#' dropped and those it assigns to another pipeline get the bundled
+#' segments, with a message. Not used with `pipeline`.
 #' @param ... Additional parameters to be passed to the function.
 #'
 #' @return A data frame with CN segments for the specified region, with a
 #' `pipeline` column naming each segment's source ("gambl" for the bundled
 #' segments; published sources add source_id, purity and ploidy columns).
+#' Bundled segments also have `cn_pipeline` (the GAMBL pipeline the sample's
+#' segments come from, e.g. battenberg, purecn, gatk_cnv) and `cn_type`
+#' ("absolute", or "relative" for gatk_cnv/cnvkit segments that couldn't be
+#' calibrated to absolute copy number), in newer GAMBLR.data databases.
 #'
 #' @import dplyr
 #' @export
@@ -80,11 +84,15 @@ get_cn_segments = function(these_samples_metadata,
 
   #source_rule: GAMBLR.data has one GAMBL segmentation per sample, so only a
   #saved selection changes anything (the samples kept)
-  if (!identical(source_rule, "cnv_master")) {
+  saved_selection = NULL
+  if (!identical(source_rule, "preference")) {
     if (!is.null(pipeline)) stop("give pipeline or source_rule, not both")
-    if (is.character(source_rule) && length(source_rule) == 1 && source_rule %in% c("qc_score", "preference")) {
-      message("GAMBLR.data bundles one GAMBL segmentation per sample (the combined merge's), ",
-              "so source_rule = \"", source_rule, "\" returns it; choosing among pipelines needs GAMBLR.results")
+    if (is.character(source_rule) && length(source_rule) == 1 && source_rule %in% c("qc_score", "cnv_master")) {
+      if (!identical(source_rule, "cnv_master")) {
+        message("GAMBLR.data bundles one GAMBL segmentation per sample (chosen by GAMBLR.results' \"preference\" ",
+                "rule; see cn_pipeline), so source_rule = \"", source_rule, "\" returns it; choosing among ",
+                "pipelines needs GAMBLR.results")
+      }
     } else {
       sel = if (is.character(source_rule)) {
         if (!file.exists(source_rule)) stop("source_rule must be \"cnv_master\", \"qc_score\", \"preference\", ",
@@ -102,11 +110,7 @@ get_cn_segments = function(these_samples_metadata,
                 " sample(s) with no pipeline chosen by source_rule")
         metadata = metadata[!lacking, , drop = FALSE]
       }
-      n_other = sum(sel$sample_id %in% metadata$sample_id & !sel$pipeline %in% "gambl")
-      if (n_other > 0) {
-        message(n_other, " sample(s) get the bundled GAMBL segments in place of the pipeline chosen in ",
-                "source_rule (GAMBLR.data bundles one GAMBL segmentation per sample)")
-      }
+      saved_selection = sel
     }
   }
 
@@ -142,6 +146,16 @@ get_cn_segments = function(these_samples_metadata,
     all_segs = GAMBLR.data::get_cn_segments_from_db(projection = projection,
                                                     sample_ids = sample_ids)
     all_segs$pipeline = rep("gambl", nrow(all_segs))
+    # a saved selection naming another pipeline than the bundled one still gets the bundled segments
+    if (!is.null(saved_selection) && "cn_pipeline" %in% colnames(all_segs)) {
+      bundled = unique(all_segs[, c("ID", "cn_pipeline")])
+      chosen = saved_selection$pipeline[match(bundled$ID, saved_selection$sample_id)]
+      n_other = sum(!is.na(chosen) & chosen != bundled$cn_pipeline)
+      if (n_other > 0) {
+        message(n_other, " sample(s) get the bundled GAMBL segments (cn_pipeline) in place of the pipeline chosen in ",
+                "source_rule (GAMBLR.data bundles one GAMBL segmentation per sample)")
+      }
+    }
     if (!is.null(published)) {
       all_segs = dplyr::bind_rows(all_segs, published)
     }
